@@ -69,7 +69,7 @@ $CAMversion='v2.0';
 $DBhostname= 'zonecalcdbp01.mysql.database.azure.com';
  $DBuser= 'MarcoBischero@zonecalcdbp01';
  $DBpasswd= 'Aqlt709_!';
- $DBname= 'zonecalcdbp01';
+ $DBname= 'zonecalculator';
  $DBPrefix= '';
  $DBOld= '';
  $whitelist = array(
@@ -82,7 +82,7 @@ if(in_array($_SERVER['REMOTE_ADDR'], $whitelist)){
 $DBhostname= 'zonecalcdbp01.mysql.database.azure.com';
  $DBuser= 'MarcoBischero@zonecalcdbp01';
  $DBpasswd= 'Aqlt709_!';
- $DBname= 'zonecalcdbp01';
+ $DBname= 'zonecalculator';
  $DBPrefix= '';
  $DBOld= '';
 }
