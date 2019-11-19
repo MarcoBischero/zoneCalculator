@@ -79,10 +79,10 @@ $CAMversion='v2.0';
 
 if(in_array($_SERVER['REMOTE_ADDR'], $whitelist)){
     $CAMversion='v2.0';
-$DBhostname= 'localhost';
- $DBuser= 'mycam2';
- $DBpasswd= 'aqlt709';
- $DBname= 'zoneCalculator';
+$DBhostname= 'zonecalcdbp01.mysql.database.azure.com';
+ $DBuser= 'MarcoBischero@zonecalcdbp01';
+ $DBpasswd= 'Aqlt709_!';
+ $DBname= 'zonecalcdbp01';
  $DBPrefix= '';
  $DBOld= '';
 }
