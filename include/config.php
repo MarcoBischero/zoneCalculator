@@ -66,10 +66,10 @@ $message_logout = "<link href=\"style.css\" rel=\"stylesheet\" type=\"text/css\"
 $mail_host="10.10.10.33";
 $server_url= $_SERVER['SERVER_NAME'];
 $CAMversion='v2.0';
- $DBhostname= 'localhost';
- $DBuser= 'mycam2';
- $DBpasswd= 'aqlt709';
- $DBname= 'zoneCalculator';
+$DBhostname= 'zonecalcdbp01.mysql.database.azure.com';
+ $DBuser= 'MarcoBischero@zonecalcdbp01';
+ $DBpasswd= 'Aqlt709_!';
+ $DBname= 'zonecalcdbp01';
  $DBPrefix= '';
  $DBOld= '';
  $whitelist = array(
