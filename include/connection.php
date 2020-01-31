@@ -8,7 +8,6 @@ $user = $DBuser;
 $pwd = $DBpasswd;
 $db_name = $DBname;
 
-
 $conn=mysqli_init(); 
 mysqli_ssl_set($conn, NULL, NULL, {ca-cert filename}, NULL, NULL); 
 mysqli_real_connect($conn, $DBhostname, $DBuser, $DBpasswd, $DBname, 3306);
