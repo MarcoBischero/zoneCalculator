@@ -66,8 +66,8 @@ $message_logout = "<link href=\"style.css\" rel=\"stylesheet\" type=\"text/css\"
 $mail_host="10.10.10.33";
 $server_url= $_SERVER['SERVER_NAME'];
 $CAMversion='v2.0';
-$DBhostname= 'zonecalcdb.mysql.database.azure.com';
- $DBuser= 'zonecalc@zonecalcdb';
+$DBhostname= 'zonecalcdb.mariadb.database.azure.com';
+ $DBuser= 'zonecalculator@zonecalcdb';
  $DBpasswd= 'T7r3mGFp_Me6nF-zXR';
  $DBname= 'zonecalculator';
  $DBPrefix= '';
@@ -79,8 +79,8 @@ $DBhostname= 'zonecalcdb.mysql.database.azure.com';
 
 if(in_array($_SERVER['REMOTE_ADDR'], $whitelist)){
     $CAMversion='v2.0';
-$DBhostname= 'zonecalcdb.mysql.database.azure.com';
- $DBuser= 'zonecalc@zonecalcdb';
+$DBhostname= 'zonecalcdb.mariadb.database.azure.com';
+ $DBuser= 'zonecalculator@zonecalcdb';
  $DBpasswd= 'T7r3mGFp_Me6nF-zXR';
  $DBname= 'zonecalculator';
  $DBPrefix= '';
