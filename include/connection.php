@@ -10,10 +10,10 @@ $db_name = $DBname;
 
 #Do not edit
 //--------------------------------------------------------------------------------------------------
-#$conn = mysql_connect($host, $user, $pwd) or die(mysql_error());
-$conn = new mysqli($host, $user, $pwd);
-mysqli_select_db ($db);
-#mysql_select_db($db_name,$conn)  or die(mysql_error());
+#$conn = mysqli_connect($host, $user, $pwd) or die(mysqli_error($conn));
+$conn = mysqli_connect($host, $username, $password, $db) or die("Error message...");
+#mysqli_select_db ($db);
+#mysqli_select_db($db_name,$conn)  or die(mysqli_error($conn));
 define("CONN", $conn);
 //--------------------------------------------------------------------------------------------------
 

@@ -192,9 +192,9 @@ cancella_random_key($DBPrefix);
 				for($c=0;$c<6;$c++){
 					$query = 'SELECT * FROM '.$DBPrefix.'calendar_items,'.$DBPrefix.'pasti WHERE calendar_items.column='.$c.' AND calendar_items.order='.$i.' AND calendar_items.cod_pasto=pasti.codice_pasto AND calendar_items.id_user='.$_COOKIE["id"];
 					//echo $query;
-					$result = mysql_query($query,CONN) or die('Query fallita: ' . mysql_error());
+					$result = mysqli_query($query,CONN) or die('Query fallita: ' . mysqli_error($conn));
 					echo '<th id="'.$c.$i.'"></th>';
-					if($row = mysql_fetch_array($result, MYSQL_ASSOC)){
+					if($row = mysqli_fetch_array($result, MYSQL_ASSOC)){
 						setcookie($c.$i, $row["cod_pasto"].";".rawurldecode($row["nome"]).' | '.$row['blocks'], strtotime( '+365 days' ),"/" );
 					}
 				}
@@ -241,8 +241,8 @@ cancella_random_key($DBPrefix);
       <?
 				$sql_tipo = "SELECT * FROM ".$DBPrefix."pasti WHERE mealType='3'";
 				//echo $sql_azienda;
-				$result_tipo = mysql_query($sql_tipo,CONN);
-				while ($row_tipo = mysql_fetch_array($result_tipo, MYSQL_ASSOC)) {
+				$result_tipo = mysqli_query($sql_tipo,CONN);
+				while ($row_tipo = mysqli_fetch_array($result_tipo, MYSQL_ASSOC)) {
 
   ?>
         <li style="cursor:pointer" id="<?=$row_tipo['codice_pasto']?>" class="draggable"><? echo $row_tipo['nome'].' | '.$row_tipo['blocks']?></li>
@@ -257,8 +257,8 @@ cancella_random_key($DBPrefix);
       <?
 				$sql_tipo = "SELECT * FROM ".$DBPrefix."pasti WHERE mealType='0'";
 				//echo $sql_azienda;
-				$result_tipo = mysql_query($sql_tipo,CONN);
-				while ($row_tipo = mysql_fetch_array($result_tipo, MYSQL_ASSOC)) {
+				$result_tipo = mysqli_query($sql_tipo,CONN);
+				while ($row_tipo = mysqli_fetch_array($result_tipo, MYSQL_ASSOC)) {
 
   ?>
         <li style="cursor:pointer" id="<?=$row_tipo['codice_pasto']?>" class="draggable"><? echo $row_tipo['nome'].' | '.$row_tipo['blocks']?></li>
@@ -273,8 +273,8 @@ cancella_random_key($DBPrefix);
       <?
 				$sql_tipo = "SELECT * FROM ".$DBPrefix."pasti WHERE mealType='1'";
 				//echo $sql_azienda;
-				$result_tipo = mysql_query($sql_tipo,CONN);
-				while ($row_tipo = mysql_fetch_array($result_tipo, MYSQL_ASSOC)) {
+				$result_tipo = mysqli_query($sql_tipo,CONN);
+				while ($row_tipo = mysqli_fetch_array($result_tipo, MYSQL_ASSOC)) {
 
   ?>
         <li style="cursor:pointer" id="<?=$row_tipo['codice_pasto']?>" class="draggable"><? echo $row_tipo['nome'].' | '.$row_tipo['blocks']?></li>
@@ -289,8 +289,8 @@ cancella_random_key($DBPrefix);
       <?
 				$sql_tipo = "SELECT * FROM ".$DBPrefix."pasti WHERE mealType='2'";
 				//echo $sql_azienda;
-				$result_tipo = mysql_query($sql_tipo,CONN);
-				while ($row_tipo = mysql_fetch_array($result_tipo, MYSQL_ASSOC)) {
+				$result_tipo = mysqli_query($sql_tipo,CONN);
+				while ($row_tipo = mysqli_fetch_array($result_tipo, MYSQL_ASSOC)) {
 
   ?>
         <li style="cursor:pointer" id="<?=$row_tipo['codice_pasto']?>"  class="draggable"><? echo $row_tipo['nome'].' | '.$row_tipo['blocks']?></li>

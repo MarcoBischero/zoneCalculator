@@ -11,9 +11,9 @@ if(!isset($_SESSION['userid'])){
 			$id=fix_special_char_sql($_SESSION['userid']['id']);
 			$auth = "SELECT id,id_ruolo,mode FROM ".$DBPrefix."risorse WHERE id=".$id;
 		 }
-		$result_auth = mysql_query($auth,CONN);
-		@$row=mysql_fetch_array($result_auth);
-		@$rows=mysql_num_rows($result_auth);
+		$result_auth = mysqli_query($auth,CONN);
+		@$row=mysqli_fetch_array($result_auth);
+		@$rows=mysqli_num_rows($result_auth);
 		if ($rows>0){
 			lastaccess($row['id'],$_SERVER['REMOTE_ADDR'],$DBPrefix); //-> update last access
 			$userinfo['id']= $row['id'];
@@ -30,17 +30,17 @@ if(is_array($_SESSION['userid'])){
 	if(is_numeric($_SESSION['userid']['ruolo']) && $_SESSION['userid']['ruolo']<>0){
 		//echo $_SESSION['userid']['id'];
 		$sql = "SELECT id_feature FROM ".$DBPrefix."ruoli_features WHERE id_ruolo=".$_SESSION['userid']['ruolo'];
-		$result = mysql_query($sql,CONN);
-		$rows = mysql_num_rows($result);
+		$result = mysqli_query($sql,CONN);
+		$rows = mysqli_num_rows($result);
 		if($rows!=0){
-			while($row = mysql_fetch_array($result,MYSQL_ASSOC)){
+			while($row = mysqli_fetch_array($result,MYSQL_ASSOC)){
 				//build menu with the enabled pages
 				//create a variable for each page for autentication
 				$sql = "SELECT descrizione,pagina, ordine, class FROM ".$DBPrefix."features WHERE id=".$row['id_feature'];
-				$result_pg = mysql_query($sql,CONN);
-				$rows_pg = mysql_num_rows($result_pg);
+				$result_pg = mysqli_query($sql,CONN);
+				$rows_pg = mysqli_num_rows($result_pg);
 				if($rows_pg!=0){
-					$row_pg = mysql_fetch_array($result_pg,MYSQL_ASSOC);
+					$row_pg = mysqli_fetch_array($result_pg,MYSQL_ASSOC);
 					$pg = trim($_GET['pg']);
 					$pg = str_replace('..','',$pg);
 					$page_menu[$row_pg['pagina']] = $row_pg['ordine'].':'.$row_pg['descrizione'].':'.$row_pg['class']; //add array elements for menu

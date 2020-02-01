@@ -11,7 +11,7 @@ $check_key = false;
 $pwdform = new HTML_Crypt(); 
 $key=random_string();
 $sql="INSERT INTO ".$DBPrefix."random_key(codice,data) VALUES('".$key."',NOW())";
-$result_sql=mysql_query($sql,CONN);
+$result_sql=mysqli_query($sql,CONN);
 $pwdform->setText('<input name="'.$key.'" type="password" class="input" id="'.$key.'" size="20" value=""/>');
 $url=fix_special_char($_SERVER['QUERY_STRING'],1);
 //colore expose
@@ -44,8 +44,8 @@ if(isset($_POST['Entra'])){
 	}
 	$sql="SELECT * from ".$DBPrefix."random_key WHERE codice='".$pwdkey."'";
 	
-	$result=mysql_query($sql,CONN);
-	$rows=mysql_num_rows($result);
+	$result=mysqli_query($sql,CONN);
+	$rows=mysqli_num_rows($result);
 	if($rows>0){
 		$check_key = true;
 	}
@@ -53,20 +53,20 @@ if(isset($_POST['Entra'])){
 	$password=trim(fix_special_char_sql($password));
 	if(strlen($username)>0 && strlen($password)>0 && $check_key = true){
 		$sql = "SELECT id FROM ".$DBPrefix."risorse WHERE username='".fix_special_char_sql($username)."'";
-		$result = mysql_query($sql,CONN);
-		$rows =  mysql_num_rows($result);
+		$result = mysqli_query($sql,CONN);
+		$rows =  mysqli_num_rows($result);
 		if($rows!=0){
 		
-			$row = mysql_fetch_array($result, MYSQL_ASSOC);
+			$row = mysqli_fetch_array($result, MYSQL_ASSOC);
 			$password = md5(fix_special_char_sql($password)).":".md5($row['id']);
 			$sql = "SELECT id,id_ruolo,nome,cognome, mode,sesso,cookie FROM ".$DBPrefix."risorse WHERE username='".fix_special_char_sql($username)."' AND password='".$password."'";
-			$result = mysql_query($sql,CONN);
-			$rows =  mysql_num_rows($result);
+			$result = mysqli_query($sql,CONN);
+			$rows =  mysqli_num_rows($result);
 			if($rows!=0){				
-				$row = mysql_fetch_array($result, MYSQL_ASSOC);
+				$row = mysqli_fetch_array($result, MYSQL_ASSOC);
 				$key = random_string();
 				$update= "UPDATE ".$DBPrefix."risorse SET rand_key='".$key."' WHERE id=".$row['id'];
-				$result_update = mysql_query($update);
+				$result_update = mysqli_query($update);
 				if($row['cookie']=='1'){
 					setcookie("id", $row['id'], time()+60*60*24*30, "/" ,NULL,0); 
 					setcookie("key", $key, time()+60*60*24*30, "/" ,NULL,0);

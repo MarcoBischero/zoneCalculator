@@ -6,10 +6,10 @@ header('Content-Type: application/json; charset=utf-8');
 if(fix_special_char_sql($_GET['alimID'])!='' && fix_special_char_sql($_GET['pgc'])!='' && isset($_GET['grams'])){
 	$alimID=fix_special_char_sql($_GET['alimID']);
 	$query="SELECT proteine,grassi,carboidrati,img,perc_prot FROM ".$DBPrefix."alimenti,".$DBPrefix."tipo,".$DBPrefix."fonte Where codice_tipo=cod_tipo AND codice_fonte=cod_fonte AND codice_alimento=".$alimID." ORDER BY nome ASC";
-	$result=mysql_query($query, $conn);
+	$result=mysqli_query($query, $conn);
 	if($result){
 		$data = array();
-		while($row=mysql_fetch_array($result,MYSQL_ASSOC)){        
+		while($row=mysqli_fetch_array($result,MYSQL_ASSOC)){        
 			if($_GET['pgc']==100){
 				$data['proteine']=$row['proteine']; 
 				$data['grassi']=$row['grassi'];
@@ -29,7 +29,7 @@ if(fix_special_char_sql($_GET['alimID'])!='' && fix_special_char_sql($_GET['pgc'
 		}
 		$data['queryStatus'] = 'Success';	
 	}else{
-		 $data['queryStatus'] = 'Error:'.mysql_error(CONN);  
+		 $data['queryStatus'] = 'Error:'.mysqli_error(CONN);  
 	}
  
 	echo json_encode($data, JSON_NUMERIC_CHECK);
@@ -41,7 +41,7 @@ if(fix_special_char_sql($_GET['alimID'])!='' && fix_special_char_sql($_GET['pgc'
 	//$data['cookies']=$cookies[00];
 	$queryDelCal="DELETE FROM calendar_items WHERE id_user=".$cod_user;
 	//$data['query']=$query;
-	$resultDelCal=mysql_query($queryDelCal, $conn);
+	$resultDelCal=mysqli_query($queryDelCal, $conn);
 		for ($col=0;$col<6;$col++){
 			for($row=0;$row<6;$row++){
 				$colString=(string)$col;
@@ -56,11 +56,11 @@ if(fix_special_char_sql($_GET['alimID'])!='' && fix_special_char_sql($_GET['pgc'
 					//while($error == false){
 						$query="INSERT INTO ".$DBPrefix."calendar_items(`column`, `order`, `id_user`, `cod_pasto`) VALUES ('".$col."','".$row."','".$cod_user."','".$pastoID."');";
 						//$data['query']=$query;
-						$resultSave = mysql_query($query, $conn);
+						$resultSave = mysqli_query($query, $conn);
 						if(!$resultSave){
 							$error= true;
-							$data['queryStatus'] = 'Error:'.mysql_error(CONN); 
-							// die('Could not update data: ' . mysql_error());
+							$data['queryStatus'] = 'Error:'.mysqli_error(CONN); 
+							// die('Could not update data: ' . mysqli_error($conn));
 							}else{
 								$data['query'.$col.$row] = 'QuerySuccess';  
 							}
@@ -76,9 +76,9 @@ if(fix_special_char_sql($_GET['alimID'])!='' && fix_special_char_sql($_GET['pgc'
 if($_GET['opt']=="chart"){
 	$data_points = array();
 	$query="SELECT lastCheck, peso, percentualeMG, percentualeMM, vita, anche, addome FROM ".$DBPrefix."prot_need WHERE (cod_user=".$_COOKIE['id'].") ORDER BY lastCheck ASC";
-	$result=mysql_query($query, $conn);
+	$result=mysqli_query($query, $conn);
  	$i=0;
-	while($row=mysql_fetch_array($result,MYSQL_ASSOC)){        
+	while($row=mysqli_fetch_array($result,MYSQL_ASSOC)){        
 		$point = array("label" => $row['lastCheck'] , "y" => $row['peso']);
 		$point2 = array("label" => $row['lastCheck'] , "y" => $row['percentualeMG']);
 		$point3 = array("label" => $row['lastCheck'] , "y" => $row['percentualeMM']);
@@ -148,14 +148,14 @@ if(!empty($_GET['pesokg']) && !empty($_GET['altezzacm']) && !empty($_GET['colloc
 				$data["blocchiMin"] = "".$blocchimin."";
 				
 				
-		$resultAddProtNeed = mysql_query("INSERT INTO ".$DBPrefix."prot_need(percentualeMM,percentualeMG,proteineDay,lastCheck,peso, altezza, collo, moltiplicatore, cod_user, blocchi".$queryField.") VALUES ('".$massamagra."','".$percmedia."','".round($proteine,1)."','".date('Y-m-d')."','".$pesokg."','".$altezzacm."' , '".$collocm."' , '".$moltiplicatore."' , '".$cod_user."' , '".$blocchi."'".$queryValue.")",$conn);
+		$resultAddProtNeed = mysqli_query("INSERT INTO ".$DBPrefix."prot_need(percentualeMM,percentualeMG,proteineDay,lastCheck,peso, altezza, collo, moltiplicatore, cod_user, blocchi".$queryField.") VALUES ('".$massamagra."','".$percmedia."','".round($proteine,1)."','".date('Y-m-d')."','".$pesokg."','".$altezzacm."' , '".$collocm."' , '".$moltiplicatore."' , '".$cod_user."' , '".$blocchi."'".$queryValue.")",$conn);
 					//echo $queryAddProtNeed;
 					
 		if($resultAddProtNeed){
 		    $data['queryStatus'] = 'Success';  
 			
 		}else{
-		    $data['queryStatus'] = 'Error:'.mysql_error(CONN);  
+		    $data['queryStatus'] = 'Error:'.mysqli_error(CONN);  
 		}
               echo json_encode($data);
 }
@@ -170,10 +170,10 @@ if(!empty($_GET['idData']) &&!empty($_GET['tipoData']) && !empty($_GET['fonteDat
          $c100 = str_replace(",",".",fix_special_char($_GET['c100Data']));
           $idAlimento = fix_special_char($_GET['idData']);
 
-    $resultUpdate = mysql_query("UPDATE ".$DBPrefix."alimenti SET nome='".fix_special_char_sql($desc_alimento)."', cod_tipo=".$tipo.", cod_fonte=".$fonte.", proteine=".$p100.", carboidrati=".$c100.", grassi=".$g100." WHERE codice_alimento=".$idAlimento, $conn);
+    $resultUpdate = mysqli_query("UPDATE ".$DBPrefix."alimenti SET nome='".fix_special_char_sql($desc_alimento)."', cod_tipo=".$tipo.", cod_fonte=".$fonte.", proteine=".$p100.", carboidrati=".$c100.", grassi=".$g100." WHERE codice_alimento=".$idAlimento, $conn);
 	if(!$resultUpdate){
-		 $data['queryStatus'] = 'Error:'.mysql_error(CONN); 
-		// die('Could not update data: ' . mysql_error());
+		 $data['queryStatus'] = 'Error:'.mysqli_error(CONN); 
+		// die('Could not update data: ' . mysqli_error($conn));
 		 }else{
 			 $data['queryStatus'] = 'Success';  
 		 }
@@ -184,10 +184,10 @@ if(!empty($_GET['idAlimento']) && $_GET['opt']=='DEL')
 {
     $idAlimento = fix_special_char($_GET['idAlimento']);
      
-    $resultDel = mysql_query("DELETE FROM ".$DBPrefix."alimenti WHERE codice_alimento=".$idAlimento, $conn);
+    $resultDel = mysqli_query("DELETE FROM ".$DBPrefix."alimenti WHERE codice_alimento=".$idAlimento, $conn);
 	if(!$resultDel){
-		 $data['queryStatus'] = 'Error:'.mysql_error(CONN); 
-		// die('Could not update data: ' . mysql_error());
+		 $data['queryStatus'] = 'Error:'.mysqli_error(CONN); 
+		// die('Could not update data: ' . mysqli_error($conn));
 		 }else{
 			 $data['queryStatus'] = 'Alimento cancellato con successo';  
 		 }
@@ -196,10 +196,10 @@ if(!empty($_GET['idAlimento']) && $_GET['opt']=='DEL')
  
  if(!empty($_GET['idPasto']) && $_GET['opt']=='DEL'){
 	$idPasto = fix_special_char($_GET['idPasto']);
-  $resultDel = mysql_query("DELETE FROM ".$DBPrefix."pasti WHERE codice_pasto=".$idPasto, $conn);
+  $resultDel = mysqli_query("DELETE FROM ".$DBPrefix."pasti WHERE codice_pasto=".$idPasto, $conn);
 	if(!$resultDel){
-		 $data['queryStatus'] = 'Error:'.mysql_error(CONN); 
-		//die('Could not update data: ' . mysql_error());
+		 $data['queryStatus'] = 'Error:'.mysqli_error(CONN); 
+		//die('Could not update data: ' . mysqli_error($conn));
 		}else{
 			$data['queryStatus'] = 'Pasto cancellato con successo';  
 		}
@@ -208,10 +208,10 @@ if(!empty($_GET['idAlimento']) && $_GET['opt']=='DEL')
 
  if(!empty($_GET['idProtNeed']) && $_GET['opt']=='DEL'){
 	$idProtNeed = fix_special_char($_GET['idProtNeed']);
-  $resultDel = mysql_query("DELETE FROM ".$DBPrefix."prot_need WHERE codice_protneed=".$idProtNeed, $conn);
+  $resultDel = mysqli_query("DELETE FROM ".$DBPrefix."prot_need WHERE codice_protneed=".$idProtNeed, $conn);
 	if(!$resultDel){
-		 $data['queryStatus'] = 'Error:'.mysql_error(CONN); 
-		//die('Could not update data: ' . mysql_error());
+		 $data['queryStatus'] = 'Error:'.mysqli_error(CONN); 
+		//die('Could not update data: ' . mysqli_error($conn));
 		}else{
 			$data['queryStatus'] = 'Misurazione cancellata con successo';  
 		}
@@ -221,10 +221,10 @@ if(!empty($_GET['idAlimento']) && $_GET['opt']=='DEL')
 if(!empty($_GET['pastoID']) && $_GET['operation']!='editMeal')
 {
   $pastoID = fix_special_char($_GET['pastoID']);
-  $result = mysql_query("SELECT proteine,carboidrati,grassi, cod_alimento, gr_alimento, alimenti.nome, pasti.note,pasti.nome AS pastoNome,pasti.mealType FROM ".$DBPrefix."pasti,".$DBPrefix."pasti_alimenti,".$DBPrefix."alimenti WHERE (codice_pasto=".$pastoID." AND codice_pasto=cod_pasto AND cod_alimento=codice_alimento)", $conn);
-	$rows = mysql_num_rows($result);
+  $result = mysqli_query("SELECT proteine,carboidrati,grassi, cod_alimento, gr_alimento, alimenti.nome, pasti.note,pasti.nome AS pastoNome,pasti.mealType FROM ".$DBPrefix."pasti,".$DBPrefix."pasti_alimenti,".$DBPrefix."alimenti WHERE (codice_pasto=".$pastoID." AND codice_pasto=cod_pasto AND cod_alimento=codice_alimento)", $conn);
+	$rows = mysqli_num_rows($result);
 	$i=0;
-	while($row=mysql_fetch_array($result,MYSQL_ASSOC)){
+	while($row=mysqli_fetch_array($result,MYSQL_ASSOC)){
 		$data[$i]['proteine']=fix_special_char($row['proteine']); 
 		$data[$i]['grassi']=fix_special_char($row['grassi']);
 		$data[$i]['carboidrati']=fix_special_char($row['carboidrati']);
@@ -250,9 +250,9 @@ if(!empty($_GET['pastoID']) && $_GET['operation']=='editMeal'){
 	
 	$query = "UPDATE ".$DBPrefix."pasti SET `blocks` = '".$blocks."', `nome` = '".$descMeal."', `mealType` = '".$mealType."', `note` = '".$note."' WHERE `codice_pasto` = '".$pastoID."'";
 	$data['query']=$query;
-	$resultPasto = mysql_query($query,CONN);
+	$resultPasto = mysqli_query($query,CONN);
 	$query = "DELETE FROM  ".$DBPrefix."pasti_alimenti WHERE `cod_pasto` = '".$pastoID."'";
-	$resultDelPasto = mysql_query($query,CONN);
+	$resultDelPasto = mysqli_query($query,CONN);
 					$c=0;
 					while ($c<=7) {
 						$a = fix_special_char_sql($_GET['a'.$c]);
@@ -260,7 +260,7 @@ if(!empty($_GET['pastoID']) && $_GET['operation']=='editMeal'){
 						
 						if ($a !='' && $g !=''){	
 							$query = "INSERT INTO ".$DBPrefix."pasti_alimenti(cod_pasto, cod_alimento, gr_alimento) VALUES ($pastoID,'".$a."' , '".$g."')";
-							$resultalimenti = mysql_query($query,CONN);
+							$resultalimenti = mysqli_query($query,CONN);
 							}
 						$c++;
 					}
@@ -269,13 +269,13 @@ if(!empty($_GET['pastoID']) && $_GET['operation']=='editMeal'){
 						if($resultalimenti){
 							$data['queryStatus']="Success";
 						}else{
-							$data['queryStatus'] = 'Error:'.mysql_error(CONN);  
+							$data['queryStatus'] = 'Error:'.mysqli_error(CONN);  
 						}
 					}else{
-						$data['queryStatus'] = 'Error:'.mysql_error(CONN);  
+						$data['queryStatus'] = 'Error:'.mysqli_error(CONN);  
 					}
 				}else{
-					$data['queryStatus'] = 'Error:'.mysql_error(CONN);  
+					$data['queryStatus'] = 'Error:'.mysqli_error(CONN);  
 				}		
 		echo json_encode($data);	   
 }
@@ -291,15 +291,15 @@ if(fix_special_char_sql($_GET['operation'])=='saveMeal'){
 			if(strlen($nome)!='' && $error == false){
 				$sql = "SELECT * FROM ".$DBPrefix."pasti WHERE nome='".$nome."'";
 				//echo $sql;
-				if (@mysql_num_rows(@mysql_query($sql,CONN)) != 0){
+				if (@mysqli_num_rows(@mysqli_query($sql,CONN)) != 0){
 					print('<div align="center"><img src="img/alert.gif" /><font color="#ff9900"> <strong>Descrizione gi&agrave; esistente nel database</strong></font></div><br>');
 					$error = true;
 				}			
 			}	
 			if (!$error){
 					$query = "INSERT INTO ".$DBPrefix."pasti(nome, mealType, note,blocks,cod_user) VALUES ('".fix_special_char_sql($nome)."','".$tipo."' ,  '".fix_special_char_sql($note)."' , '".$blocks."' , '".$cod_user."')";
-					$resultPasto = mysql_query($query,CONN);
-					$cod_pasto=mysql_insert_id();
+					$resultPasto = mysqli_query($query,CONN);
+					$cod_pasto=mysqli_insert_id($conn);
 					
 					$c=0;
 					while ($c<=7) {
@@ -308,7 +308,7 @@ if(fix_special_char_sql($_GET['operation'])=='saveMeal'){
 						
 						if ($a !='' && $g !=''){
 							$query = "INSERT INTO ".$DBPrefix."pasti_alimenti(cod_pasto, cod_alimento, gr_alimento) VALUES ($cod_pasto,'".$a."' , '".$g."')";
-							$result = mysql_query($query,CONN);
+							$result = mysqli_query($query,CONN);
 							}
 						$c++;
 					}
@@ -316,10 +316,10 @@ if(fix_special_char_sql($_GET['operation'])=='saveMeal'){
 					if($resultPasto){
 						$data['queryStatus']="Success";
 					}else{
-					$data['queryStatus'] = 'Error:'.mysql_error(CONN);  
+					$data['queryStatus'] = 'Error:'.mysqli_error(CONN);  
 					}
 				}else{
-					$data['queryStatus'] = 'Error:'.mysql_error(CONN);  
+					$data['queryStatus'] = 'Error:'.mysqli_error(CONN);  
 				}
 					
 			}
@@ -340,7 +340,7 @@ if($_GET['operation']=='addAlim'){
 			if(strlen($nome)!='' && $error == false){
 				$sql = "SELECT * FROM ".$DBPrefix."alimenti WHERE nome='".$nome."'";
 				//echo $sql;
-				if (@mysql_num_rows(@mysql_query($sql,CONN)) != 0){
+				if (@mysqli_num_rows(@mysqli_query($sql,CONN)) != 0){
 					print('<div align="center"><img src="img/alert.gif" /><font color="#ff9900"> <strong>Descrizione gi&agrave; esistente nel database</strong></font></div><br>');
 					$error = true;
 				}			
@@ -372,14 +372,14 @@ if($_GET['operation']=='addAlim'){
 			}						
 			if (!$error){
 					$query = "INSERT INTO ".$DBPrefix."alimenti(nome, proteine, grassi, carboidrati, cod_tipo, cod_fonte) VALUES ('".$nome."','".round($proteine,1)."','".round($grassi,1)."','".round($carboidrati,1)."','".$tipo."' , '".$fonte."')";
-					$result = mysql_query($query,CONN);
+					$result = mysqli_query($query,CONN);
 				$data = array();
 				
 					if(!$result){
-					 $data['queryStatus'] = 'Error:'.mysql_error(CONN); 
-					//die('Could not update data: ' . mysql_error());
+					 $data['queryStatus'] = 'Error:'.mysqli_error(CONN); 
+					//die('Could not update data: ' . mysqli_error($conn));
 					}else{
-						$data['id'] = mysql_insert_id();
+						$data['id'] = mysqli_insert_id($conn);
 						$data['queryStatus'] = 'Alimento inserito con successo';  
 					}
 				echo json_encode($data);

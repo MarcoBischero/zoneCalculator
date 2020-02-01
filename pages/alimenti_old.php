@@ -187,8 +187,8 @@ if(trim($_GET['act'])!="add" && trim($_GET['act'])!="edit" && trim($_GET['act'])
 		$count=querycount($query);
 			offset($count,10,"");			
 			$query .=" LIMIT $offset,$limit";	
-			$result = mysql_query($query,CONN) or die('Query fallita: ' . mysql_error());
-			$rows = mysql_num_rows($result);
+			$result = mysqli_query($query,CONN) or die('Query fallita: ' . mysqli_error($conn));
+			$rows = mysqli_num_rows($result);
 		if($rows>0){
 	?>
 	<div id="table_alimenti">
@@ -204,7 +204,7 @@ if(trim($_GET['act'])!="add" && trim($_GET['act'])!="edit" && trim($_GET['act'])
 		<?
 			$conta = 0;
 			$color = "#FFFFFF";
-			while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
+			while ($row = mysqli_fetch_array($result, MYSQL_ASSOC)) {
 			$c_menu++;
 				if ($conta == 1){
 					$color = "#26689D";
@@ -215,12 +215,12 @@ if(trim($_GET['act'])!="add" && trim($_GET['act'])!="edit" && trim($_GET['act'])
 				}	
 				$sql_tipo = "SELECT * FROM ".$DBPrefix."tipo WHERE codice_tipo=".$row['cod_tipo'];
 				//echo $sql_azienda;
-				$result_tipo = mysql_query($sql_tipo,CONN);
-				$row_tipo = mysql_fetch_array($result_tipo);
+				$result_tipo = mysqli_query($sql_tipo,CONN);
+				$row_tipo = mysqli_fetch_array($result_tipo);
 				$sql_fonte = "SELECT * FROM ".$DBPrefix."fonte WHERE codice_fonte=".$row['cod_fonte'];
 				//echo $sql_azienda;
-				$result_fonte = mysql_query($sql_fonte,CONN);
-				$row_fonte = mysql_fetch_array($result_fonte);
+				$result_fonte = mysqli_query($sql_fonte,CONN);
+				$row_fonte = mysqli_fetch_array($result_fonte);
 				
 		?>
 		<script type="text/JavaScript">
@@ -289,10 +289,10 @@ foreach ($arrayPaging as $page){
 			$userid=trim($_GET['id']);
 			if(is_numeric($userid)){
 				$query = 'SELECT * FROM '.$DBPrefix.'alimenti WHERE codice_alimento='.$userid;
-				$result = mysql_query($query,CONN);
-				$rows = mysql_num_rows($result);
+				$result = mysqli_query($query,CONN);
+				$rows = mysqli_num_rows($result);
 				if ($rows != 0){
-					$row = mysql_fetch_array($result, MYSQL_ASSOC);
+					$row = mysqli_fetch_array($result, MYSQL_ASSOC);
 					$nome = fix_special_char($row['nome']);
 					$proteine = fix_special_char($row['proteine']);
 					$carboidrati = fix_special_char($row['carboidrati']);
@@ -324,7 +324,7 @@ foreach ($arrayPaging as $page){
 			if(strlen($nome)!=0 && $error == false){
 				if ($edit == true) $nome_sql = " AND codice_alimento <>".$userid;
 				$sql = "SELECT nome FROM ".$DBPrefix."alimenti WHERE nome='".$nome."'".$nome_sql;
-				if (@mysql_num_rows(@mysql_query($sql,CONN)) != 0){
+				if (@mysqli_num_rows(@mysqli_query($sql,CONN)) != 0){
 					print('<div align="center"><img src="img/alert.gif" /><font color="#ff9900"> <strong>Descrizione gi&agrave; esistente nel database</strong></font></div><br>');
 					$error = true;
 				}			
@@ -347,14 +347,14 @@ foreach ($arrayPaging as $page){
 			if (!$error){
 				if($edit==false){
 				$query = "INSERT INTO ".$DBPrefix."alimenti(nome, proteine, grassi, carboidrati, cod_tipo, cod_fonte) VALUES ('".$nome."','".$proteine."','".$grassi."','".$carboidrati."','".$tipo."' , '".$fonte."')";
-				$result = mysql_query($query,CONN);
+				$result = mysqli_query($query,CONN);
 				
 				}else{
 	
 					$query = "UPDATE ".$DBPrefix."alimenti SET nome='".fix_special_char_sql($nome)."',proteine='".fix_special_char_sql($proteine)."',grassi='".fix_special_char_sql($grassi)."',carboidrati='".fix_special_char_sql($carboidrati)."',cod_tipo='".fix_special_char_sql($tipo)."',cod_fonte='".fix_special_char_sql($fonte)."' WHERE codice_alimento='".$userid."'";
 				//echo $query;
 				//exit;
-				$result = mysql_query($query,CONN);
+				$result = mysqli_query($query,CONN);
 				}
 				
 				print $message_successful;
@@ -364,7 +364,7 @@ foreach ($arrayPaging as $page){
 		}
 		if(isset($_POST['Cancella'])){
 			$query = "DELETE FROM ".$DBPrefix."alimenti WHERE codice_alimento=".$userid."";
-			$result = mysql_query($query,CONN);
+			$result = mysqli_query($query,CONN);
 
 			print $message_successful;
 			header("Refresh: 1; URL=".$_SERVER['PHP_SELF'].'?pg='.$pg."");
@@ -403,10 +403,10 @@ foreach ($arrayPaging as $page){
 	  <?
 	  $sql_tipo = "SELECT * FROM ".$DBPrefix."tipo ORDER BY codice_tipo ASC";
 		//echo $sql_azienda;
-		$result_tipo = mysql_query($sql_tipo,CONN);
-		$rows_tipo = mysql_num_rows($result_tipo);
+		$result_tipo = mysqli_query($sql_tipo,CONN);
+		$rows_tipo = mysqli_num_rows($result_tipo);
 		if($rows_tipo!=0){
-			while ($row_tipo=mysql_fetch_array($result_tipo,MYSQL_ASSOC)){
+			while ($row_tipo=mysqli_fetch_array($result_tipo,MYSQL_ASSOC)){
 		?>
       <option value="<?=$row_tipo['codice_tipo']?>" <? if($row_tipo['codice_tipo']==fix_special_char($_GET['tipo'])) echo "SELECTED" ?>><?=$row_tipo['descrizione']?></option>
 	  <?
@@ -424,10 +424,10 @@ foreach ($arrayPaging as $page){
 	  <?
 	  $sql_fonte = "SELECT * FROM ".$DBPrefix."fonte ORDER BY codice_fonte ASC";
 		//echo $sql_azienda;
-		$result_fonte = mysql_query($sql_fonte,CONN);
-		$rows_fonte = mysql_num_rows($result_fonte);
+		$result_fonte = mysqli_query($sql_fonte,CONN);
+		$rows_fonte = mysqli_num_rows($result_fonte);
 		if($rows_fonte!=0){
-			while ($row_fonte=mysql_fetch_array($result_fonte,MYSQL_ASSOC)){
+			while ($row_fonte=mysqli_fetch_array($result_fonte,MYSQL_ASSOC)){
 		?>
       <option value="<?=$row_fonte['codice_fonte']?>" <? if($row_fonte['codice_fonte']==fix_special_char($_GET['fonte'])) echo "SELECTED" ?>><?=$row_fonte['descrizione']?></option>
 	  <?
