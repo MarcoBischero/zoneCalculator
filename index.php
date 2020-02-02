@@ -16,7 +16,6 @@ if (!file_exists( 'include/config.php' )){
 
 /*----------------------------------------*/
 $redirect = false;
-//require_once("include/mysql2i.class.php");
 require_once("include/connection.php");
 require_once("include/top.inc.php");
 require_once("include/config.php");
