@@ -3,8 +3,8 @@
     mysql2i.class.php ver 1.5
     
     #fixed statement structure to support legacy versions of PHP older than 5.5
-    #updated mysqli_result
-    #fixed mysqli_fetch_object so third param defaults to an array
+    #updated mysql_result
+    #fixed mysql_fetch_object so third param defaults to an array
     
     ver 1.0
     
@@ -16,7 +16,7 @@
       
       public static $currObj;
       
-      public static function mysqli_affected_rows($link=null){
+      public static function mysql_affected_rows($link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -26,7 +26,7 @@
           
       }
       
-      public static function mysqli_client_encoding($link=null){
+      public static function mysql_client_encoding($link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -36,7 +36,7 @@
           
       }
       
-      public static function mysqli_close($link=null){
+      public static function mysql_close($link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -46,7 +46,7 @@
           
       }
 
-      public static function mysqli_connect($host = '',$username = '',$passwd = '',$new_link = false,$client_flags = 0){
+      public static function mysql_connect($host = '',$username = '',$passwd = '',$new_link = false,$client_flags = 0){
           
           $link = mysqli_connect($host,$username,$passwd);
           self::$currObj = $link;
@@ -55,7 +55,7 @@
           
       }
 
-      public static function mysqli_create_db($database_name,$link=null){
+      public static function mysql_create_db($database_name,$link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -73,13 +73,13 @@
           
       }
 
-      public static function mysqli_data_seek($result,$offset){
+      public static function mysql_data_seek($result,$offset){
           
           return mysqli_data_seek($result,$offset);
           
       }
       
-      public static function mysqli_db_name($result,$row,$field=null){
+      public static function mysql_db_name($result,$row,$field=null){
           
           mysqli_data_seek($result,$row);
           
@@ -89,7 +89,7 @@
           
       }
 
-      public static function mysqli_db_query($database,$query,$link=null){
+      public static function mysql_db_query($database,$query,$link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -101,7 +101,7 @@
           
       }
 
-      public static function mysqli_drop_db($database,$link=null){
+      public static function mysql_drop_db($database,$link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -118,7 +118,7 @@
           
       }
 
-      public static function mysqli_errno($link=null){
+      public static function mysql_errno($link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -127,7 +127,7 @@
           return mysqli_errno($link);
       }
 
-      public static function mysqli_error($link=null){
+      public static function mysql_error($link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -136,7 +136,7 @@
           return mysqli_error($link);
       }
 
-      public static function mysqli_escape_string($escapestr){
+      public static function mysql_escape_string($escapestr){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -145,19 +145,19 @@
           return mysqli_real_escape_string($link,$escapestr);
       }
 
-      public static function mysqli_fetch_array($result,$resulttype=MYSQLI_BOTH){
+      public static function mysql_fetch_array($result,$resulttype=MYSQLI_BOTH){
           
           return mysqli_fetch_array($result,$resulttype);
           
       }
 
-      public static function mysqli_fetch_assoc($result){
+      public static function mysql_fetch_assoc($result){
           
           return mysqli_fetch_assoc($result);
           
       }
 
-      public static function mysqli_fetch_field($result,$field_offset=0){
+      public static function mysql_fetch_field($result,$field_offset=0){
           
           if( !empty($field_offset) ){
               for($x=0;$x<$field_offset;$x++){
@@ -169,19 +169,19 @@
           
       }
 
-      public static function mysqli_fetch_lengths($result){
+      public static function mysql_fetch_lengths($result){
           
           return mysqli_fetch_lengths($result);
           
       }
 
-      public static function mysqli_fetch_object($result,$class_name=null,$params=array()){
+      public static function mysql_fetch_object($result,$class_name=null,$params=array()){
           
           return mysqli_fetch_object($result,$class_name,$params);
           
       }
       
-      public static function mysqli_fetch_row($result){
+      public static function mysql_fetch_row($result){
           
           return mysqli_fetch_row($result);
           
@@ -190,7 +190,7 @@
       /*
       credit to andre at koethur dot de from php.net and NinjaKC from stackoverflow.com
       */
-      public static function mysqli_field_flags( $result , $field_offset ) {
+      public static function mysql_field_flags( $result , $field_offset ) {
           static $flags;
           
           $flags_num = mysqli_fetch_field_direct($result,$field_offset)->flags;
@@ -212,7 +212,7 @@
           return $return;
       }      
       
-      public static function mysqli_field_len($result,$field_offset){
+      public static function mysql_field_len($result,$field_offset){
           
           $fieldInfo = mysqli_fetch_field_direct($result,$field_offset);
           
@@ -220,7 +220,7 @@
           
       }
 
-      public static function mysqli_field_name($result,$field_offset){
+      public static function mysql_field_name($result,$field_offset){
           
           $fieldInfo = mysqli_fetch_field_direct($result,$field_offset);
           
@@ -228,13 +228,13 @@
           
       }
 
-      public static function mysqli_field_seek($result,$fieldnr){
+      public static function mysql_field_seek($result,$fieldnr){
           
           return mysqli_field_seek($result,$fieldnr);
           
       }
 
-      public static function mysqli_field_table($result,$field_offset){
+      public static function mysql_field_table($result,$field_offset){
           
           $fieldInfo = mysqli_fetch_field_direct($result,$field_offset);
           
@@ -245,7 +245,7 @@
       /*
       credit to andre at koethur dot de from php.net and NinjaKC from stackoverflow.com
       */
-      public static function mysqli_field_type( $result , $field_offset ) {
+      public static function mysql_field_type( $result , $field_offset ) {
           static $types;
           
           $type_id = mysqli_fetch_field_direct($result,$field_offset)->type;
@@ -260,20 +260,20 @@
           return array_key_exists($type_id, $types)? $types[$type_id] : NULL;
       }      
 
-      public static function mysqli_free_result($result){
+      public static function mysql_free_result($result){
           
           return mysqli_free_result($result);
           
       }
 
-      public static function mysqli_get_client_info(){
+      public static function mysql_get_client_info(){
           
           $link = self::$currObj;
           
           return mysqli_get_client_info($link);
       }
 
-      public static function mysqli_get_host_info($link=null){
+      public static function mysql_get_host_info($link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -282,7 +282,7 @@
           return mysqli_get_host_info($link);
       }
 
-      public static function mysqli_get_proto_info($link=null){
+      public static function mysql_get_proto_info($link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -291,7 +291,7 @@
           return mysqli_get_proto_info($link);
       }
 
-      public static function mysqli_get_server_info($link=null){
+      public static function mysql_get_server_info($link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -300,7 +300,7 @@
           return mysqli_get_server_info($link);
       }
 
-      public static function mysqli_info($link=null){
+      public static function mysql_info($link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -309,7 +309,7 @@
           return mysqli_info($link);
       }
 
-      public static function mysqli_insert_id($link=null){
+      public static function mysql_insert_id($link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -318,7 +318,7 @@
           return mysqli_insert_id($link);
       }
 
-      public static function mysqli_list_dbs($link=null){
+      public static function mysql_list_dbs($link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -335,7 +335,7 @@
           
       }
 
-      public static function mysqli_list_fields($database_name,$table_name,$link=null){
+      public static function mysql_list_fields($database_name,$table_name,$link=null){
          
           if( empty($link) ){
               $link = self::$currObj;
@@ -352,7 +352,7 @@
           
       }
 
-      public static function mysqli_list_processes($link=null){
+      public static function mysql_list_processes($link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -361,7 +361,7 @@
           return mysqli_thread_id($link);
       }
 
-      public static function mysqli_list_tables($database,$link=null){
+      public static function mysql_list_tables($database,$link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -378,19 +378,19 @@
           
       }
 
-      public static function mysqli_num_fields($result){
+      public static function mysql_num_fields($result){
           
           $link = self::$currObj;
           
           return mysqli_field_count($link);
       }
 
-      public static function mysqli_num_rows($result){
+      public static function mysql_num_rows($result){
           
           return mysqli_num_rows($result);
       }
 
-      public static function mysqli_pconnect($host = '',$username = '',$passwd = '',$new_link = false,$client_flags = 0){
+      public static function mysql_pconnect($host = '',$username = '',$passwd = '',$new_link = false,$client_flags = 0){
           
           $link = mysqli_connect('p:'.$host,$username,$passwd);
           if( !$link ){
@@ -402,7 +402,7 @@
           
       }
 
-      public static function mysqli_ping($link=null){
+      public static function mysql_ping($link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -412,7 +412,7 @@
           
       }
 
-      public static function mysqli_query($query,$link=null){
+      public static function mysql_query($query,$link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -423,7 +423,7 @@
           return $r;
       }
 
-      public static function mysqli_real_escape_string($escapestr,$link=null){
+      public static function mysql_real_escape_string($escapestr,$link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -433,9 +433,9 @@
           
       }
 
-      public static function mysqli_result($result,$row,$field=0){
+      public static function mysql_result($result,$row,$field=0){
           
-          //ver 1.5 code credited to Mario Lurig at https://mariolurig.com/coding/mysqli_result-function-to-match-mysqli_result/
+          //ver 1.5 code credited to Mario Lurig at https://mariolurig.com/coding/mysqli_result-function-to-match-mysql_result/
           $numrows = mysqli_num_rows($result); 
           if( $numrows && $row <= ($numrows-1) && $row >=0 ){
                mysqli_data_seek($result,$row);
@@ -465,7 +465,7 @@
       
       }
 
-      public static function mysqli_select_db($dbname,$link=null){
+      public static function mysql_select_db($dbname,$link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -483,7 +483,7 @@
           
       }
 
-      public static function mysqli_set_charset($charset,$link=null){
+      public static function mysql_set_charset($charset,$link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -493,7 +493,7 @@
           
       }
 
-      public static function mysqli_stat($link=null){
+      public static function mysql_stat($link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -503,7 +503,7 @@
           
       }
 
-      public static function mysqli_tablename($result,$row,$field=null){
+      public static function mysql_tablename($result,$row,$field=null){
           
           mysqli_data_seek($result,$row);
           
@@ -513,7 +513,7 @@
           
       }
 
-      public static function mysqli_thread_id($link=null){
+      public static function mysql_thread_id($link=null){
           
           if( empty($link) ){
               $link = self::$currObj;
@@ -523,7 +523,7 @@
           
       }
 
-      public static function mysqli_unbuffered_query($query,$link=null){
+      public static function mysql_unbuffered_query($query,$link=null){
           
           if( empty($link) ){
               $link = self::$currObj;

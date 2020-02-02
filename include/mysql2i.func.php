@@ -9,290 +9,290 @@ define('MYSQL_BOTH',MYSQLI_BOTH);
 define('MYSQL_NUM',MYSQLI_NUM);
 define('MYSQL_ASSOC',MYSQLI_ASSOC);
 
-function mysqli_affected_rows($link=null){
+function mysql_affected_rows($link=null){
     
-    return mysql2i::mysqli_affected_rows($link);
-    
-}
-
-function mysqli_client_encoding($link=null){
-    
-    return mysql2i::mysqli_client_encoding($link);
+    return mysql2i::mysql_affected_rows($link);
     
 }
 
-function mysqli_close($link=null){
+function mysql_client_encoding($link=null){
     
-    return mysql2i::mysqli_close($link);
-    
-}
-
-function mysqli_connect($host = '',$username = '',$passwd = '',$new_link = false,$client_flags = 0){
-    
-    return mysql2i::mysqli_connect($host,$username,$passwd);
+    return mysql2i::mysql_client_encoding($link);
     
 }
 
-function mysqli_create_db($database_name,$link=null){
+function mysql_close($link=null){
     
-    return mysql2i::mysqli_create_db($database_name,$link);
-    
-}
-
-function mysqli_data_seek($result,$offset){
-    
-    return mysql2i::mysqli_data_seek($result,$offset);
+    return mysql2i::mysql_close($link);
     
 }
 
-function mysqli_db_name($result,$row,$field=null){
+function mysql_connect($host = '',$username = '',$passwd = '',$new_link = false,$client_flags = 0){
     
-    return mysql2i::mysqli_db_name($result,$row,$field);
-    
-}
-
-function mysqli_db_query($database,$query,$link=null){
-    
-    return mysql2i::mysqli_db_query($database,$query,$link);
+    return mysql2i::mysql_connect($host,$username,$passwd);
     
 }
 
-function mysqli_drop_db($database,$link=null){
+function mysql_create_db($database_name,$link=null){
     
-    return mysql2i::mysqli_drop_db($database,$link);
-    
-}
-
-function mysqli_errno($link=null){
-    
-    return mysql2i::mysqli_errno($link);
+    return mysql2i::mysql_create_db($database_name,$link);
     
 }
 
-function mysqli_error($link=null){
+function mysql_data_seek($result,$offset){
     
-    return mysql2i::mysqli_error($link);
-    
-}
-
-function mysqli_escape_string($escapestr){
-    
-    return mysql2i::mysqli_escape_string($escapestr);
+    return mysql2i::mysql_data_seek($result,$offset);
     
 }
 
-function mysqli_fetch_array($result,$resulttype=MYSQLI_BOTH){
+function mysql_db_name($result,$row,$field=null){
     
-    return mysql2i::mysqli_fetch_array($result,$resulttype);
-    
-}
-
-function mysqli_fetch_assoc($result){
-    
-    return mysql2i::mysqli_fetch_assoc($result);
+    return mysql2i::mysql_db_name($result,$row,$field);
     
 }
 
-function mysqli_fetch_field($result,$field_offset=null){
+function mysql_db_query($database,$query,$link=null){
     
-    return mysql2i::mysqli_fetch_field($result,$field_offset);
-    
-}
-
-function mysqli_fetch_lengths($result){
-    
-    return mysql2i::mysqli_fetch_lengths($result);
+    return mysql2i::mysql_db_query($database,$query,$link);
     
 }
 
-function mysqli_fetch_object($result,$class_name=null,$params=null){
+function mysql_drop_db($database,$link=null){
     
-    return mysql2i::mysqli_fetch_object($result,$class_name,$params);
-    
-}
-
-function mysqli_fetch_row($result){
-    
-    return mysql2i::mysqli_fetch_row($result);
+    return mysql2i::mysql_drop_db($database,$link);
     
 }
 
-function mysqli_field_flags($result,$field_offset){
+function mysql_errno($link=null){
     
-    return mysql2i::mysqli_field_flags($result,$field_offset);
-    
-}
-
-function mysqli_field_len($result,$field_offset){
-    
-    return mysql2i::mysqli_field_len($result,$field_offset);
+    return mysql2i::mysql_errno($link);
     
 }
 
-function mysqli_field_name($result,$field_offset){
+function mysql_error($link=null){
     
-    return mysql2i::mysqli_field_name($result,$field_offset);
-    
-}
-
-function mysqli_field_seek($result,$fieldnr){
-    
-    return mysql2i::mysqli_field_seek($result,$fieldnr);
+    return mysql2i::mysql_error($link);
     
 }
 
-function mysqli_field_table($result,$field_offset){
+function mysql_escape_string($escapestr){
     
-    return mysql2i::mysqli_field_table($result,$field_offset);
-    
-}
-
-function mysqli_field_type($result,$field_offset){
-    
-    return mysql2i::mysqli_field_type($result,$field_offset);
+    return mysql2i::mysql_escape_string($escapestr);
     
 }
 
-function mysqli_free_result($result){
+function mysql_fetch_array($result,$resulttype=MYSQLI_BOTH){
     
-    return mysql2i::mysqli_free_result($result);
-    
-}
-
-function mysqli_get_client_info(){
-    
-    return mysql2i::mysqli_get_client_info();
-}
-
-function mysqli_get_host_info($link=null){
-    
-    return mysql2i::mysqli_get_host_info($link);
+    return mysql2i::mysql_fetch_array($result,$resulttype);
     
 }
 
-function mysqli_get_proto_info($link=null){
+function mysql_fetch_assoc($result){
     
-    return mysql2i::mysqli_get_proto_info($link);
-    
-}
-
-function mysqli_get_server_info($link=null){
-    
-    return mysql2i::mysqli_get_server_info($link);
+    return mysql2i::mysql_fetch_assoc($result);
     
 }
 
-function mysqli_info($link=null){
+function mysql_fetch_field($result,$field_offset=null){
     
-    return mysql2i::mysqli_info($link);
-    
-}
-
-function mysqli_insert_id($link=null){
-    
-    return mysql2i::mysqli_insert_id($link);
+    return mysql2i::mysql_fetch_field($result,$field_offset);
     
 }
 
-function mysqli_list_dbs($link=null){
+function mysql_fetch_lengths($result){
     
-    return mysql2i::mysqli_list_dbs();
-    
-}
-
-function mysqli_list_fields($database_name,$table_name,$link=null){
-    
-    return mysql2i::mysqli_list_fields($database_name,$table_name,$link);
+    return mysql2i::mysql_fetch_lengths($result);
     
 }
 
-function mysqli_list_processes($link=null){
+function mysql_fetch_object($result,$class_name=null,$params=null){
     
-    return mysql2i::mysqli_list_processes($link);
-    
-}
-
-function mysqli_list_tables($database,$link){
-    
-    return mysql2i::mysqli_list_tables($database,$link);
+    return mysql2i::mysql_fetch_object($result,$class_name,$params);
     
 }
 
-function mysqli_num_fields($result){
+function mysql_fetch_row($result){
     
-    return mysql2i::mysqli_num_fields($result);
-    
-}
-
-function mysqli_num_rows($result){
-    
-    return mysql2i::mysqli_num_rows($result);
+    return mysql2i::mysql_fetch_row($result);
     
 }
 
-function mysqli_pconnect($host = '',$username = '',$passwd = '',$new_link = false,$client_flags = 0){
+function mysql_field_flags($result,$field_offset){
     
-    return mysql2i::mysqli_pconnect($host,$username,$passwd,$new_link,$client_flags);
-    
-}
-
-function mysqli_ping($link=null){
-    
-    return mysql2i::mysqli_ping($link);
+    return mysql2i::mysql_field_flags($result,$field_offset);
     
 }
 
-function mysqli_query($query,$link=null){
+function mysql_field_len($result,$field_offset){
     
-    return mysql2i::mysqli_query($query,$link);
-    
-}
-
-function mysqli_real_escape_string($escapestr,$link=null){
-    
-    return mysql2i::mysqli_real_escape_string($escapestr,$link);
+    return mysql2i::mysql_field_len($result,$field_offset);
     
 }
 
-function mysqli_result($result,$row,$field=null){
+function mysql_field_name($result,$field_offset){
     
-    return mysql2i::mysqli_result($result,$row,$field);
-    
-}
-
-function mysqli_select_db($dbname,$link=null){
-    
-    return mysql2i::mysqli_select_db($dbname,$link);
+    return mysql2i::mysql_field_name($result,$field_offset);
     
 }
 
-function mysqli_set_charset($charset,$link=null){
+function mysql_field_seek($result,$fieldnr){
     
-    return mysql2i::mysqli_set_charset($charset,$link);
-    
-}
-
-function mysqli_stat($link=null){
-    
-    return mysql2i::mysqli_stat($link);
+    return mysql2i::mysql_field_seek($result,$fieldnr);
     
 }
 
-function mysqli_tablename($result,$row,$field=null){
+function mysql_field_table($result,$field_offset){
     
-    return mysql2i::mysqli_tablename($result,$row,$field);
-    
-}
-
-function mysqli_thread_id($link=null){
-    
-    return mysql2i::mysqli_thread_id($link);
+    return mysql2i::mysql_field_table($result,$field_offset);
     
 }
 
-function mysqli_unbuffered_query($query,$link=null){
+function mysql_field_type($result,$field_offset){
     
-    return mysql2i::mysqli_unbuffered_query($query,$link);
+    return mysql2i::mysql_field_type($result,$field_offset);
+    
+}
+
+function mysql_free_result($result){
+    
+    return mysql2i::mysql_free_result($result);
+    
+}
+
+function mysql_get_client_info(){
+    
+    return mysql2i::mysql_get_client_info();
+}
+
+function mysql_get_host_info($link=null){
+    
+    return mysql2i::mysql_get_host_info($link);
+    
+}
+
+function mysql_get_proto_info($link=null){
+    
+    return mysql2i::mysql_get_proto_info($link);
+    
+}
+
+function mysql_get_server_info($link=null){
+    
+    return mysql2i::mysql_get_server_info($link);
+    
+}
+
+function mysql_info($link=null){
+    
+    return mysql2i::mysql_info($link);
+    
+}
+
+function mysql_insert_id($link=null){
+    
+    return mysql2i::mysql_insert_id($link);
+    
+}
+
+function mysql_list_dbs($link=null){
+    
+    return mysql2i::mysql_list_dbs();
+    
+}
+
+function mysql_list_fields($database_name,$table_name,$link=null){
+    
+    return mysql2i::mysql_list_fields($database_name,$table_name,$link);
+    
+}
+
+function mysql_list_processes($link=null){
+    
+    return mysql2i::mysql_list_processes($link);
+    
+}
+
+function mysql_list_tables($database,$link){
+    
+    return mysql2i::mysql_list_tables($database,$link);
+    
+}
+
+function mysql_num_fields($result){
+    
+    return mysql2i::mysql_num_fields($result);
+    
+}
+
+function mysql_num_rows($result){
+    
+    return mysql2i::mysql_num_rows($result);
+    
+}
+
+function mysql_pconnect($host = '',$username = '',$passwd = '',$new_link = false,$client_flags = 0){
+    
+    return mysql2i::mysql_pconnect($host,$username,$passwd,$new_link,$client_flags);
+    
+}
+
+function mysql_ping($link=null){
+    
+    return mysql2i::mysql_ping($link);
+    
+}
+
+function mysql_query($query,$link=null){
+    
+    return mysql2i::mysql_query($query,$link);
+    
+}
+
+function mysql_real_escape_string($escapestr,$link=null){
+    
+    return mysql2i::mysql_real_escape_string($escapestr,$link);
+    
+}
+
+function mysql_result($result,$row,$field=null){
+    
+    return mysql2i::mysql_result($result,$row,$field);
+    
+}
+
+function mysql_select_db($dbname,$link=null){
+    
+    return mysql2i::mysql_select_db($dbname,$link);
+    
+}
+
+function mysql_set_charset($charset,$link=null){
+    
+    return mysql2i::mysql_set_charset($charset,$link);
+    
+}
+
+function mysql_stat($link=null){
+    
+    return mysql2i::mysql_stat($link);
+    
+}
+
+function mysql_tablename($result,$row,$field=null){
+    
+    return mysql2i::mysql_tablename($result,$row,$field);
+    
+}
+
+function mysql_thread_id($link=null){
+    
+    return mysql2i::mysql_thread_id($link);
+    
+}
+
+function mysql_unbuffered_query($query,$link=null){
+    
+    return mysql2i::mysql_unbuffered_query($query,$link);
     
 }
 ?>
