@@ -10,7 +10,7 @@ $db_name = $DBname;
 
 #Do not edit
 //--------------------------------------------------------------------------------------------------
-$conn = new mysqli($host, $user, $pwd);
+$conn = mysqli_connect($host, $user, $pwd, $db_name);
 mysqli_select_db($db_name,$conn);
 define("CONN", $conn);
 //--------------------------------------------------------------------------------------------------
