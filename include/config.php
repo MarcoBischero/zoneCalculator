@@ -86,7 +86,5 @@ $message_logout = "<link href=\"style.css\" rel=\"stylesheet\" type=\"text/css\"
 	 $DBPrefix= '';
 	 $DBOld= '';
 	}
-	?>
-	<?
 	 $company= 'ZoneCalculator';
-	?>
+?>
