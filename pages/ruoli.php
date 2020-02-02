@@ -5,9 +5,9 @@ $act = trim($_GET['act']);
 if($auth_user==true){
 function querycount_ruoli(){
 		$querycount = 'SELECT count(*) FROM '.$DBPrefix.'ruoli';
-		$result = mysqli_query($querycount,CONN);
+		$result = mysql_query($querycount,CONN);
 		global $count;
-		@list($count) = mysqli_fetch_row($result);
+		@list($count) = mysql_fetch_row($result);
 		return $count;
 }
 offset(querycount_ruoli(),20,"");
@@ -19,8 +19,8 @@ offset(querycount_ruoli(),20,"");
 	?>
 	<?
 		$query = 'SELECT id,descrizione FROM '.$DBPrefix.'ruoli LIMIT '.$offset.','.$limit.'';
-		$result = mysqli_query($query,CONN) or die('Query fallita: ' . mysqli_error($conn));
-		$rows = mysqli_num_rows($result);
+		$result = mysql_query($query,CONN) or die('Query fallita: ' . mysql_error());
+		$rows = mysql_num_rows($result);
 		if($rows>0){
 	?>
         <table width="246" border="0" align="center" cellpadding="0" cellspacing="1" bgcolor="#1B486D">
@@ -30,7 +30,7 @@ offset(querycount_ruoli(),20,"");
           <?
 			$conta = 0;
 			$color = "#FFFFFF";
-			while ($row = mysqli_fetch_array($result, MYSQL_ASSOC)) {
+			while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 			   $get_features = "";
 			   $features_assoc = "";
 				if ($conta == 1){
@@ -41,10 +41,10 @@ offset(querycount_ruoli(),20,"");
 					$color = "#2B72AC";
 				}
 			$query_assoc = 'SELECT id_feature FROM '.$DBPrefix.'ruoli_features WHERE id_ruolo='.$row['id'].'';
-			$result_assoc = mysqli_query($query_assoc,CONN);
-			$rows_assoc = mysqli_num_rows($result_assoc);
+			$result_assoc = mysql_query($query_assoc,CONN);
+			$rows_assoc = mysql_num_rows($result_assoc);
 			if ($rows_assoc != 0){
-			  while ($row_assoc = mysqli_fetch_array($result_assoc, MYSQL_ASSOC)) {
+			  while ($row_assoc = mysql_fetch_array($result_assoc, MYSQL_ASSOC)) {
 				$features_assoc[] = $row_assoc['id_feature'];
 			  }
 			  //print_r($features_assc);
@@ -94,10 +94,10 @@ foreach ($arrayPaging as $page){
 			$ruoloid=trim($_GET['id']);
 			if(is_numeric($ruoloid)){
 				$query = 'SELECT id,descrizione FROM '.$DBPrefix.'ruoli WHERE id='.$ruoloid.'';
-				$result = mysqli_query($query,CONN);
-				$rows = mysqli_num_rows($result);
+				$result = mysql_query($query,CONN);
+				$rows = mysql_num_rows($result);
 				if ($rows != 0){
-					$row = mysqli_fetch_array($result, MYSQL_ASSOC);
+					$row = mysql_fetch_array($result, MYSQL_ASSOC);
 					$descrizione = fix_special_char($row['descrizione']);
 				}
 			}else{
@@ -120,21 +120,21 @@ foreach ($arrayPaging as $page){
 			if (!$error){
 				if($edit==false){
 				  $query = "INSERT INTO ".$DBPrefix."ruoli (descrizione) VALUES ('".fix_special_char_sql($descrizione)."')";
-				  $result = mysqli_query($query,CONN);
-				  $ruoloid = mysqli_insert_id($conn);
+				  $result = mysql_query($query,CONN);
+				  $ruoloid = mysql_insert_id();
 				}else{
 				  $query = "UPDATE ".$DBPrefix."ruoli SET descrizione='".fix_special_char_sql($descrizione)."' WHERE id=".$ruoloid."";
-				  $result = mysqli_query($query,CONN);
+				  $result = mysql_query($query,CONN);
 				
 				  $query = "DELETE FROM ".$DBPrefix."ruoli_features WHERE id_ruolo=".$ruoloid."";
-				  $result = mysqli_query($query,CONN);
+				  $result = mysql_query($query,CONN);
 				}
 
 				foreach($features as $feature){
 					$feature=trim($feature);
 					if(is_numeric($feature)){
 						$query = "INSERT INTO ".$DBPrefix."ruoli_features (id_ruolo,id_feature) VALUES (".$ruoloid.",".fix_special_char_sql($feature).")";
-						$result = mysqli_query($query,CONN);
+						$result = mysql_query($query,CONN);
 					}
 				}
 				
@@ -146,9 +146,9 @@ foreach ($arrayPaging as $page){
 		}
 		if(isset($_POST['Cancella'])){
 			$query = "DELETE FROM ".$DBPrefix."ruoli WHERE id=".$ruoloid."";
-			$result = mysqli_query($query,CONN);
+			$result = mysql_query($query,CONN);
 		    $query = "DELETE FROM ".$DBPrefix."ruoli_features WHERE id_ruolo=".$ruoloid."";
-		    $result = mysqli_query($query,CONN);
+		    $result = mysql_query($query,CONN);
 
 			print $message_successful;
 			#header("Refresh: 1; URL=".$_SERVER['PHP_SELF']."");
@@ -180,10 +180,10 @@ foreach ($arrayPaging as $page){
 			  <select name="features" id="features" class="input" style="width:97%">
 			  <?
 			  $query = 'SELECT id,descrizione FROM '.$DBPrefix.'features';
-			  $result = mysqli_query($query,CONN) or die('Query fallita: ' . mysqli_error($conn));
-			  $rows = mysqli_num_rows($result);
+			  $result = mysql_query($query,CONN) or die('Query fallita: ' . mysql_error());
+			  $rows = mysql_num_rows($result);
 			  if($rows>0){
-			  	while ($row = mysqli_fetch_array($result, MYSQL_ASSOC)) {
+			  	while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 				  if(!in_array($row['id'],$features)){
 			  ?>
                   <option value="<?=addget('features',$row['id'])?>"><?=$row['descrizione']?></option>
@@ -203,10 +203,10 @@ foreach ($arrayPaging as $page){
 				foreach($features as $feature){
 				 if(is_numeric($feature)){
 				   $query = 'SELECT id,descrizione FROM '.$DBPrefix.'features WHERE id='.trim($feature).'';
-				   $result = mysqli_query($query,CONN) or die('Query fallita: ' . mysqli_error($conn));
-				   $rows = mysqli_num_rows($result);
+				   $result = mysql_query($query,CONN) or die('Query fallita: ' . mysql_error());
+				   $rows = mysql_num_rows($result);
 				   if($rows>0){
-				     $row = mysqli_fetch_array($result, MYSQL_ASSOC);
+				     $row = mysql_fetch_array($result, MYSQL_ASSOC);
 			?>
             <tr>
               <td height="20" bgcolor="#1B486D" align="right">ID:<?=$row['id']?>&nbsp;</td>

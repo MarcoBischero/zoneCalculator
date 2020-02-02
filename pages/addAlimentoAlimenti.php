@@ -38,10 +38,10 @@
 										  <?
 										  $sql_tipo = "SELECT * FROM ".$DBPrefix."tipo ORDER BY codice_tipo ASC";
 											echo $sql_tipo;
-											$result_tipo = mysqli_query($sql_tipo,CONN);
-											$rows_tipo = mysqli_num_rows($result_tipo);
+											$result_tipo = mysql_query($sql_tipo,CONN);
+											$rows_tipo = mysql_num_rows($result_tipo);
 											if($rows_tipo!=0){
-												while ($row_tipo=mysqli_fetch_array($result_tipo,MYSQL_ASSOC)){?>
+												while ($row_tipo=mysql_fetch_array($result_tipo,MYSQL_ASSOC)){?>
 									      	<option value="<?=$row_tipo['codice_tipo']?>">
 									      		<?=$row_tipo['descrizione']?>
 									      	</option>
@@ -67,10 +67,10 @@
 										  <?
 										  $sql_tipo = "SELECT * FROM ".$DBPrefix."fonte ORDER BY codice_fonte ASC";
 											//echo $sql_azienda;
-											$result_tipo = mysqli_query($sql_tipo,CONN);
-											$rows_tipo = mysqli_num_rows($result_tipo);
+											$result_tipo = mysql_query($sql_tipo,CONN);
+											$rows_tipo = mysql_num_rows($result_tipo);
 											if($rows_tipo!=0){
-												while ($row_tipo=mysqli_fetch_array($result_tipo,MYSQL_ASSOC)){?>
+												while ($row_tipo=mysql_fetch_array($result_tipo,MYSQL_ASSOC)){?>
 									      	<option value="<?=$row_tipo['codice_fonte']?>">
 									      		<?=$row_tipo['descrizione']?>
 									      	</option>

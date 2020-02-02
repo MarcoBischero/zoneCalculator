@@ -5,10 +5,10 @@ $userid=$_COOKIE['id'];
 			if(is_numeric($userid)){
 				$query = 'SELECT password,cookie FROM '.$DBPrefix.'risorse WHERE id='.$userid;
 				
-				$result = mysqli_query($query,CONN);
-				$rows = mysqli_num_rows($result);
+				$result = mysql_query($query,CONN);
+				$rows = mysql_num_rows($result);
 				if ($rows != 0){
-					$row = mysqli_fetch_array($result, MYSQL_ASSOC);
+					$row = mysql_fetch_array($result, MYSQL_ASSOC);
 					$password = fix_special_char($row['password']);
 				}
 			}else{
@@ -39,7 +39,7 @@ if(isset($_POST['Modifica'])){
 				}
 				$query = "UPDATE ".$DBPrefix."risorse SET ".$sql_password."cookie='".$cookie."' WHERE id=".$userid;
 				
-				$result = mysqli_query($query,CONN);
+				$result = mysql_query($query,CONN);
 				
 				
 				print $message_successful;

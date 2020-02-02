@@ -161,25 +161,25 @@ function menu_filter($nome){
 	return $nome_id;
 }
 
-function mysqli_table_exist($conn,  $db, $tbl){
+function mysql_table_exist($conn,  $db, $tbl){
 	//check if exists a table
 	$tables = array();
-	#$link = @mysqli_connect($host, $user, $pass);
-	@mysqli_select_db($db);
-	$q = @mysqli_query("SHOW TABLES");
-	while ($r = @mysqli_fetch_array($q)) { $tables[] = $r[0]; }
-	@mysqli_free_result($q);
-	@mysqli_close($link);
+	#$link = @mysql_connect($host, $user, $pass);
+	@mysql_select_db($db);
+	$q = @mysql_query("SHOW TABLES");
+	while ($r = @mysql_fetch_array($q)) { $tables[] = $r[0]; }
+	@mysql_free_result($q);
+	@mysql_close($link);
 	if (in_array($tbl, $tables)) { return TRUE; }
 	else { return FALSE; }
 }
 
-function mysqli_field_exist($conn,$db,$tbl,$field){
+function mysql_field_exist($conn,$db,$tbl,$field){
 	//check if exists a field on a table
-	$fields = mysqli_list_fields($db, $tbl, $conn);
-	$column = mysqli_num_fields($fields);
+	$fields = mysql_list_fields($db, $tbl, $conn);
+	$column = mysql_num_fields($fields);
 	for ($i = 0; $i < $column; $i++) {
-	   $fieldschk[]=mysqli_field_name($fields, $i);
+	   $fieldschk[]=mysql_field_name($fields, $i);
 	}
 	if (in_array($field, $fieldschk)) { return TRUE; }
 	else { return FALSE; }
@@ -365,7 +365,7 @@ function get_deletev2($getname,$filtro){
 function lastaccess($session,$ip,$DBPrefix){
 		//EDIT USER
 		$query = 'UPDATE '.$DBPrefix.'risorse SET lastaccess = lastaccessupdate,lastaccessupdate='.time().', ip=ipupdate,ipupdate="'.$ip.'" WHERE  id='.$session.'';
-		$result = mysqli_query($query, CONN);
+		$result = mysql_query($query, CONN);
 		
 }
 function lastaccesshtml($rowaccess,$ip){
@@ -387,16 +387,16 @@ function lastaccesshtml($rowaccess,$ip){
 
 function cancella_random_key($DBPrefix){
 	$query = "DELETE FROM ".$DBPrefix."random_key WHERE (DATE_ADD(data, INTERVAL '1' DAY) <= NOW()) OR (data='0000-00-00 00:00:00')";
-	$result = mysqli_query($query,CONN);
+	$result = mysql_query($query,CONN);
 }
 
 function download_file($id_file,$form,$path="attach/"){
 	if(is_numeric($id_file)){
 		$query_file = "SELECT id,file FROM ".$form."_files WHERE id_file=".$id_file;
-		$result_file = mysqli_query($query_file,CONN);
-		$rows_file = mysqli_num_rows($result_file);
+		$result_file = mysql_query($query_file,CONN);
+		$rows_file = mysql_num_rows($result_file);
 		if($rows_file!=0){
-			$row_file = mysqli_fetch_array($result_file,MYSQL_ASSOC);
+			$row_file = mysql_fetch_array($result_file,MYSQL_ASSOC);
 			$file = $row_file['file'];
 
 			//fix filename input
@@ -473,8 +473,8 @@ function word_promo ($aziendap,$clientep,$dalp,$alp,$DBPrefix){
 		 //-->
 		</script>
 		<?
-        $azienda=mysqli_fetch_array(mysqli_query("SELECT * FROM ".$DBPrefix."anagrafica_azienda WHERE codice_azienda=".fix_special_char($aziendap)));
-		$cliente=mysqli_fetch_array(mysqli_query("SELECT * FROM ".$DBPrefix."anagrafica WHERE codice_cliente=".fix_special_char($clientep)));
+        $azienda=mysql_fetch_array(mysql_query("SELECT * FROM ".$DBPrefix."anagrafica_azienda WHERE codice_azienda=".fix_special_char($aziendap)));
+		$cliente=mysql_fetch_array(mysql_query("SELECT * FROM ".$DBPrefix."anagrafica WHERE codice_cliente=".fix_special_char($clientep)));
 		//	echo "../piano_promo/".$azienda['ragione_sociale']."-".$cliente['ragione_sociale']."-dal ".$dalp."-al-".$alp.".doc";
 			//exit;
 			 $fp = fopen("piano_promo/".$azienda['ragione_sociale']."-".$cliente['ragione_sociale']."-dal-".$dalp."-al-".$alp.".doc", 'w+');
@@ -528,7 +528,7 @@ function word_promo ($aziendap,$clientep,$dalp,$alp,$DBPrefix){
 		
 		$sql="SELECT * FROM ".$DBPrefix."piano_promozionale WHERE cod_azienda=".$azienda['codice_azienda']." AND cod_cliente=".$cliente['codice_cliente']." AND sellinda>='".americandate(fix_special_char($dalp))."' AND sellouta<='".americandate(fix_special_char($alp))."'";
 		//echo $sql;
-		$result=mysqli_query($sql);
+		$result=mysql_query($sql);
 		$str.="<table style='border:thin; border-style:solid' border='1' align='center' cellpadding='0' cellspacing='1' >
 			  <tr>
 				<td width='201' height='20' class='primo_td'> <div align='center'><strong>SELL-IN	</strong></div></td>
@@ -542,11 +542,11 @@ function word_promo ($aziendap,$clientep,$dalp,$alp,$DBPrefix){
 		
 		$conta = 0;
 		$color = '#FFFFFF';
-		$rows=mysqli_num_rows($result);
-		while ($row_piano=mysqli_fetch_array($result)) {
+		$rows=mysql_num_rows($result);
+		while ($row_piano=mysql_fetch_array($result)) {
 			$sql_prod="SELECT * FROM ".$DBPrefix."prodotto WHERE codice='".$row_piano['cod_prodotto']."'";
-			$result_prod=mysqli_query($sql_prod);
-			$row_prod=mysqli_fetch_array($result_prod);
+			$result_prod=mysql_query($sql_prod);
+			$row_prod=mysql_fetch_array($result_prod);
 			$c++;
 			if ($conta == 1){
 				$color = '#26689D';
@@ -596,10 +596,10 @@ function word_order ($aziendap,$clientep,$id_ordinep,$DBPrefix) {
  //-->
 </script>
 <?
-	$azienda=mysqli_fetch_array(mysqli_query("SELECT * FROM ".$DBPrefix."anagrafica_azienda WHERE codice_azienda=".fix_special_char($aziendap)));
-	$azienda_agente=mysqli_fetch_array(mysqli_query("SELECT * FROM ".$DBPrefix."agente_azienda WHERE cod_azienda=".fix_special_char($aziendap)));
-	$agente=mysqli_fetch_array(mysqli_query("SELECT * FROM ".$DBPrefix."risorse WHERE id=".fix_special_char($azienda_agente['cod_agente'])));
-	$cliente=mysqli_fetch_array(mysqli_query("SELECT * FROM ".$DBPrefix."anagrafica WHERE codice_cliente=".fix_special_char($clientep)));
+	$azienda=mysql_fetch_array(mysql_query("SELECT * FROM ".$DBPrefix."anagrafica_azienda WHERE codice_azienda=".fix_special_char($aziendap)));
+	$azienda_agente=mysql_fetch_array(mysql_query("SELECT * FROM ".$DBPrefix."agente_azienda WHERE cod_azienda=".fix_special_char($aziendap)));
+	$agente=mysql_fetch_array(mysql_query("SELECT * FROM ".$DBPrefix."risorse WHERE id=".fix_special_char($azienda_agente['cod_agente'])));
+	$cliente=mysql_fetch_array(mysql_query("SELECT * FROM ".$DBPrefix."anagrafica WHERE codice_cliente=".fix_special_char($clientep)));
 	
  	
 	 $fp = fopen("ordini/".$agente['nome']." ".$agente['cognome']."-".$azienda['ragione_sociale']."-".$cliente['ragione_sociale']."-Ordine n ".fix_special_char($id_ordinep).".doc", 'w+');
@@ -647,17 +647,17 @@ fwrite($fp, $str);
 
 		$idordine=array();
 		$idordine = explode(",",fix_special_char($id_ordinep));
-		$ordine=mysqli_fetch_array(mysqli_query("SELECT * FROM ".$DBPrefix."ordine WHERE codice_ordine=".$idordine[0]));
+		$ordine=mysql_fetch_array(mysql_query("SELECT * FROM ".$DBPrefix."ordine WHERE codice_ordine=".$idordine[0]));
 
     $str2 = " <table align='center'>
         <tr>
         	<td width='526'>
 <div style='font-size:16px; border: thin; border-color:#000000; border-style:solid; width:450px;' align='center'>";
                 $sql = "SELECT valore FROM ".$DBPrefix."opzioni WHERE opzione='intestazione_ordine'";
-						$result = mysqli_query($sql,CONN);
-						$rows = mysqli_num_rows($result);
+						$result = mysql_query($sql,CONN);
+						$rows = mysql_num_rows($result);
 						if($rows!=0)
-							$row = mysqli_fetch_array($result,MYSQL_ASSOC);   
+							$row = mysql_fetch_array($result,MYSQL_ASSOC);   
     $str2 .= $row['valore']." </div>
           </td>
             <td width='319' align='right'>
@@ -704,7 +704,7 @@ fwrite($fp, $str);
     </table><br /><br />";
 	fwrite($fp, $str2);
 foreach($idordine as $key=>$value){
-	$ordine=mysqli_fetch_array(mysqli_query("SELECT * FROM ".$DBPrefix."ordine WHERE codice_ordine=".$value));
+	$ordine=mysql_fetch_array(mysql_query("SELECT * FROM ".$DBPrefix."ordine WHERE codice_ordine=".$value));
 	
 
     $str2="<div><strong>ORDINE N&deg; ".$value."</strong></div><br />
@@ -740,16 +740,16 @@ foreach($idordine as $key=>$value){
      </table><br /><br />
      *** SALVO APPROVAZIONE DELLA CASA ***<br /><br /><br /> ";
  $query="SELECT * FROM ".$DBPrefix."prodotto, ".$DBPrefix."prodotto_ordine, ".$DBPrefix."ordine WHERE codice=".$DBPrefix."prodotto_ordine.cod_prodotto AND cod_ordine=codice_ordine AND codice_ordine='".fix_special_char($value)."'";
-	$result=mysqli_query($query) or die ("dderrore query");
+	$result=mysql_query($query) or die ("dderrore query");
 	$query_col="SELECT * FROM ".$DBPrefix."prodotto, ".$DBPrefix."prodotto_ordine, ".$DBPrefix."ordine WHERE codice=".$DBPrefix."prodotto_ordine.cod_prodotto AND cod_ordine=codice_ordine AND codice_ordine='".fix_special_char($value)."'";
-	$result_col=mysqli_query($query_col) or die ("dderrore query");
+	$result_col=mysql_query($query_col) or die ("dderrore query");
 	$valore=0;
 	$canale=0;
 	$percentuale=0;
 	$merce=0;
 	$cartoni=0;
 	$pedane=0;
-	while ($datax=mysqli_fetch_object($result_col)) {
+	while ($datax=mysql_fetch_object($result_col)) {
 		$valore.=$valore+$datax->sconto_valore;//controlla se � presente almeno un el. con questa colonna 
 		$canale.=$canale+$datax->sconto_canale1+$datax->sconto_canale2+$datax->sconto_canale3;
 		$percentuale.=$percentuale+$datax->sconto_per+$datax->sconto_per2+$datax->sconto_per3;
@@ -784,9 +784,9 @@ foreach($idordine as $key=>$value){
 	
 $conta = 0;
 $color = "#FFFFFF";
-$rows=mysqli_num_rows($result);
+$rows=mysql_num_rows($result);
 
-while ($data=mysqli_fetch_object($result)) {
+while ($data=mysql_fetch_object($result)) {
 	$c++;
 	if ($conta == 1){
 		$color = "#26689D";
@@ -845,8 +845,8 @@ if($cartoni!=0){
    
    $srt2="</table><br />";
   $query_totale="SELECT totale_euro FROM ".$DBPrefix."ordine WHERE codice_ordine='".$value."';";
-$result_totale=mysqli_query($query_totale) or die ("errore query");
-$data_totaleeuro=mysqli_fetch_array($result_totale);
+$result_totale=mysql_query($query_totale) or die ("errore query");
+$data_totaleeuro=mysql_fetch_array($result_totale);
 
  $srt2.="<div align='right'>"."Totale ordine: "."&euro; ".str_replace(".",",",$data_totaleeuro[0])."</div><br />
 <br />
@@ -867,8 +867,8 @@ print $file;
 	
 	}
 function querycount($query){
-		$result = mysqli_query($query,CONN);
-		$count = mysqli_num_rows($result);
+		$result = mysql_query($query,CONN);
+		$count = mysql_num_rows($result);
 		return $count;
 }	
 

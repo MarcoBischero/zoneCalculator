@@ -28,7 +28,7 @@ $message_scheda = "<link href=\"style.css\" rel=\"stylesheet\" type=\"text/css\"
 		</table>
 		</td>
 	</tr>
-	</table>";	
+	</table>";
 
 $message_successful_popup = "<link href=\"../style.css\" rel=\"stylesheet\" type=\"text/css\">
 	<table height=\"100%\" width=\"100%\">
@@ -62,31 +62,31 @@ $message_logout = "<link href=\"style.css\" rel=\"stylesheet\" type=\"text/css\"
 	</tr>
 	</table>
 	</div>";
-	
-$mail_host="10.10.10.33";
-$server_url= $_SERVER['SERVER_NAME'];
-$CAMversion='v2.0';
-$DBhostname= 'zonecalcdb.mariadb.database.azure.com';
- $DBuser= 'zonecalculator@zonecalcdb';
- $DBpasswd= 'T7r3mGFp_Me6nF-zXR';
- $DBname= 'zonecalculator';
- $DBPrefix= '';
- $DBOld= '';
- $whitelist = array(
-    '127.0.0.1',
-    '::1'
-);
 
-if(in_array($_SERVER['REMOTE_ADDR'], $whitelist)){
-    $CAMversion='v2.0';
-$DBhostname= 'zonecalcdb.mariadb.database.azure.com';
- $DBuser= 'zonecalculator@zonecalcdb';
- $DBpasswd= 'T7r3mGFp_Me6nF-zXR';
- $DBname= 'zonecalculator';
- $DBPrefix= '';
- $DBOld= '';
-}
-?>
-<?
- $company= 'ZoneCalculator';
-?>
+	$mail_host="10.10.10.33";
+	$server_url= $_SERVER['SERVER_NAME'];
+	$CAMversion='v2.0';
+	 $DBhostname= 'zonecalcdb.mariadb.database.azure.com';
+	 $DBuser= 'zonecalculator@zonecalcdb';
+ 	$DBpasswd= 'T7r3mGFp_Me6nF-zXR';
+	$DBname= 'zoneCalculator';
+	 $DBPrefix= '';
+	 $DBOld= '';
+	 $whitelist = array(
+	    '127.0.0.1',
+	    '::1'
+	);
+
+	if(in_array($_SERVER['REMOTE_ADDR'], $whitelist)){
+	    $CAMversion='v2.0';
+	 $DBhostname= 'zonecalcdb.mariadb.database.azure.com';
+ 	$DBuser= 'zonecalculator@zonecalcdb';
+ 	$DBpasswd= 'T7r3mGFp_Me6nF-zXR';
+	$DBname= 'zoneCalculator';
+	 $DBPrefix= '';
+	 $DBOld= '';
+	}
+	?>
+	<?
+	 $company= 'ZoneCalculator';
+	?>

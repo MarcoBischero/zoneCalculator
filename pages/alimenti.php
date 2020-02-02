@@ -91,8 +91,8 @@ $act = trim($_GET['act']);
 	//start dispaly
 		$query = 'SELECT * FROM '.$DBPrefix.'alimenti'.$query_prodotto.' ORDER BY nome ASC';
 			//echo $query;
-		$result = mysqli_query($query,CONN) or die('Query fallita: ' . mysqli_error($conn));
-		$rows = mysqli_num_rows($result);
+		$result = mysql_query($query,CONN) or die('Query fallita: ' . mysql_error());
+		$rows = mysql_num_rows($result);
 		if($rows>0){
 	?>
 	<table id="table_alimenti" class="display responsive" style="width: 100%; color:#FFFFFF;">
@@ -112,7 +112,7 @@ $act = trim($_GET['act']);
 		<?
 			$conta = 0;
 			$color = "#FFFFFF";
-			while ($row = mysqli_fetch_array($result, MYSQL_ASSOC)) {
+			while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 			$c_menu++;
 				if ($conta == 1){
 					$color = "#26689D";
@@ -123,12 +123,12 @@ $act = trim($_GET['act']);
 				}	
 				$sql_tipo = "SELECT * FROM ".$DBPrefix."tipo WHERE codice_tipo=".$row['cod_tipo'];
 				//echo $sql_azienda;
-				$result_tipo = mysqli_query($sql_tipo,CONN);
-				$row_tipo = mysqli_fetch_array($result_tipo);
+				$result_tipo = mysql_query($sql_tipo,CONN);
+				$row_tipo = mysql_fetch_array($result_tipo);
 				$sql_fonte = "SELECT * FROM ".$DBPrefix."fonte WHERE codice_fonte=".$row['cod_fonte'];
 				//echo $sql_azienda;
-				$result_fonte = mysqli_query($sql_fonte,CONN);
-				$row_fonte = mysqli_fetch_array($result_fonte);
+				$result_fonte = mysql_query($sql_fonte,CONN);
+				$row_fonte = mysql_fetch_array($result_fonte);
 				
 		?>
 

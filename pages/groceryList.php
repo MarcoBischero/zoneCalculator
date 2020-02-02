@@ -102,8 +102,8 @@ require_once("../include/connection.php");
 	
 		$query = 'SELECT `alimenti`.nome AS AlimName, SUM(`pasti_alimenti`.gr_alimento) AS TotalGrAlimento FROM `calendar_items`,`pasti_alimenti`,`alimenti` WHERE calendar_items.id_user='.$_COOKIE["id"].''.$queryDay.' AND cod_alimento=codice_alimento AND calendar_items.cod_pasto=pasti_alimenti.cod_pasto GROUP BY alimenti.nome';
 		//echo $query;
-		$result = mysqli_query($query,CONN) or die('Query fallita: ' . mysqli_error($conn));
-		$rows = mysqli_num_rows($result);
+		$result = mysql_query($query,CONN) or die('Query fallita: ' . mysql_error());
+		$rows = mysql_num_rows($result);
 		if($rows>0){	
 	?>
 	
@@ -119,7 +119,7 @@ require_once("../include/connection.php");
 		<tbody>
 		<?
 			$c = 0;
-			while ($row = mysqli_fetch_array($result, MYSQL_ASSOC)) {
+			while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 				$TotalAlimento=$row['TotalGrAlimento'];
 				if($row['TotalGrAlimento']>=1000){ 
 					$TotalAlimento=$row['TotalGrAlimento']/1000;

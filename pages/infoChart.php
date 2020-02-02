@@ -170,8 +170,8 @@ $act = trim($_GET['act']);
 	//start dispaly
 		$query = 'SELECT * FROM '.$DBPrefix.'prot_need WHERE cod_user='.$_COOKIE["id"].' ORDER BY codice_protneed DESC';
 			//echo $query;
-		$result = mysqli_query($query,CONN) or die('Query fallita: ' . mysqli_error($conn));
-		$rows = mysqli_num_rows($result);
+		$result = mysql_query($query,CONN) or die('Query fallita: ' . mysql_error());
+		$rows = mysql_num_rows($result);
 		if($rows>0){
 	?>
 		
@@ -197,7 +197,7 @@ $act = trim($_GET['act']);
 		<?
 			$conta = 0;
 			$color = "#FFFFFF";
-			while ($row = mysqli_fetch_array($result, MYSQL_ASSOC)) {
+			while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 			$c_menu++;
 				if ($conta == 1){
 					$color = "#26689D";

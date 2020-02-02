@@ -136,10 +136,10 @@ cancella_random_key($DBPrefix);
 			require_once($page_require_once);
 		}elseif(isset($_SESSION['userid'])){
 			$query_access = 'SELECT lastaccess,ip FROM '.$DBPrefix.'risorse WHERE id='.$_SESSION['userid']['id'].'';
-			$result_access = mysqli_query($query_access,CONN);
-			$rows_access = mysqli_num_rows($result_access);
+			$result_access = mysql_query($query_access,CONN);
+			$rows_access = mysql_num_rows($result_access);
 			if ($rows_access > 0){
-				$row_access = mysqli_fetch_array($result_access);
+				$row_access = mysql_fetch_array($result_access);
 				echo lastaccesshtml($row_access['lastaccess'],$row_access['ip']);
 			}else echo lastaccesshtml('');
 			

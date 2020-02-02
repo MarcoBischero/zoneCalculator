@@ -43,8 +43,8 @@ require_once("../include/connection.php");
 		
 		$query = 'SELECT `alimenti`.nome AS AlimName, gr_alimento as TotalGrAlimento FROM `pasti_alimenti`,`alimenti` WHERE alimenti.codice_alimento=pasti_alimenti.cod_alimento AND pasti_alimenti.cod_pasto='.$_COOKIE["PastoID"].'' ;
 		//echo $query;
-		$result = mysqli_query($query,CONN) or die('Query fallita: ' . mysqli_error($conn));
-		$rows = mysqli_num_rows($result);
+		$result = mysql_query($query,CONN) or die('Query fallita: ' . mysql_error());
+		$rows = mysql_num_rows($result);
 		if($rows>0){	
 	?>
 	
@@ -60,7 +60,7 @@ require_once("../include/connection.php");
 		<tbody>
 		<?
 			$c = 0;
-			while ($row = mysqli_fetch_array($result, MYSQL_ASSOC)) {
+			while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 				$TotalAlimento=$row['TotalGrAlimento'];
 				if($TotalAlimento>=1000){ 
 					$TotalAlimento=$TotalAlimento/1000;

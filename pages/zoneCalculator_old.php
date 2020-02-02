@@ -97,10 +97,10 @@ if($auth_user==true){
 			   <option value="0">----------------------SELEZIONARE ALIMENTO----------------------</option>
 				<?
 				$sql = "SELECT * FROM ".$DBPrefix."alimenti,".$DBPrefix."tipo WHERE codice_tipo=cod_tipo AND cod_tipo<>12 ORDER BY nome ASC";
-				$result = mysqli_query($sql,CONN);
-				$rows = mysqli_num_rows($result);
+				$result = mysql_query($sql,CONN);
+				$rows = mysql_num_rows($result);
 				if($rows!=0){
-					while ($row=mysqli_fetch_array($result,MYSQL_ASSOC)){
+					while ($row=mysql_fetch_array($result,MYSQL_ASSOC)){
 						?>
 					  <option value="<?=$row['codice_alimento']?>" ><?=$row['nome']?></option>
 					  <?
@@ -110,10 +110,10 @@ if($auth_user==true){
 			  <option value="0">----------------------SELEZIONARE IINTEGRATORE----------------------</option>
 			  <?
 				$sql = "SELECT * FROM ".$DBPrefix."alimenti,".$DBPrefix."tipo WHERE codice_tipo=cod_tipo AND cod_tipo=12 ORDER BY nome ASC";
-				$result = mysqli_query($sql,CONN);
-				$rows = mysqli_num_rows($result);
+				$result = mysql_query($sql,CONN);
+				$rows = mysql_num_rows($result);
 				if($rows!=0){
-					while ($row=mysqli_fetch_array($result,MYSQL_ASSOC)){
+					while ($row=mysql_fetch_array($result,MYSQL_ASSOC)){
 						?>
 					  <option value="<?=$row['codice_alimento']?>" ><?=$row['nome']?></option>
 					  <?
