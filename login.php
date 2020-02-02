@@ -1,5 +1,6 @@
 <?
-require("include/connection.php");
+require_once("include/mysql2i.class.php");
+eequire("include/connection.php");
 require("include/top.inc.php");
 require("include/functions.php");
 require("include/config.php");
