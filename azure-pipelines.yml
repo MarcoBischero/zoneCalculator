@@ -59,21 +59,6 @@ stages:
     - upload: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
       displayName: 'Upload package'
       artifact: drop
-    - task: SonarQubePrepare@4
-      inputs:
-        SonarQube: 'SonarQube'
-        scannerMode: 'CLI'
-        configMode: 'file'
-        extraProperties: |
-          # Additional properties that will be passed to the scanner, 
-          # Put one key=value per line, example:
-          # sonar.exclusions=**/*.bin
-          sonar.projectKey=znclc
-          sonar.projectName=ZoneCalculator
-    - task: SonarQubeAnalyze@4
-    - task: SonarQubePublish@4
-      inputs:
-       pollingTimeoutSec: '300'
 - stage: Deploy
   displayName: 'Deploy Web App'
   dependsOn: Build
