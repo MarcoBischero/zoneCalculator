@@ -121,14 +121,14 @@ $(document).ready( function () {
 					$conta = 1;
 					$color = "#2B72AC";
 				}	
-				$sql_tipo = "SELECT * FROM ".$DBPrefix."pasti_alimenti, alimenti WHERE codice_tipo=".$row['cod_tipo'];
-				//echo $sql_azienda;
-				$result_tipo = mysql_query($sql_tipo,CONN);
-				$row_tipo = mysql_fetch_array($result_tipo);
-				$sql_fonte = "SELECT * FROM ".$DBPrefix."fonte WHERE codice_fonte=".$row['cod_fonte'];
-				//echo $sql_azienda;
-				$result_fonte = mysql_query($sql_fonte,CONN);
-				$row_fonte = mysql_fetch_array($result_fonte);
+				//$sql_tipo = "SELECT * FROM ".$DBPrefix."pasti_alimenti, alimenti WHERE codice_tipo=".$row['cod_tipo'];
+				//echo $sql_tipo;
+				//$result_tipo = mysql_query($sql_tipo,CONN);
+				//$row_tipo = mysql_fetch_array($result_tipo);
+				//$sql_fonte = "SELECT * FROM ".$DBPrefix."fonte WHERE codice_fonte=".$row['cod_fonte'];
+				//echo $sql_fonte;
+				//$result_fonte = mysql_query($sql_fonte,CONN);
+				//$row_fonte = mysql_fetch_array($result_fonte);
 				
 				switch ($row['mealType']){
 					case "0":
