@@ -1,0 +1,31 @@
+/* Responsive adjustments */
+
+/* On screens that are 992px or less, display the menu vertically */
+@media screen and (max-width: 992px) {
+  #tabs ul li {
+    display: block;
+    width: 100%;
+  }
+
+  #tabs ul li a {
+    width: 100%;
+    display: block;
+  }
+}
+
+/* On screens that are 600px or less, hide the menu text and only show icons */
+@media screen and (max-width: 600px) {
+  #menuText {
+    display: none;
+  }
+  
+  #tabs ul li a {
+    text-align: center;
+  }
+}
+
+.container {
+  margin: 0 auto;
+  max-width: 1280px;
+  width: 90%;
+}
