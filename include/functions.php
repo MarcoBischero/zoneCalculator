@@ -5,7 +5,7 @@
  * @param mysqli $conn The database connection object.
  * @param string $DBPrefix The database table prefix.
  */
-function cancella_random_key(mysqli $conn, string $DBPrefix): void {
+function cancella_random_key($conn, $DBPrefix) {
     $query = "DELETE FROM {$DBPrefix}random_key WHERE (DATE_ADD(data, INTERVAL '1' DAY) <= NOW()) OR (data = '0000-00-00 00:00:00')";
     $conn->query($query);
 }
@@ -18,7 +18,7 @@ function cancella_random_key(mysqli $conn, string $DBPrefix): void {
  * @param string $ipAddress The user's IP address.
  * @param string $DBPrefix The database table prefix.
  */
-function lastaccess(mysqli $conn, int $userId, string $ipAddress, string $DBPrefix): void {
+function lastaccess($conn, $userId, $ipAddress, $DBPrefix) {
     $stmt = $conn->prepare(
         "UPDATE {$DBPrefix}risorse 
          SET lastaccess = lastaccessupdate, 
