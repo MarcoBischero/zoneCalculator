@@ -1,6 +1,7 @@
 <?php
 require_once("include/connection.php");
 require_once("include/functions.php");
+require_once("include/utils.php");
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -78,7 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
 
                     // Set "remember me" cookie if requested
                     if ($remember_me) {
-                        $key = random_string(); // Generate a secure random key
+                        $key = random_string(32); // Generate a secure random key
                         $update_key_stmt = $conn->prepare("UPDATE {$DBPrefix}risorse SET rand_key = ? WHERE id = ?");
                         $update_key_stmt->bind_param('si', $key, $user['id']);
                         $update_key_stmt->execute();
