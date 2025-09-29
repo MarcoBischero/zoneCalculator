@@ -6,10 +6,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Include the database connection and functions.
-require_once("connection.php");
-require_once("functions.php");
-
 $auth_user = false;
 $page_menu = [];
 
