@@ -55,6 +55,9 @@ cancella_random_key($conn, $DBPrefix);
     <!-- DataTables Bootstrap 5 CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/2.0.7/css/dataTables.bootstrap5.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.2/css/responsive.bootstrap5.css">
+    <!-- Noty CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.css" />
+
     
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -71,8 +74,10 @@ cancella_random_key($conn, $DBPrefix);
     <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.print.min.js"></script>
 
-    <script type="text/javascript" src="js/js.cookie.js"></script>
-    <script type="text/javascript" src="js/noty/packaged/jquery.noty.packaged.min.js"></script>
+    <!-- JS Cookie -->
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <!-- Noty JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
 </head>
 <body>
 
@@ -132,6 +137,12 @@ $(document).ready(function() {
             $('#main-content').html('<div class="d-flex justify-content-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
             $('#main-content').load(page, function(response, status, xhr) {
                 if (status == "error") {
+                    new Noty({
+                        type: 'error',
+                        layout: 'topRight',
+                        text: 'Could not load page. Please reload or try again later.',
+                        timeout: 5000
+                    }).show();
                     $('#main-content').html('<div class="alert alert-danger" role="alert">Could not load page. Please reload or try again later.</div>');
                 }
             });

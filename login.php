@@ -1,164 +1,177 @@
-<?
-require("include/connection.php");
-require("include/top.inc.php");
-require("include/functions.php");
-require("include/config.php");
-require("include/Crypt.php");
-$error = false;
-$redirect = false;
-$check_key = false;
-$pwdform = new HTML_Crypt(); 
-$key=random_string();
-$sql="INSERT INTO ".$DBPrefix."random_key(codice,data) VALUES('".$key."',NOW())";
-$result_sql=mysql_query($sql,CONN);
-$pwdform->setText('<input name="'.$key.'" type="password" class="input" id="'.$key.'" size="20" value=""/>');
-$url=fix_special_char($_SERVER['QUERY_STRING'],1);
-//colore expose
-$color=random_string2();
-?>
+<?php
+require_once("include/connection.php");
+require_once("include/functions.php");
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-
-	<head>
-		<? require("head.inc.php"); ?>
-		<link rel="shortcut icon" href="logo.gif" />
-		<link rel="stylesheet" href="jquery-ui-1.10.4.custom/css/custom-theme/jquery-ui-1.10.4.custom.css">
-		<script src="jquery-ui-1.10.4.custom/js/jquery-1.10.2.js" type="text/javascript"></script>
-		<script src="jquery-ui-1.10.4.custom/js/jquery-ui-1.10.4.custom.js" type="text/javascript"></script>
-		<script src="js/jquery.tools.min.js" type="text/javascript"></script>
-	</head>
-
-	<body>
-
-		<?
-if(isset($_POST['Entra'])){
-	$username=trim(fix_special_char($_POST['username'])); //function fix_special_char NOT fix_special_char_sql
-	unset ($_POST['Entra']);
-	unset ($_POST['username']);
-	foreach($_POST as $pwdkey=>$password){
-		$pwdkey = $pwdkey;
-		$password = $password;
-		break;
-	}
-	$sql="SELECT * from ".$DBPrefix."random_key WHERE codice='".$pwdkey."'";
-	
-	$result=mysql_query($sql,CONN);
-	$rows=mysql_num_rows($result);
-	if($rows>0){
-		$check_key = true;
-	}
-
-	$password=trim(fix_special_char_sql($password));
-	if(strlen($username)>0 && strlen($password)>0 && $check_key = true){
-		$sql = "SELECT id FROM ".$DBPrefix."risorse WHERE username='".fix_special_char_sql($username)."'";
-		$result = mysql_query($sql,CONN);
-		$rows =  mysql_num_rows($result);
-		if($rows!=0){
-		
-			$row = mysql_fetch_array($result, MYSQL_ASSOC);
-			$password = md5(fix_special_char_sql($password)).":".md5($row['id']);
-			$sql = "SELECT id,id_ruolo,nome,cognome, mode,sesso,cookie FROM ".$DBPrefix."risorse WHERE username='".fix_special_char_sql($username)."' AND password='".$password."'";
-			$result = mysql_query($sql,CONN);
-			$rows =  mysql_num_rows($result);
-			if($rows!=0){				
-				$row = mysql_fetch_array($result, MYSQL_ASSOC);
-				$key = random_string();
-				$update= "UPDATE ".$DBPrefix."risorse SET rand_key='".$key."' WHERE id=".$row['id'];
-				$result_update = mysql_query($update);
-				if($row['cookie']=='1'){
-					setcookie("id", $row['id'], time()+60*60*24*30, "/" ,NULL,0); 
-					setcookie("key", $key, time()+60*60*24*30, "/" ,NULL,0);
-					setcookie("nome", $row['nome'], time()+60*60*24*30, "/" ,NULL,0); 
-					setcookie("cognome", $row['cognome'], time()+60*60*24*30, "/" ,NULL,0);
-					setcookie("sesso", $row['sesso'], time()+60*60*24*30, "/" ,NULL,0);
-				}
-				lastaccess($row['id'],$_SERVER['REMOTE_ADDR'],$DBPrefix); //-> update last access
-				$userinfo['id']= $row['id'];
-				$userinfo['ruolo']= $row['id_ruolo'];
-				$userinfo['mode']= $row['mode'];
-				$userinfo['sesso']= $row['sesso'];
-				$_SESSION['userid']= $userinfo;
-				echo $message_successful;			
-				header("Refresh: 1; URL=index.php?".$url);
-				$redirect = true;
-			}else $error=true;
-		}else $error=true;
-	}else $error=true;
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
-if($redirect == false){?>
-	<table valign="top" bgcolor="#3288CB" width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="padding: 5px; color:#FFFFFF;" class="ui-corner-all">
-		<tr>
-			<td></td>
-			<td>
-				<div align="center" style="font-weight: bold">
-					<img src="favicon/favicon-32x32.png" width="32" height="32" />
-				</div>
-			</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td></td>
-			<td>
-				<div align="center" style="font-weight: bold">
-					<?=$company.' WEB INTERFACE'?>
-				</div>
-			</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td></td>
-			<td>
-				<form id="form1" name="form1" method="post" action="<?=$_SERVER['PHP_SELF']?>?<?=$url?>">
-					<?
-		if($error==true){
-			echo "<div align=center> <font color=\"#ff9900\"><strong>Login non avvenuto</strong></font></div>";
-			sleep(1);
-		}
-		?>
-				<br>
-				<table style="padding: 5px; color:#FFFFFF;" class="ui-corner-all" width="280" border="0" align="center" cellpadding="0" cellspacing="1" bgcolor="#1B486D">
-					<!--DWLayoutTable-->
-					<tr>
-						<td height="20">&nbsp;<img src="img/menu_ico.gif" width="8" height="8" /> Username </td>
-						<td>
-							<input name="username" type="text" class="input" id="username" size="20" value="<?=$username?>" /> </td>
-					</tr>
-					<tr>
-						<td height="20">&nbsp;<img src="img/menu_ico.gif" width="8" height="8" /> Password </td>
-						<td>
-							<? $pwdform->output(); ?>
-						</td>
-					</tr>
-					<tr>
-						<td height="35" colspan="2">
-							<div align="center">
-								<label for="Submit"></label>
-								<div align="center">
-									<button name="Entra" type="submit" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" id="Entra"><span class="ui-button-text">Entra</span></button>
-								</div>
-							</div>
-						</td>
-					</tr>
-				</table>
-				</form>
-			</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td></td>
-			<td>
-				<div align="left">
-					<?=$CAMversion?>
-				</div>
-			</td>
-			<td></td>
-		</tr>
-	</table>
-	</body>
+
+// If the user is already logged in, redirect to the main page.
+if (isset($_SESSION['userid'])) {
+    header('Location: index.php');
+    exit();
+}
+
+$error_message = '';
+
+// Handle form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
+    $username = trim($_POST['username']);
+    $password = $_POST['password'];
+    $remember_me = isset($_POST['remember_me']);
+
+    if (empty($username) || empty($password)) {
+        $error_message = "Username and password are required.";
+    } else {
+        // First, get the user ID to build the legacy password hash
+        $stmt_id = $conn->prepare("SELECT id FROM {$DBPrefix}risorse WHERE username = ?");
+        $stmt_id->bind_param('s', $username);
+        $stmt_id->execute();
+        $result_id = $stmt_id->get_result();
+
+        if ($result_id->num_rows === 1) {
+            $user_id_row = $result_id->fetch_assoc();
+            $user_id = $user_id_row['id'];
+            
+            // Legacy password check
+            $legacy_password_hash = md5($password) . ":" . md5($user_id);
+
+            $stmt = $conn->prepare(
+                "SELECT id, id_ruolo, nome, cognome, password, sesso, mode FROM {$DBPrefix}risorse WHERE username = ?"
+            );
+            $stmt->bind_param('s', $username);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows === 1) {
+                $user = $result->fetch_assoc();
+
+                // Check against modern hash first, then legacy
+                if (password_verify($password, $user['password'])) {
+                    // Password is correct. Upgrade hash if it's still the legacy one.
+                    // The auth_user.php script now handles this check and potential upgrade.
+                    $password_ok = true;
+                } else if ($user['password'] === $legacy_password_hash) {
+                    // Legacy password is correct, upgrade it now.
+                    $new_hash = password_hash($password, PASSWORD_DEFAULT);
+                    $upgrade_stmt = $conn->prepare("UPDATE {$DBPrefix}risorse SET password = ? WHERE id = ?");
+                    $upgrade_stmt->bind_param('si', $new_hash, $user['id']);
+                    $upgrade_stmt->execute();
+                    $password_ok = true;
+                } else {
+                    $password_ok = false;
+                }
+
+                if ($password_ok) {
+                    session_regenerate_id(true); // Prevent session fixation
+
+                    // Store user info in session
+                    $userinfo = [
+                        'id' => $user['id'],
+                        'ruolo' => $user['id_ruolo'],
+                        'nome' => $user['nome'],
+                        'cognome' => $user['cognome'],
+                        'sesso' => $user['sesso'],
+                        'mode' => $user['mode']
+                    ];
+                    $_SESSION['userid'] = $userinfo;
+
+                    // Set "remember me" cookie if requested
+                    if ($remember_me) {
+                        $key = random_string(); // Generate a secure random key
+                        $update_key_stmt = $conn->prepare("UPDATE {$DBPrefix}risorse SET rand_key = ? WHERE id = ?");
+                        $update_key_stmt->bind_param('si', $key, $user['id']);
+                        $update_key_stmt->execute();
+
+                        $cookie_duration = time() + (60 * 60 * 24 * 30); // 30 days
+                        setcookie('id', $user['id'], $cookie_duration, '/', null, false, true);
+                        setcookie('key', $key, $cookie_duration, '/', null, false, true);
+                    }
+
+                    // Update last access info
+                    lastaccess($conn, $user['id'], $_SERVER['REMOTE_ADDR'], $DBPrefix);
+                    
+                    // Redirect to the main page
+                    header("Location: index.php");
+                    exit();
+                } else {
+                    $error_message = "Invalid username or password.";
+                }
+            }
+        } else {
+            $error_message = "Invalid username or password.";
+        }
+
+        if ($stmt) $stmt->close();
+        if ($stmt_id) $stmt_id->close();
+    }
+}
+
+$conn->close();
+?>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - zoneCalculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .login-card {
+            max-width: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card login-card">
+    <div class="card-body">
+        <h3 class="card-title text-center mb-4">zoneCalculator</h3>
+        
+        <?php if (!empty($error_message)): ?>
+            <div class="alert alert-danger" role="alert">
+                <?php echo $error_message; ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['status']) && $_GET['status'] === 'loggedout'): ?>
+             <div class="alert alert-success" role="alert">
+                You have been successfully logged out.
+            </div>
+        <?php endif; ?>
+
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="remember_me" name="remember_me">
+                <label class="form-check-label" for="remember_me">Remember me</label>
+            </div>
+            <div class="d-grid">
+                <button type="submit" name="login" class="btn btn-primary">Login</button>
+            </div>
+        </form>
+    </div>
+    <div class="card-footer text-center">
+        <small class="text-muted">&copy; 2007-<?php echo date("Y"); ?> MB</small>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
 </html>
-	<?
-}
-require("include/bottom.inc.php");
-
-?>

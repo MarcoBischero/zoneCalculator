@@ -9,7 +9,6 @@ $DBuser = 'mycam2';
 $DBpasswd = 'Aqlt709_!0';
 $DBname = 'zoneCalculator';
 $DBPrefix = '';
-$DBOld = '';
 
 // Whitelist for development environments
 $whitelist = array(
@@ -21,11 +20,5 @@ $whitelist = array(
 if (in_array($_SERVER['REMOTE_ADDR'], $whitelist)) {
     // Development specific settings can go here
 }
-
-// Message variables to be replaced with a notification system
-$message_successful = "Operazione effettuata con successo";
-$message_scheda = "Per visionare un'altra scheda cliente tornare indietro";
-$message_successful_popup = "Operazione effettuata con successo";
-$message_logout = "Logout effettuato con successo";
 
 ?>
