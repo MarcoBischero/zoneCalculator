@@ -37,6 +37,7 @@ if (!file_exists('include/config.php')) {
 /*----------------------------------------*/
 require_once("include/connection.php");
 require_once("include/auth_user.php");
+require_once("include/functions.php");
 
 // Clean up expired random keys for 'remember me' functionality
 cancella_random_key($conn, $DBPrefix);
