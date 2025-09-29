@@ -1,64 +1,74 @@
-<?
-require('functions.php');
-$auth_user = false;
+<?php
+// This file handles user authentication and authorization.
 
-if(!isset($_SESSION['userid'])){
-	if(isset($_COOKIE['id']) && isset($_COOKIE['key'])){
-		$id=fix_special_char_sql($_COOKIE['id']);
-		$key=fix_special_char_sql($_COOKIE['key']);
-		$auth = "SELECT id,id_ruolo,mode FROM ".$DBPrefix."risorse WHERE id=".$id." AND rand_key='".$key."'";
-		}else{
-			$id=fix_special_char_sql($_SESSION['userid']['id']);
-			$auth = "SELECT id,id_ruolo,mode FROM ".$DBPrefix."risorse WHERE id=".$id;
-		 }
-		$result_auth = mysql_query($auth,CONN);
-		@$row=mysql_fetch_array($result_auth);
-		@$rows=mysql_num_rows($result_auth);
-		if ($rows>0){
-			lastaccess($row['id'],$_SERVER['REMOTE_ADDR'],$DBPrefix); //-> update last access
-			$userinfo['id']= $row['id'];
-			$userinfo['ruolo']= $row['id_ruolo'];
-			$userinfo['mode']= $row['mode'];
-			
-			$_SESSION['userid']= $userinfo;	
-	}
+// Start a session to manage user login state.
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
+// Include the database connection and functions.
+require_once("connection.php");
+require_once("functions.php");
 
-if(is_array($_SESSION['userid'])){
+$auth_user = false;
+$page_menu = [];
 
-	if(is_numeric($_SESSION['userid']['ruolo']) && $_SESSION['userid']['ruolo']<>0){
-		//echo $_SESSION['userid']['id'];
-		$sql = "SELECT id_feature FROM ".$DBPrefix."ruoli_features WHERE id_ruolo=".$_SESSION['userid']['ruolo'];
-		$result = mysql_query($sql,CONN);
-		$rows = mysql_num_rows($result);
-		if($rows!=0){
-			while($row = mysql_fetch_array($result,MYSQL_ASSOC)){
-				//build menu with the enabled pages
-				//create a variable for each page for autentication
-				$sql = "SELECT descrizione,pagina, ordine, class FROM ".$DBPrefix."features WHERE id=".$row['id_feature'];
-				$result_pg = mysql_query($sql,CONN);
-				$rows_pg = mysql_num_rows($result_pg);
-				if($rows_pg!=0){
-					$row_pg = mysql_fetch_array($result_pg,MYSQL_ASSOC);
-					$pg = trim($_GET['pg']);
-					$pg = str_replace('..','',$pg);
-					$page_menu[$row_pg['pagina']] = $row_pg['ordine'].':'.$row_pg['descrizione'].':'.$row_pg['class']; //add array elements for menu
-					if($pg==$row_pg['pagina']){
-						$auth_user = true; //do i permessi per caricare la pagina
-					}
-				}
-			}
-		}		
-	}else{
-		$pg = 'norules.php';
-	}
-}else{
-	$url=fix_special_char($_SERVER['QUERY_STRING'],1);
-	
-	$error = '<br /><br /><br />
-<div align="center"><img src="img/alert.gif" /> <tag>Accesso non autorizzato</tag> </div>';
-	header("Refresh: 1; URL=login.php?".$url);
-	//redirect login.php
+// Check if the user is logged in via session or cookies.
+if (!isset($_SESSION['userid'])) {
+    if (isset($_COOKIE['id']) && isset($_COOKIE['key'])) {
+        $id = $_COOKIE['id'];
+        $key = $_COOKIE['key'];
+
+        // Fetch user details including name for the session
+        $stmt = $conn->prepare("SELECT id, id_ruolo, mode, nome, cognome FROM {$DBPrefix}risorse WHERE id = ? AND rand_key = ?");
+        $stmt->bind_param("is", $id, $key);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            lastaccess($conn, $row['id'], $_SERVER['REMOTE_ADDR'], $DBPrefix);
+            
+            // Store user info in the session
+            $_SESSION['userid'] = [
+                'id' => $row['id'],
+                'ruolo' => $row['id_ruolo'],
+                'mode' => $row['mode'],
+                'nome' => $row['nome'],
+                'cognome' => $row['cognome'],
+            ];
+        }
+    }
+}
+
+// If the user is logged in, fetch their permissions and build the menu.
+if (isset($_SESSION['userid'])) {
+    $id_ruolo = $_SESSION['userid']['ruolo'];
+
+    if (is_numeric($id_ruolo) && $id_ruolo != 0) {
+        $stmt = $conn->prepare("SELECT f.descrizione, f.pagina, f.ordine, f.class 
+                                 FROM {$DBPrefix}ruoli_features rf 
+                                 JOIN {$DBPrefix}features f ON rf.id_feature = f.id 
+                                 WHERE rf.id_ruolo = ? ORDER BY f.ordine");
+        $stmt->bind_param("i", $id_ruolo);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $page_menu[$row['pagina']] = $row['ordine'] . ':' . $row['descrizione'] . ':' . $row['class'];
+            }
+        }
+
+        // Check if the user is authorized to access the current page.
+        $auth_user = !isset($_GET['pg']) || array_key_exists(trim($_GET['pg']), $page_menu);
+    } else {
+        header("Location: pages/norules.php");
+        exit();
+    }
+} else {
+    // If the user is not logged in, redirect to the login page.
+    header("Location: login.php");
+    exit();
 }
 ?>
