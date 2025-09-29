@@ -1,0 +1,10 @@
+/vendor/
+composer.lock
+.env
+.idea/
+.vscode/
+*.log
+*~
+*.swp
+.idx/
+*bck
