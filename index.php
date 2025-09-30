@@ -19,27 +19,10 @@ if (isset($_GET['logout']) && $_GET['logout'] == '1') {
     exit();
 }
 
-/*------------------------------------------
-CHECK SETUP*/
-if (!file_exists('include/config.php')) {
-    if (file_exists('setup/index.php')) {
-        header('Location: setup/index.php');
-        exit();
-    } else {
-        echo 'No configuration file found and no installation code available. Exiting...';
-        exit();
-    }
-} elseif (file_exists('include/config.php') && file_exists('setup/index.php')) {
-    echo 'Setup folder still exists. Please delete it.';
-    exit();
-}
-
-/*----------------------------------------*/
 require_once("include/connection.php");
 require_once("include/functions.php");
 require_once("include/auth_user.php");
 
-// Clean up expired random keys for 'remember me' functionality
 cancella_random_key($conn, $DBPrefix);
 
 ?>
@@ -49,35 +32,20 @@ cancella_random_key($conn, $DBPrefix);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>zoneCalculator</title>
-    <!-- Bootstrap CSS -->
+    <!-- CSS Dependencies -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- DataTables Bootstrap 5 CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/2.0.7/css/dataTables.bootstrap5.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.2/css/responsive.bootstrap5.css">
-    <!-- Noty CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.css" />
 
-    
+    <!-- JS Dependencies -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- DataTables & Plugins -->
     <script src="https://cdn.datatables.net/2.0.7/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.0.7/js/dataTables.bootstrap5.js"></script>
     <script src="https://cdn.datatables.net/responsive/3.0.2/js/dataTables.responsive.js"></script>
     <script src="https://cdn.datatables.net/responsive/3.0.2/js/responsive.bootstrap5.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.0.2/js/dataTables.buttons.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.bootstrap5.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.print.min.js"></script>
-
-    <!-- JS Cookie -->
-    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
-    <!-- Noty JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
 </head>
 <body>
@@ -92,11 +60,13 @@ cancella_random_key($conn, $DBPrefix);
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <?php
                 if (!empty($page_menu) && is_array($page_menu)) {
+                    // Sort menu items by order specified in the database
+                    asort($page_menu);
                     foreach ($page_menu as $pagina => $descrizione) {
                         list($ordine, $desc, $class) = explode(":", $descrizione, 3);
                 ?>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" data-page="pages/<?php echo $pagina; ?>">
+                    <a class="nav-link main-nav-link" href="#" data-page="pages/<?php echo $pagina; ?>">
                         <i class="fa <?php echo $class; ?>"></i> <?php echo $desc; ?>
                     </a>
                 </li>
@@ -106,7 +76,7 @@ cancella_random_key($conn, $DBPrefix);
                 ?>
             </ul>
             <ul class="navbar-nav">
-                <?php require("include/logout.inc.php");?>
+                 <?php require("include/logout.inc.php");?>
             </ul>
         </div>
     </div>
@@ -114,51 +84,121 @@ cancella_random_key($conn, $DBPrefix);
 
 <main class="container-fluid mt-4">
     <div id="main-content">
-        <!-- Content will be loaded here -->
+        <!-- AJAX Content will be loaded here -->
     </div>
 </main>
 
-<footer class="footer mt-auto py-3 bg-light">
+<footer class="footer mt-auto py-3 bg-light fixed-bottom">
   <div class="container text-center">
     <span class="text-muted">Copyright &copy; 2007-<?php echo date("Y"); ?> MB | <a href="mailto:marco.biscardi@gmail.com?subject=zoneCalculator">Contact</a></span>
   </div>
 </footer>
 
 <script>
+// Function to initialize event handlers and plugins for dynamically loaded content
+function initializePage(pageUrl) {
+    // Extract page name to apply specific logic
+    const pageName = pageUrl.split('/').pop();
+
+    if (pageName === 'alimenti.php') {
+        // Initialize DataTable for the aliments table
+        $('#table_alimenti').DataTable({
+            pagingType: "full_numbers",
+            responsive: true,
+            language: { url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/it-IT.json' },
+            columnDefs: [{ targets: 'no-sort', orderable: false }]
+        });
+
+        // Handle form submission for adding an alimento
+        $(document).off('submit', '#addAlimentoForm').on('submit', '#addAlimentoForm', function(e) {
+            e.preventDefault();
+            const formData = { action: 'addAlimento', ...Object.fromEntries(new FormData(e.target)) };
+            $.post('pages/ajax.php', formData, handleAjaxResponse, 'json');
+        });
+
+        // Handle clicks for editing an alimento
+        $('.btn-edit-alimento').off('click').on('click', function() {
+            const alimentoId = $(this).data('alimento-id');
+            $('#editAlimentoModalBody').html('<div class="text-center"><div class="spinner-border"></div></div>');
+            $('#editAlimentoModal').modal('show');
+            $('#editAlimentoModalBody').load(`pages/editAlimento.php?id=${alimentoId}`);
+        });
+
+        // Handle clicks for deleting an alimento
+        $('.btn-delete-alimento').off('click').on('click', function() {
+            const alimentoId = $(this).data('alimento-id');
+            confirmDeletion(alimentoId);
+        });
+    }
+}
+
+// Generic AJAX response handler
+function handleAjaxResponse(response) {
+    if (response.status === 'success') {
+        new Noty({ type: 'success', text: response.message, timeout: 3000 }).show();
+        $('.modal').modal('hide');
+        // Reload the current page to see changes
+        const currentPage = $('.main-nav-link.active').data('page');
+        loadPage(currentPage);
+    } else {
+        new Noty({ type: 'error', text: response.message || 'Errore sconosciuto.', timeout: 5000 }).show();
+    }
+}
+
+// Confirmation for deletion
+function confirmDeletion(alimentoId) {
+    new Noty({
+        text: 'Sei sicuro di voler eliminare questo alimento?',
+        layout: 'center', modal: true,
+        buttons: [
+            Noty.button('Sì, Elimina', 'btn btn-danger', function () {
+                $.post('pages/ajax.php', { action: 'DEL', idAlimento: alimentoId }, function(response) {
+                    if(response.status === 'success'){
+                       new Noty({ type: 'success', text: response.message, timeout: 2000 }).show();
+                       loadPage($('.main-nav-link.active').data('page'));
+                    } else {
+                       new Noty({ type: 'error', text: response.message, timeout: 3000 }).show();
+                    }
+                }, 'json').fail(() => new Noty({ type: 'error', text: 'Errore di comunicazione.' }).show());
+                Noty.closeAll();
+            }),
+            Noty.button('Annulla', 'btn btn-secondary', () => Noty.closeAll())
+        ]
+    }).show();
+}
+
+// Function to load a page into the main content area
+function loadPage(pageUrl) {
+    if (!pageUrl) return;
+    $('#main-content').html('<div class="d-flex justify-content-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
+    $('#main-content').load(pageUrl, function(response, status, xhr) {
+        if (status === "error") {
+            $('#main-content').html('<div class="alert alert-danger">Errore di caricamento.</div>');
+        } else {
+            // After loading, initialize any scripts specific to that page
+            initializePage(pageUrl);
+        }
+    });
+}
+
+// Main document ready handler
 $(document).ready(function() {
-    // Handle menu clicks
-    $('.nav-link').on('click', function(e) {
+    // Handle main navigation clicks
+    $('.main-nav-link').on('click', function(e) {
         e.preventDefault();
         var page = $(this).data('page');
-        if (page) {
-            // Set active class
-            $('.nav-link').removeClass('active');
-            $(this).addClass('active');
-            
-            $('#main-content').html('<div class="d-flex justify-content-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
-            $('#main-content').load(page, function(response, status, xhr) {
-                if (status == "error") {
-                    new Noty({
-                        type: 'error',
-                        layout: 'topRight',
-                        text: 'Could not load page. Please reload or try again later.',
-                        timeout: 5000
-                    }).show();
-                    $('#main-content').html('<div class="alert alert-danger" role="alert">Could not load page. Please reload or try again later.</div>');
-                }
-            });
-        }
+        $('.main-nav-link').removeClass('active');
+        $(this).addClass('active');
+        loadPage(page);
     });
 
     // Load the first page by default
-    var firstPageLink = $('.nav-link').first();
-    if(firstPageLink.length){
+    const firstPageLink = $('.main-nav-link').first();
+    if (firstPageLink.length) {
         firstPageLink.addClass('active');
-        $('#main-content').html('<div class="d-flex justify-content-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
-        $('#main-content').load(firstPageLink.data('page'));
+        loadPage(firstPageLink.data('page'));
     } else {
-        // If no menu items are available, show a message.
-        $('#main-content').html('<div class="alert alert-warning" role="alert">No pages available. Please contact an administrator.</div>');
+        $('#main-content').html('<div class="alert alert-warning">Nessuna pagina disponibile.</div>');
     }
 });
 </script>
