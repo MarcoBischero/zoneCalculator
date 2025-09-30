@@ -1,7 +1,6 @@
 <?php
 require_once("include/connection.php");
 require_once("include/functions.php");
-require_once("include/utils.php");
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

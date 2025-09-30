@@ -1,204 +1,190 @@
-<?
-/*------------------------------------------
-CHECK SETUP*/
-if (!file_exists( '../include/config.php' )){
-	if(file_exists('../setup/index.php')){
-		header( 'Location: ../setup/index.php' );
-		exit();
-	}else{
-		echo 'No configuration file found and no installation code available. Exiting...';
-		exit();
-	}
-}elseif(file_exists( '../include/config.php') && file_exists('../setup/index.php')){
-		echo 'Setup folder still exists. Please delete it.';
-		exit();
-}
-
-/*----------------------------------------*/
-$redirect = false;
+<?php
 require_once("../include/connection.php");
-require_once("../include/top.inc.php");
-require_once("../include/config.php");
 require_once("../include/auth_user.php");
 
-cancella_random_key($DBPrefix);
-//print_r( $_SESSION['userid']);
+// Fetch all data needed for the page with proper joins and error handling
+$alimenti = [];
+$query = "SELECT 
+            a.codice_alimento, 
+            a.nome, 
+            a.proteine, 
+            a.carboidrati, 
+            a.grassi, 
+            t.descrizione as tipo_desc, 
+            f.descrizione as fonte_desc, 
+            f.img as fonte_img
+          FROM {$DBPrefix}alimenti a
+          LEFT JOIN {$DBPrefix}tipo t ON a.cod_tipo = t.codice_tipo
+          LEFT JOIN {$DBPrefix}fonte f ON a.cod_fonte = f.codice_fonte
+          ORDER BY a.nome ASC";
+
+$result = $conn->query($query);
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $alimenti[] = $row;
+    }
+} else {
+    // Handle query error, maybe log it or show a user-friendly message
+    // For now, we just have an empty array.
+}
 
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<script type="text/javascript"> 
-//$.getScript("js/ajax.js");
+<div class="container-fluid mt-4">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Gestione Alimenti</h4>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAlimentoModal">
+                <i class="fas fa-plus"></i> Aggiungi Alimento
+            </button>
+        </div>
+        <div class="card-body">
+            <?php if (empty($alimenti)): ?>
+                <div class="alert alert-info">Nessun alimento trovato. Inizia aggiungendone uno!</div>
+            <?php else: ?>
+                <table id="table_alimenti" class="table table-striped table-bordered" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Proteine</th>
+                            <th>Carboidrati</th>
+                            <th>Grassi</th>
+                            <th>Tipo</th>
+                            <th>Fonte</th>
+                            <th class="no-sort">Modifica</th>
+                            <th class="no-sort">Elimina</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($alimenti as $alimento): ?>
+                            <tr id="alimento-<?php echo $alimento['codice_alimento']; ?>">
+                                <td><?php echo htmlspecialchars($alimento['nome']); ?></td>
+                                <td><?php echo str_replace('.', ',', $alimento['proteine']); ?></td>
+                                <td><?php echo str_replace('.', ',', $alimento['carboidrati']); ?></td>
+                                <td><?php echo str_replace('.', ',', $alimento['grassi']); ?></td>
+                                <td><?php echo htmlspecialchars($alimento['tipo_desc']); ?></td>
+                                <td><img src="img/<?php echo htmlspecialchars($alimento['fonte_img']); ?>" alt="<?php echo htmlspecialchars($alimento['fonte_desc']); ?>" title="<?php echo htmlspecialchars($alimento['fonte_desc']); ?>" style="width: 24px; height: 24px;"></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-warning" onclick="openEditModal(<?php echo $alimento['codice_alimento']; ?>)">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </button>
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-danger" onclick="confirmDelete(<?php echo $alimento['codice_alimento']; ?>)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
 
-$(document).ready( function () {
-    $('#table_alimenti').dataTable( {
-			pagingType: "full_numbers",
-        responsive: {
-            details: {
-                type: 'inline'
-            }
-        },
-        columnDefs: [
-            {
-                targets: [ 6 ],
-                sortable: false
-            },
-            {
-                targets: [ 7 ],
-                sortable: false
-            }
-        ],
-			  "autoWidth": false,
-        order: [ 0, 'asc' ]
-    } );
-} );
-$('#AddAlimAlimenti').click(function() {
-				aggiungiAlimento(false)
-			});
-validator.message['empty'] = 'Obbligatorio';	
-	$('#editAlimentoForm')
-			.on('blur', 'input[required], input.optional, select.required', validator.checkField)
-			.on('change', 'select.required', validator.checkField)
-			.on('keypress', 'input[required][pattern]', validator.keypress);
-	$('#addAlimentoFormAlimenti')
-			.on('blur', 'input[required], input.optional, select.required', validator.checkField)
-			.on('change', 'select.required', validator.checkField)
-			.on('keypress', 'input[required][pattern]', validator.keypress);
-			
-</script>
+<!-- Add Alimento Modal -->
+<div class="modal fade" id="addAlimentoModal" tabindex="-1" aria-labelledby="addAlimentoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAlimentoModalLabel">Aggiungi Nuovo Alimento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <?php include 'addAlimento.php'; // Includes the refactored form ?>
+            </div>
+        </div>
+    </div>
+</div>
 
-</head>
-<body>
-<div align="center" id='contentAlimenti'>
-	  <?
-	if($_GET['logout']=='1'){
-		@session_start();
-		@session_destroy();
-		
-		#Here is a way to delete alle cookies and cookie arrays from your domain.###########
-		foreach ($_COOKIE as $key=>$value) setcookie($key,'', time()-1, "/" ,NULL,0); 
-		####################################################################################
-		echo $message_logout;
-		header("Refresh: 1; URL=../login.php");
-		$redirect = true;
-		@ob_end_flush();
-	}
-	if ($redirect == false){
-
-$act = trim($_GET['act']);
-
-	//start dispaly
-		$query = 'SELECT * FROM '.$DBPrefix.'alimenti'.$query_prodotto.' ORDER BY nome ASC';
-			//echo $query;
-		$result = mysql_query($query,CONN) or die('Query fallita: ' . mysql_error());
-		$rows = mysql_num_rows($result);
-		if($rows>0){
-	?>
-	<table id="table_alimenti" class="display responsive" style="width: 100%; color:#FFFFFF;">
-	<thead height="40" bgcolor="#1B486D">
-      <tr >
-    <th class="desktop mobile tablet"><strong>Nome</strong></th>
-		<th class="desktop"><strong>Proteine</strong></th>
-		<th class="desktop"><strong>Carboidrati</strong></th>
-		<th class="desktop"><strong>Grassi</strong></th>
-		<th class="desktop tablet"><strong>Tipo</strong></th>
-		<th class="desktop mobile tablet"><strong>Fonte</strong></th>
-		<th class="desktop mobile tablet"></th>
-		<th class="desktop mobile tablet"></th>
-      </tr>
-	</thead>
-	<tbody>
-		<?
-			$conta = 0;
-			$color = "#FFFFFF";
-			while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
-			$c_menu++;
-				if ($conta == 1){
-					$color = "#26689D";
-					$conta = 0;
-				}else{
-					$conta = 1;
-					$color = "#2B72AC";
-				}	
-				$sql_tipo = "SELECT * FROM ".$DBPrefix."tipo WHERE codice_tipo=".$row['cod_tipo'];
-				//echo $sql_azienda;
-				$result_tipo = mysql_query($sql_tipo,CONN);
-				$row_tipo = mysql_fetch_array($result_tipo);
-				$sql_fonte = "SELECT * FROM ".$DBPrefix."fonte WHERE codice_fonte=".$row['cod_fonte'];
-				//echo $sql_azienda;
-				$result_fonte = mysql_query($sql_fonte,CONN);
-				$row_fonte = mysql_fetch_array($result_fonte);
-				
-		?>
-
-
-	  <tr height="40" id="selector<?=$c_menu?>" style="cursor:pointer; background-color: #2191c0;" >
-        <td height="20" style="background-color: #2191c0;"><div align="center">
-          <?=$row['nome']?>
-        </div></td>
-		<td><div align="center">
-		  <? echo str_replace('.',',',$row['proteine'])?>
-	    </div></td>
-        <td><div align="center">
-          <? echo str_replace('.',',',$row['carboidrati'])?>
-        </div></td>
-        <td><div align="center">
-        <? echo str_replace('.',',',$row['grassi'])?>
-        </div></td>
-		<td><div align="center">
-		  <?=$row_tipo['descrizione']?>
-	    </div></td>
-        <td>
-        	<div align="center">
-        		<img WIDTH="20" HEIGHT="20" src="img/<?=$row_fonte['img']?>" />
-             </div>
-        </td>
-        <td> 
-        	<div align="center" class="ui-widget-header">
-        		<span onclick="return modifyAlimento('<?=$row['codice_alimento']?>','<?=fix_special_char_sql($row['nome'])?>','<?=$row['cod_tipo']?>','<?=$row['cod_fonte']?>','<?=str_replace('.',',',$row['proteine'])?>','<?=str_replace('.',',',$row['grassi'])?>','<?=str_replace('.',',',$row['carboidrati'])?>');" class="ui-icon ui-icon-pencil">
-				</span>
-        	</div>
-        </td>
-       <td> 
-   		<div align="center" class="ui-widget-header">
-		   	<span onclick="notyDelAlimento(<?=$row['codice_alimento']?>,'<?=fix_special_char_sql($row['nome'])?>')" class="ui-icon ui-icon-white ui-icon-trash">
-		   	</span>
-		</div>
-       </td>
-	  </tr>
-		<?
-			}		
-	?>
-	</tbody>
-	</table>
-	<div align="left" style="display: inline-block; float: left">
-							<button role="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" id="AddAlimAlimenti" type="button">
-				<span class="ui-button-text"><i class="fa fa-plus"></i>&nbsp;Aggiungi Alimento</span>
-			</button>
-						</div>
-	<?
-	}else{
-	$errore = "<div align=center><img src=\"img/alert.gif\" /> <font color=\"#ff9900\"><strong>Nessun record da visualizzare</strong></font></div><br>";
-			echo $errore;
-	}  ?>
-	<br />
-	
-	
-	<?
-		
-	}
-	?>
+<!-- Edit Alimento Modal -->
+<div class="modal fade" id="editAlimentoModal" tabindex="-1" aria-labelledby="editAlimentoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editAlimentoModalLabel">Modifica Alimento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="editAlimentoModalBody">
+                <!-- Content will be loaded via AJAX -->
+                <div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 
-<div id="addAlimentoAlimenti" title="Aggiungi Alimento" style="display:none">
-<? include_once('addAlimentoAlimenti.php')?>
-	</div>
-	
-	<div id="editAlimento" title="Modifica Alimento" style="display:none">
-<? include_once('editAlimento.php')?>
-	</div>
+<script>
+$(document).ready(function() {
+    const alimentiTable = $('#table_alimenti').DataTable({
+        pagingType: "full_numbers",
+        responsive: true,
+        language: { url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/it-IT.json' },
+        columnDefs: [ {
+            targets: 'no-sort',
+            orderable: false
+        } ]
+    });
 
-</body>
-</html>
+    // Handle form submission for adding an alimento
+    $(document).on('submit', '#addAlimentoForm', function(e) {
+        e.preventDefault();
+        const formData = {
+            action: 'addAlimento',
+            descrizione: $('#desc_alimento').val(),
+            tipo: $('#tipo').val(),
+            fonte: $('#fonte').val(),
+            proteine: $('#proteine100').val(),
+            grassi: $('#grassi100').val(),
+            carboidrati: $('#carboidrati100').val()
+        };
+
+        $.post('pages/ajax.php', formData, function(response) {
+            if (response.status === 'success') {
+                new Noty({ type: 'success', text: response.message, timeout: 3000 }).show();
+                $('#addAlimentoModal').modal('hide');
+                // Here you should dynamically add the new row to the DataTable
+                // or simply reload the page/table content to see the changes.
+                loadPage('alimenti.php'); // Reloads the page content
+            } else {
+                new Noty({ type: 'error', text: response.message || 'Errore sconosciuto.', timeout: 3000 }).show();
+            }
+        }, 'json').fail(function() {
+            new Noty({ type: 'error', text: 'Errore di comunicazione con il server.', timeout: 3000 }).show();
+        });
+    });
+});
+
+function openEditModal(alimentoId) {
+    $('#editAlimentoModalBody').load(`pages/editAlimento.php?id=${alimentoId}`, function() {
+        $('#editAlimentoModal').modal('show');
+    });
+}
+
+function confirmDelete(alimentoId) {
+    new Noty({
+        text: 'Sei sicuro di voler eliminare questo alimento?',
+        layout: 'center',
+        modal: true,
+        buttons: [
+            Noty.button('Sì, Elimina', 'btn btn-danger', function () {
+                $.getJSON('pages/ajax.php', { action: 'DEL', idAlimento: alimentoId }, function(response) {
+                    if (response.status === 'success') {
+                        new Noty({ type: 'success', text: response.message, timeout: 2000 }).show();
+                        $(`#alimento-${alimentoId}`).fadeOut(300, function() { $(this).remove(); });
+                    } else {
+                        new Noty({ type: 'error', text: response.message, timeout: 3000 }).show();
+                    }
+                }).fail(function() {
+                    new Noty({ type: 'error', text: 'Errore di comunicazione.', timeout: 3000 }).show();
+                });
+                Noty.closeAll();
+            }),
+            Noty.button('Annulla', 'btn btn-secondary', function () {
+                Noty.closeAll();
+            })
+        ]
+    }).show();
+}
+
+</script>

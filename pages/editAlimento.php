@@ -1,137 +1,113 @@
+<?php
+require_once("../include/connection.php");
+require_once("../include/auth_user.php");
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-	<!--[if IE]>
-	<style>
-		.item .tooltip .content{ display:none; opacity:1; }
-		.item .tooltip:hover .content{ display:block; }
-	</style>
-	<![endif]-->
-</head>
-<body>
-<table border="0" width="100%" bgcolor="#3288CB" align="center" cellpadding="0" cellspacing="0" class="ui-corner-all" style="color:#FFFFFF;">
-	  <tr>
-	    <td>
-		 <section class='form'>
-				<form id="editAlimentoForm" >
-					<fieldset>
-						<div class="item">
-							<label>
-								<span>Descrizione</span>
-								<input data-validate-length-range="3" id="desc_alimentoedit" placeholder="ex. Pollo" required="required" />		
-							</label>
-							<div class='tooltip help'>
-								<span>?</span>
-								<div class='content'>
-									<b></b>
-									<p>Nome dell'alimento che si desidera aggiungere</p>
-								</div>
-							</div>
-						</div>
-						<div class="item">
-							<label>
-								<span>Tipo Alimento</span>
-								<select name="tipoedit" id="tipoedit" class="required">
-								    	<option value=''>
-								    		---Selezionare Tipo---
-								    	</option>
-										  <?
-										  $sql_tipo = "SELECT * FROM ".$DBPrefix."tipo ORDER BY codice_tipo ASC";
-											echo $sql_tipo;
-											$result_tipo = mysql_query($sql_tipo,CONN);
-											$rows_tipo = mysql_num_rows($result_tipo);
-											if($rows_tipo!=0){
-												while ($row_tipo=mysql_fetch_array($result_tipo,MYSQL_ASSOC)){?>
-									      	<option value="<?=$row_tipo['codice_tipo']?>">
-									      		<?=$row_tipo['descrizione']?>
-									      	</option>
-										  <?}
-										  }?>
-	    							</select>   
-							</label>
-							<div class='tooltip help'>
-								<span>?</span>
-								<div class='content'>
-									<b></b>
-									<p>Tipo alimento</p>
-								</div>
-							</div>
-						</div>
-						<div class="item">
-							<label>
-								<span>Fonte</span>
-									<select name="fonteedit" id="fonteedit" class="required">
-								    	<option value=''>
-								    		---Selezionare Fonte---
-								    	</option>
-										  <?
-										  $sql_tipo = "SELECT * FROM ".$DBPrefix."fonte ORDER BY codice_fonte ASC";
-											//echo $sql_azienda;
-											$result_tipo = mysql_query($sql_tipo,CONN);
-											$rows_tipo = mysql_num_rows($result_tipo);
-											if($rows_tipo!=0){
-												while ($row_tipo=mysql_fetch_array($result_tipo,MYSQL_ASSOC)){?>
-									      	<option value="<?=$row_tipo['codice_fonte']?>">
-									      		<?=$row_tipo['descrizione']?>
-									      	</option>
-										  <?}
-										  }?>
-	    							</select>   						</label>
-							<div class='tooltip help'>
-								<span>?</span>
-								<div class='content'>
-									<b></b>
-									<p>Fonte<br /><em>Ottima - Accettabile - Discutibile</em></p>
-								</div>
-							</div>
-						</div>
-						
-						<div class="item">
-							<label>
-								<span>Proteine 100g</span>
-									<input style="border:0; font-weight:bold;" required="required" type="text" id="proteine100edit" size="5"  value="" />
-							</label>
-						<div class='tooltip help'>
-								<span>?</span>
-								<div class='content'>
-									<b></b>
-									<p>Proteine per 100g di prodotto</p>
-								</div>
-							</div>
-						</div>
-							<div class="item">
-							<label>
-								<span>Grassi 100g</span>
-									<input style="border:0; font-weight:bold;" required="required" type="text" id="grassi100edit" size="5"  value="" />
-							</label>
-						<div class='tooltip help'>
-								<span>?</span>
-								<div class='content'>
-									<b></b>
-									<p>Grassi per 100g di prodotto</p>
-								</div>
-							</div>
-						</div>
-							<div class="item">
-							<label>
-								<span>Carbo 100g</span>
-									<input style="border:0; font-weight:bold;" required="required" type="text" id="carboidrati100edit" size="5"  value="" />
-							</label>
-						<div class='tooltip help'>
-								<span>?</span>
-								<div class='content'>
-									<b></b>
-									<p>Carboidrati per 100g di prodotto</p>
-								</div>
-							</div>
-						</div>
-	
-	
-					</fieldset>
-				</form>	
-		 </section>
-		</td>
-	  </tr>
-	</table>
-</body>
-</html>
+// Get the ID of the alimento from the URL
+$alimento_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+
+if ($alimento_id === 0) {
+    echo '<div class="alert alert-danger">ID Alimento non valido.</div>';
+    exit;
+}
+
+// Fetch the specific alimento data
+$stmt = $conn->prepare("SELECT * FROM {$DBPrefix}alimenti WHERE codice_alimento = ?");
+$stmt->bind_param('i', $alimento_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$alimento = $result->fetch_assoc();
+
+if (!$alimento) {
+    echo '<div class="alert alert-danger">Alimento non trovato.</div>';
+    exit;
+}
+
+// Fetch options for dropdowns
+$tipi = $conn->query("SELECT * FROM {$DBPrefix}tipo ORDER BY descrizione ASC");
+$fonti = $conn->query("SELECT * FROM {$DBPrefix}fonte ORDER BY descrizione ASC");
+
+?>
+
+<form id="editAlimentoForm">
+    <input type="hidden" name="alimento_id" value="<?php echo $alimento['codice_alimento']; ?>">
+
+    <div class="mb-3">
+        <label for="desc_alimento_edit" class="form-label">Descrizione</label>
+        <input type="text" class="form-control" id="desc_alimento_edit" name="descrizione" value="<?php echo htmlspecialchars($alimento['nome']); ?>" required>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="tipo_edit" class="form-label">Tipo Alimento</label>
+            <select class="form-select" id="tipo_edit" name="tipo" required>
+                <?php while($tipo = $tipi->fetch_assoc()): ?>
+                    <option value="<?php echo $tipo['codice_tipo']; ?>" <?php echo ($alimento['cod_tipo'] == $tipo['codice_tipo']) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($tipo['descrizione']); ?>
+                    </option>
+                <?php endwhile; ?>
+            </select>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="fonte_edit" class="form-label">Fonte</label>
+            <select class="form-select" id="fonte_edit" name="fonte" required>
+                <?php while($fonte = $fonti->fetch_assoc()): ?>
+                    <option value="<?php echo $fonte['codice_fonte']; ?>" <?php echo ($alimento['cod_fonte'] == $fonte['codice_fonte']) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($fonte['descrizione']); ?>
+                    </option>
+                <?php endwhile; ?>
+            </select>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="proteine100_edit" class="form-label">Proteine (100g)</label>
+            <input type="number" class="form-control" id="proteine100_edit" name="proteine" value="<?php echo $alimento['proteine']; ?>" step="0.1" required>
+        </div>
+        <div class="col-md-4">
+            <label for="grassi100_edit" class="form-label">Grassi (100g)</label>
+            <input type="number" class="form-control" id="grassi100_edit" name="grassi" value="<?php echo $alimento['grassi']; ?>" step="0.1" required>
+        </div>
+        <div class="col-md-4">
+            <label for="carboidrati100_edit" class="form-label">Carboidrati (100g)</label>
+            <input type="number" class="form-control" id="carboidrati100_edit" name="carboidrati" value="<?php echo $alimento['carboidrati']; ?>" step="0.1" required>
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-end">
+        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Annulla</button>
+        <button type="submit" class="btn btn-primary">Salva Modifiche</button>
+    </div>
+</form>
+
+<script>
+// This script block will be executed when the form is loaded into the modal
+$(document).ready(function() {
+    $('#editAlimentoForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = {
+            action: 'updateAlimento',
+            id: $('[name="alimento_id"]').val(),
+            descrizione: $('#desc_alimento_edit').val(),
+            tipo: $('#tipo_edit').val(),
+            fonte: $('#fonte_edit').val(),
+            proteine: $('#proteine100_edit').val(),
+            grassi: $('#grassi100_edit').val(),
+            carboidrati: $('#carboidrati100_edit').val()
+        };
+
+        $.post('pages/ajax.php', formData, function(response) {
+            if (response.status === 'success') {
+                new Noty({ type: 'success', text: response.message, timeout: 3000 }).show();
+                $('#editAlimentoModal').modal('hide');
+                loadPage('alimenti.php'); // Reload the main content to see changes
+            } else {
+                new Noty({ type: 'error', text: response.message || 'Errore durante l\'aggiornamento.', timeout: 3000 }).show();
+            }
+        }, 'json').fail(function() {
+            new Noty({ type: 'error', text: 'Errore di comunicazione con il server.', timeout: 3000 }).show();
+        });
+    });
+});
+</script>
