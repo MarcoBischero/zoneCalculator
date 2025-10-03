@@ -5,8 +5,8 @@ $CAMversion = 'v2.0';
 
 // Database credentials
 $DBhostname = 'localhost';
-$DBuser = 'mycam2';
-$DBpasswd = 'Aqlt709_!0';
+$DBuser = 'mycamcccc';
+$DBpasswd = 'xxxxxxx';
 $DBname = 'zoneCalculator';
 $DBPrefix = '';
 
