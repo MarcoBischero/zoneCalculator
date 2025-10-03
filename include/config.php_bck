@@ -80,8 +80,8 @@ $CAMversion='v2.0';
 if(in_array($_SERVER['REMOTE_ADDR'], $whitelist)){
     $CAMversion='v2.0';
 $DBhostname= 'localhost';
- $DBuser= 'mycam2';
- $DBpasswd= 'aqlt709';
+ $DBuser= 'mycamccccc';
+ $DBpasswd= 'xxxxxx';
  $DBname= 'zoneCalculator';
  $DBPrefix= '';
  $DBOld= '';
