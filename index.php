@@ -120,15 +120,31 @@ function calculateProteinNeed() {
     if (sesso === 'uomo') {
         const addome = parseFloat($('#addome').val());
         if (isNaN(addome) || addome <= 0) { new Noty({type: 'warning', text: 'Inserire un valore valido per l\'addome.'}).show(); return; }
+
+        // BUG FIX: Validate the input to Math.log10
+        const logInputMale = addome - collo;
+        if (logInputMale <= 0) {
+            new Noty({type: 'error', text: 'La circonferenza dell\'addome deve essere maggiore di quella del collo.'}).show();
+            return;
+        }
+
         // Formula di Hodgdon & Beckett per Uomo (in cm)
-        percMassaGrassa = 495 / (1.0324 - 0.19077 * Math.log10(addome - collo) + 0.15456 * Math.log10(altezza)) - 450;
+        percMassaGrassa = 495 / (1.0324 - 0.19077 * Math.log10(logInputMale) + 0.15456 * Math.log10(altezza)) - 450;
     } else { // Donna
         const vita = parseFloat($('#vita').val());
         const anche = parseFloat($('#anche').val());
-         if (isNaN(vita) || vita <= 0) { new Noty({type: 'warning', text: 'Inserire un valore valido per la vita.'}).show(); return; }
+        if (isNaN(vita) || vita <= 0) { new Noty({type: 'warning', text: 'Inserire un valore valido per la vita.'}).show(); return; }
         if (isNaN(anche) || anche <= 0) { new Noty({type: 'warning', text: 'Inserire un valore valido per le anche.'}).show(); return; }
+
+        // BUG FIX: Validate the input to Math.log10
+        const logInputFemale = vita + anche - collo;
+        if (logInputFemale <= 0) {
+            new Noty({type: 'error', text: 'La somma di vita e anche deve essere maggiore della circonferenza del collo.'}).show();
+            return;
+        }
+
         // Formula di Hodgdon & Beckett per Donna (in cm)
-        percMassaGrassa = 495 / (1.29579 - 0.35004 * Math.log10(vita + anche - collo) + 0.22100 * Math.log10(altezza)) - 450;
+        percMassaGrassa = 495 / (1.29579 - 0.35004 * Math.log10(logInputFemale) + 0.22100 * Math.log10(altezza)) - 450;
     }
 
     if (isNaN(peso) || isNaN(altezza) || isNaN(collo) || isNaN(attivita)){

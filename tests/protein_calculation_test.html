@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test for Protein Calculation Bug</title>
+    <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-2.20.0.css">
+</head>
+<body>
+    <div id="qunit"></div>
+    <div id="qunit-fixture">
+        <!-- Man's measurements -->
+        <div class="misura-uomo">
+            <input type="number" id="peso" value="80">
+            <input type="number" id="altezza" value="180">
+            <input type="number" id="collo" value="40">
+            <input type="number" id="addome" value="35">
+            <select id="attivita"><option value="1.7"></option></select>
+        </div>
+        <!-- Woman's measurements -->
+        <div class="misura-donna" style="display: none;">
+            <input type="number" id="vita" value="60">
+            <input type="number" id="anche" value="90">
+        </div>
+        <!-- Result fields -->
+        <input type="text" id="out_percentualeMG">
+        <input type="text" id="out_percentualeMM">
+        <input type="text" id="out_proteineDay">
+        <input type="text" id="out_blocchiZona">
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://code.jquery.com/qunit/qunit-2.20.0.js"></script>
+
+    <script>
+    // Original buggy function
+    function calculateProteinNeed_buggy() {
+        const sesso = $('.misura-donna').is(':visible') ? 'donna' : 'uomo';
+        const peso = parseFloat($('#peso').val());
+        const altezza = parseFloat($('#altezza').val());
+        const collo = parseFloat($('#collo').val());
+        const attivita = parseFloat($('#attivita').val());
+        let percMassaGrassa = 0;
+        if (sesso === 'uomo') {
+            const addome = parseFloat($('#addome').val());
+            percMassaGrassa = 495 / (1.0324 - 0.19077 * Math.log10(addome - collo) + 0.15456 * Math.log10(altezza)) - 450;
+        } else {
+            const vita = parseFloat($('#vita').val());
+            const anche = parseFloat($('#anche').val());
+            percMassaGrassa = 495 / (1.29579 - 0.35004 * Math.log10(vita + anche - collo) + 0.22100 * Math.log10(altezza)) - 450;
+        }
+        const massaGrassaKg = (peso * percMassaGrassa) / 100;
+        const massaMagraKg = peso - massaGrassaKg;
+        const fabbisognoProteico = massaMagraKg * attivita;
+        $('#out_percentualeMG').val(percMassaGrassa.toFixed(2) + ' %');
+        $('#out_proteineDay').val(fabbisognoProteico.toFixed(2));
+    }
+
+    // Corrected function
+    function calculateProteinNeed_fixed() {
+        const sesso = $('.misura-donna').is(':visible') ? 'donna' : 'uomo';
+        const peso = parseFloat($('#peso').val());
+        const altezza = parseFloat($('#altezza').val());
+        const collo = parseFloat($('#collo').val());
+        const attivita = parseFloat($('#attivita').val());
+        let percMassaGrassa = 0;
+
+        if (sesso === 'uomo') {
+            const addome = parseFloat($('#addome').val());
+            const logInputMale = addome - collo;
+            if (logInputMale <= 0) {
+                return "La circonferenza dell'addome deve essere maggiore di quella del collo.";
+            }
+            percMassaGrassa = 495 / (1.0324 - 0.19077 * Math.log10(logInputMale) + 0.15456 * Math.log10(altezza)) - 450;
+        } else {
+            const vita = parseFloat($('#vita').val());
+            const anche = parseFloat($('#anche').val());
+            const logInputFemale = vita + anche - collo;
+            if (logInputFemale <= 0) {
+                return "La somma di vita e anche deve essere maggiore della circonferenza del collo.";
+            }
+            percMassaGrassa = 495 / (1.29579 - 0.35004 * Math.log10(logInputFemale) + 0.22100 * Math.log10(altezza)) - 450;
+        }
+        const massaGrassaKg = (peso * percMassaGrassa) / 100;
+        const massaMagraKg = peso - massaGrassaKg;
+        const fabbisognoProteico = massaMagraKg * attivita;
+        $('#out_percentualeMG').val(percMassaGrassa.toFixed(2) + ' %');
+        $('#out_proteineDay').val(fabbisognoProteico.toFixed(2));
+        return "OK";
+    }
+
+    QUnit.module('Protein Calculation Logic', function() {
+        QUnit.test('Buggy function fails with invalid input', function(assert) {
+            $('#addome').val(35); // Invalid input: addome <= collo (40)
+            calculateProteinNeed_buggy();
+            const result = $('#out_percentualeMG').val();
+            assert.ok(result.includes('NaN'), 'The buggy function should produce NaN');
+        });
+
+        QUnit.test('Fixed function shows error with invalid input', function(assert) {
+            $('#addome').val(35);
+            const result = calculateProteinNeed_fixed();
+            assert.equal(result, "La circonferenza dell'addome deve essere maggiore di quella del collo.", "The fixed function should return an error message.");
+        });
+
+        QUnit.test('Fixed function works with valid input', function(assert) {
+            $('#addome').val(45); // Valid input
+            const result = calculateProteinNeed_fixed();
+            const protein = parseFloat($('#out_proteineDay').val());
+            assert.equal(result, "OK", "The fixed function should execute successfully.");
+            assert.ok(!isNaN(protein) && protein > 0, "Protein calculation should be a valid positive number.");
+        });
+    });
+    </script>
+</body>
+</html>
