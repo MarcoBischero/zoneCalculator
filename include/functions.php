@@ -56,14 +56,11 @@ function cancella_random_key($conn, $DBPrefix)
  * @return string The generated random string.
  */
 function random_string($length) {
-    $key = '';
-    $keys = array_merge(range(0, 9), range('a', 'z'));
-
-    for ($i = 0; $i < $length; $i++) {
-        $key .= $keys[array_rand($keys)];
-    }
-
-    return $key;
+    // Each byte from random_bytes is represented by two hex characters, so we need half the length.
+    $byteLength = ceil($length / 2);
+    $randomBytes = random_bytes($byteLength);
+    // Convert to hex and trim to the exact desired length
+    return substr(bin2hex($randomBytes), 0, $length);
 }
 
 ?>
