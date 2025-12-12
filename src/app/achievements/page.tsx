@@ -79,9 +79,9 @@ export default function AchievementsPage() {
                 {achievements.map((achievement) => (
                     <div
                         key={achievement.id}
-                        className={`glass-card p-6 rounded-2xl border transition-all hover:scale-[1.02] relative overflow-hidden ${achievement.unlocked
-                            ? 'border-primary/20 bg-white/60 dark:bg-white/5 shadow-lg shadow-primary/5'
-                            : 'border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 opacity-80'
+                        className={`p-6 rounded-2xl border transition-all hover:scale-[1.02] relative overflow-hidden ${achievement.unlocked
+                            ? 'glass-card border-primary/20 bg-white/60 dark:bg-white/5 shadow-lg shadow-primary/5'
+                            : 'bg-slate-900 border-slate-800 opacity-90'
                             }`}
                     >
                         {/* Lock Overlay for Locked Items */}
@@ -92,22 +92,22 @@ export default function AchievementsPage() {
                         )}
 
                         <div className="flex items-start justify-between mb-4">
-                            <div className={`p-3 rounded-xl ${achievement.unlocked ? achievement.bg : 'bg-slate-200 dark:bg-slate-800'}`}>
-                                <achievement.icon className={`w-6 h-6 ${achievement.unlocked ? achievement.color : 'text-slate-400'}`} />
+                            <div className={`p-3 rounded-xl ${achievement.unlocked ? achievement.bg : 'bg-slate-800'}`}>
+                                <achievement.icon className={`w-6 h-6 ${achievement.unlocked ? achievement.color : 'text-slate-500'}`} />
                             </div>
                             {achievement.unlocked ? (
                                 <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-900">
                                     {t('achievements.unlocked')}
                                 </span>
                             ) : (
-                                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-500 border border-slate-300 dark:border-slate-700">
+                                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
                                     {t('achievements.locked')}
                                 </span>
                             )}
                         </div>
 
-                        <h3 className="font-semibold text-lg mb-1">{achievement.title}</h3>
-                        <p className={`text-sm leading-relaxed mb-4 ${achievement.unlocked ? 'text-muted-foreground' : 'text-slate-500 dark:text-slate-400'}`}>
+                        <h3 className={`font-semibold text-lg mb-1 ${achievement.unlocked ? '' : 'text-slate-200'}`}>{achievement.title}</h3>
+                        <p className={`text-sm leading-relaxed mb-4 ${achievement.unlocked ? 'text-muted-foreground' : 'text-slate-400'}`}>
                             {achievement.description}
                         </p>
 

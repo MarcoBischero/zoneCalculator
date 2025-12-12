@@ -11,7 +11,7 @@
 
 **From simple calculator to complete platform** - ZoneCalculator PRO is a modern, AI-powered platform for Zone Diet management, featuring meal planning, gamification, and multi-user support.
 
-[🚀 Live Demo](#) • [📚 Documentation](https://codewiki.google/MarcoBischero/zoneCalculator) • [🐛 Report Bug](https://github.com/MarcoBischero/zoneCalculator/issues) • [✨ Request Feature](https://github.com/MarcoBischero/zoneCalculator/issues)
+[🚀 Quick Start](#-quick-start) • [📚 API Docs](./API_DOCS.md) • [🏗️ Architecture](./ARCHITECTURE.md) • [🐛 Report Bug](https://github.com/MarcoBischero/zoneCalculator/issues)
 
 </div>
 
@@ -153,7 +153,7 @@ GEMINI_API_KEY="your-gemini-api-key"
 - **[📖 API Documentation](./API_DOCS.md)** - Complete API reference
 - **[🏗️ Architecture](./ARCHITECTURE.md)** - System design & patterns
 - **[🚀 Deployment Guide](./DEPLOYMENT.md)** - Production deployment
-- **[🤖 CodeWiki](https://codewiki.google/MarcoBischero/zoneCalculator)** - AI-generated docs
+- **[🤖 AI Models](./docs/AI_MODELS.md)** - Logic and configuration of AI features
 
 ---
 
@@ -309,7 +309,7 @@ Need help? We're here for you:
 - 📧 **Email**: support@zonecalculator.app
 - 💬 **Discord**: [Join our server](https://discord.gg/zonecalculator)
 - 🐛 **Issues**: [GitHub Issues](https://github.com/MarcoBischero/zoneCalculator/issues)
-- 📚 **Docs**: [CodeWiki](https://codewiki.google/MarcoBischero/zoneCalculator)
+- 📚 **Docs**: [API Documentation](./API_DOCS.md)
 
 ---
 

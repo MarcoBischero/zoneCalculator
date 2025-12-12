@@ -1,0 +1,78 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: europe-west1
+  SERVICE_NAME: zone-calculator-pro
+  REPO_NAME: zone-calculator-repo
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      - name: Install Dependencies
+        run: npm ci --legacy-peer-deps
+      
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      # Note: E2E tests often require a running database.
+      # For simple CI, we might skip E2E that requires DB or use a service container.
+      # For now, we will run build verification and unit tests if any.
+      # Running full E2E against a persistent DB in CI requires more complex setup (docker-compose).
+      # We will run the build to ensure it compiles.
+      - name: Verify Build
+        run: npm run build
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+
+      - name: 'Configure Docker'
+        run: |
+          gcloud auth configure-docker ${env.REGION}-docker.pkg.dev
+
+      - name: 'Build and Push Container'
+        run: |
+          docker build -t ${env.REGION}-docker.pkg.dev/${env.PROJECT_ID}/${env.REPO_NAME}/${env.SERVICE_NAME}:${{ github.sha }} .
+          docker push ${env.REGION}-docker.pkg.dev/${env.PROJECT_ID}/${env.REPO_NAME}/${env.SERVICE_NAME}:${{ github.sha }}
+      
+      # Tag as latest as well
+          docker tag ${env.REGION}-docker.pkg.dev/${env.PROJECT_ID}/${env.REPO_NAME}/${env.SERVICE_NAME}:${{ github.sha }} ${env.REGION}-docker.pkg.dev/${env.PROJECT_ID}/${env.REPO_NAME}/${env.SERVICE_NAME}:latest
+          docker push ${env.REGION}-docker.pkg.dev/${env.PROJECT_ID}/${env.REPO_NAME}/${env.SERVICE_NAME}:latest
+
+      - name: 'Deploy to Cloud Run'
+        uses: 'google-github-actions/deploy-cloudrun@v1'
+        with:
+          service: '${{ env.SERVICE_NAME }}'
+          region: '${{ env.REGION }}'
+          image: '${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}'
+          env_vars: |
+            NODE_ENV=production
+            # Secrets should be injected here or via Secret Manager
