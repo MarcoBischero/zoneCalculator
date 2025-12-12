@@ -60,12 +60,10 @@ jobs:
 
       - name: 'Build and Push Container'
         run: |
-          docker build -t ${env.REGION}-docker.pkg.dev/${env.PROJECT_ID}/${env.REPO_NAME}/${env.SERVICE_NAME}:${{ github.sha }} .
-          docker push ${env.REGION}-docker.pkg.dev/${env.PROJECT_ID}/${env.REPO_NAME}/${env.SERVICE_NAME}:${{ github.sha }}
-      
-      # Tag as latest as well
-          docker tag ${env.REGION}-docker.pkg.dev/${env.PROJECT_ID}/${env.REPO_NAME}/${env.SERVICE_NAME}:${{ github.sha }} ${env.REGION}-docker.pkg.dev/${env.PROJECT_ID}/${env.REPO_NAME}/${env.SERVICE_NAME}:latest
-          docker push ${env.REGION}-docker.pkg.dev/${env.PROJECT_ID}/${env.REPO_NAME}/${env.SERVICE_NAME}:latest
+          docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }} .
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          docker tag ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }} ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:latest
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:latest
 
       - name: 'Deploy to Cloud Run'
         uses: 'google-github-actions/deploy-cloudrun@v1'
