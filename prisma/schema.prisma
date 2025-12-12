@@ -1,0 +1,227 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Alimento {
+  nome           String @db.Text
+  proteine       Float  @default(0.00) @db.Float
+  carboidrati    Float  @default(0.00) @db.Float
+  grassi         Float  @default(0.00) @db.Float
+  codiceAlimento Int    @id @default(autoincrement()) @map("codice_alimento")
+  codTipo        Int    @default(0) @map("cod_tipo")
+  codFonte       Int    @default(0) @map("cod_fonte")
+  tipo           Tipo?  @relation(fields: [codTipo], references: [codiceTipo])
+  fonte          Fonte? @relation(fields: [codFonte], references: [codiceFonte])
+  pasti          PastoAlimento[]
+
+  @@index([nome], map: "alimento_nome_idx")
+  @@map("alimenti")
+}
+
+model CalendarItem {
+  id             Int      @id @default(autoincrement())
+  column         Int
+  order          Int
+  lastUpdateDate DateTime @default(now()) @updatedAt @map("last_update_date") @db.Timestamp(0)
+  idUser         Int      @map("id_user")
+  codPasto       Int      @map("cod_pasto")
+  user           User     @relation(fields: [idUser], references: [id])
+  pasto          Pasto    @relation(fields: [codPasto], references: [codicePasto])
+
+  @@index([idUser], map: "calendar_items_id_user_idx")
+  @@index([codPasto], map: "calendar_items_cod_pasto_idx")
+  @@index([idUser, column, order], map: "calendar_user_day_order_idx")
+  @@map("calendar_items")
+}
+
+model Feature {
+  id          Int    @id @default(autoincrement())
+  descrizione String @db.Text
+  pagina      String @db.Text
+  ordine      Int?   @db.SmallInt
+
+  class       String @db.VarChar(25)
+  ruoli       RoleFeature[]
+
+  @@map("features")
+}
+
+model Fonte {
+  codiceFonte Int    @id @default(autoincrement()) @map("codice_fonte")
+  descrizione String @db.Text
+
+
+  img         String @db.Text
+  alimenti    Alimento[]
+
+  @@map("fonte")
+}
+
+model Opzione {
+  id      Int     @id @default(autoincrement())
+  opzione String? @db.Text
+  valore  String? @db.LongText
+
+  @@map("opzioni")
+}
+
+model Pasto {
+  codicePasto Int            @id @default(autoincrement()) @map("codice_pasto")
+  dow         String?     @map("dow")
+  mealType    String      @map("mealType") @default("0")
+  nome        String         @db.VarChar(50)
+  note        String?        @db.Text
+  description String?        @db.LongText // For AI Procedure
+  imgUrl      String?        @db.Text // For AI Image
+  blocks      Int
+  isShared    Boolean        @default(false) @map("is_shared") // Dietician shared meal
+  codUser     Int            @map("cod_user")
+  user        User?          @relation(fields: [codUser], references: [id])
+  calendarItems CalendarItem[]
+  alimenti    PastoAlimento[]
+
+  @@index([codUser], map: "cod_user")
+  @@index([codUser, isShared], map: "pasto_user_shared_idx")
+  @@index([mealType], map: "pasto_meal_type_idx")
+  @@map("pasti")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model PastoAlimento {
+  codPasto    Int @map("cod_pasto")
+  codAlimento Int @map("cod_alimento")
+  grAlimento  Float   @default(0) @map("gr_alimento")
+  pasto       Pasto    @relation(fields: [codPasto], references: [codicePasto], onDelete: NoAction, onUpdate: NoAction, map: "pasti_alimenti_ibfk_1")
+  alimento    Alimento @relation(fields: [codAlimento], references: [codiceAlimento], onDelete: NoAction, onUpdate: NoAction, map: "pasti_alimenti_ibfk_2")
+
+  @@id([codPasto, codAlimento])
+  @@index([codAlimento], map: "cod_alimento")
+  @@map("pasti_alimenti")
+}
+
+model ProtNeed {
+  codiceProtneed Int                      @id @default(autoincrement()) @map("codice_protneed")
+  codUser        Int                      @map("cod_user")
+  peso           Int
+  altezza        Int
+  addome         Int?
+  collo          Int
+  vita           Int?
+  anche          Int?
+  polso          Int?
+  avambraccio    Int?
+  moltiplicatore String
+  lastCheck      DateTime                 @map("lastCheck") @db.Date
+  blocchi        Int
+  percentualeMM  Decimal                  @db.Decimal(5, 1)
+  percentualeMG  Decimal                  @db.Decimal(5, 1)
+
+
+  proteineDay    Decimal                  @db.Decimal(5, 1)
+
+  user           User                     @relation(fields: [codUser], references: [id])
+
+  @@index([codUser], map: "cod_user")
+  @@map("prot_need")
+}
+
+model User {
+  id               Int            @id @default(autoincrement())
+  cognome          String?        @db.Text
+  nome             String?        @db.Text
+  email            String?        @db.Text
+  username         String?        @db.Text
+  password         String?        @db.Text
+  idRuolo          Int?           @map("id_ruolo")
+  mode             String?        @default("0")
+  language         String         @default("it")
+  sesso            risorse_sesso  @default(uomo)
+  randKey          String         @map("rand_key") @db.Text
+  cookie           String         @default("1")
+  lastaccess       Int            @default(0)
+  lastaccessupdate Int            @default(0)
+  ip               String         @db.Text
+  ipupdate         String         @db.Text
+
+  // Hierarchy: Dietician -> Patients
+  dieticianId      Int?           @map("dietician_id")
+  dietician        User?          @relation("DieticianPatients", fields: [dieticianId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  patients         User[]         @relation("DieticianPatients")
+
+  // Gamification
+  gamification     GamificationProfile?
+
+  ruolo            Role?          @relation(fields: [idRuolo], references: [id])
+  pasti            Pasto[]
+  calendarItems    CalendarItem[]
+  protNeeds        ProtNeed[]
+
+  @@index([id], map: "id")
+  @@index([idRuolo], map: "id_ruolo")
+  @@index([dieticianId], map: "dietician_id")
+  @@map("risorse")
+}
+
+model GamificationProfile {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  points    Int      @default(0)
+  level     Int      @default(1)
+  streak    Int      @default(0)
+  lastAction DateTime @default(now()) @map("last_action")
+
+  @@index([points]) // efficient leaderboard
+  @@map("gamification_profiles")
+}
+
+model Role {
+  id          Int     @id @default(autoincrement())
+  descrizione String? @db.Text
+  users       User[]
+  features    RoleFeature[]
+
+  @@map("ruoli")
+}
+
+model RoleFeature {
+  idRuolo   Int? @map("id_ruolo")
+  idFeature Int? @map("id_feature")
+  cod       Int  @id @default(autoincrement())
+  ruolo     Role?   @relation(fields: [idRuolo], references: [id])
+  feature   Feature? @relation(fields: [idFeature], references: [id])
+
+  @@index([idFeature], map: "id_feature")
+  @@index([idRuolo], map: "id_ruolo")
+  @@map("ruoli_features")
+}
+
+model Tipo {
+  codiceTipo  Int    @id @default(autoincrement()) @map("codice_tipo")
+  descrizione String @db.Text
+
+
+  percProt    Int    @default(0) @map("perc_prot")
+  alimenti    Alimento[]
+
+  @@map("tipo")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model random_key {
+  codice String   @db.Text
+  data   DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
+
+  @@ignore
+}
+
+enum risorse_sesso {
+  uomo
+  donna
+}
