@@ -3,495 +3,227 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* ZONE OS - LIGHT MODE (Default) */
+    /* Base HSL Values */
+    --base-hue: 220;
+    --base-sat: 14%;
 
-  :root,
-  .professional-light {
-    /* OCEAN BLUE SERENITY - Coolors Palette */
-    --background: 0 0% 100%;
-    --foreground: 195 80% 15%;
+    /* Semantic Colors */
+    --background: var(--base-hue) var(--base-sat) 98%;
+    /* Soft Off-White */
+    --foreground: var(--base-hue) var(--base-sat) 10%;
+    /* Deep Gunmetal */
 
+    /* Surfaces */
     --card: 0 0% 100%;
-    --card-foreground: 195 80% 15%;
-
+    --card-foreground: var(--base-hue) var(--base-sat) 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 195 80% 15%;
+    --popover-foreground: var(--base-hue) var(--base-sat) 10%;
 
-    /* Sky Blue Primary - #4cb8d8 */
-    --primary: 190 65% 45%;
+    /* Brand Colors (Linear-style Blue) */
+    --primary: 220 90% 56%;
     --primary-foreground: 0 0% 100%;
 
-    /* Teal Accent - #1a7f9b */
-    --secondary: 193 69% 36%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 220 20% 90%;
+    --secondary-foreground: 220 40% 10%;
 
-    --muted: 186 30% 96%;
-    --muted-foreground: 195 40% 35%;
+    --muted: 220 20% 94%;
+    --muted-foreground: 220 20% 45%;
 
-    --accent: 186 30% 96%;
-    --accent-foreground: 195 80% 15%;
+    --accent: 220 90% 56%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 186 30% 88%;
-    --input: 186 30% 88%;
-    --ring: 190 65% 45%;
+    /* Borders & Inputs */
+    --border: 220 20% 90%;
+    --input: 220 20% 90%;
+    --ring: 220 90% 56%;
 
-    --radius: 0.5rem;
+    /* Radius & Spacing */
+    --radius: 0.75rem;
+    /* 12px for modern feel */
 
-    /* Sidebar - Deep Teal with white text */
-    --sidebar-bg: 193 69% 36%;
-    --sidebar-fg: 0 0% 100%;
-    --sidebar-accent: 190 100% 85%;
+    /* ZoneOS Specifics */
+    --sidebar-bg: var(--base-hue) var(--base-sat) 98%;
+    --sidebar-fg: var(--base-hue) var(--base-sat) 40%;
+    --sidebar-fg-active: var(--base-hue) var(--base-sat) 10%;
+    --sidebar-accent: 220 90% 56%;
 
-    --macro-protein: 0 72% 51%;
-    --macro-carb: 142 71% 45%;
-    --macro-fat: 38 92% 50%;
-
-    --gradient-primary: linear-gradient(135deg, hsl(190 65% 45%) 0%, hsl(193 69% 36%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(186 30% 96%) 0%, hsl(190 65% 45%) 100%);
-  }
-
-  .midnight-pro {
-    /* DEEP SEA - Coolors Palette */
-    --background: 220 65% 8%;
-    --foreground: 180 30% 95%;
-
-    --card: 220 55% 12%;
-    --card-foreground: 180 30% 95%;
-
-    --popover: 220 55% 12%;
-    --popover-foreground: 180 30% 95%;
-
-    /* Sea Serpent - #5BC0BE */
-    --primary: 179 47% 56%;
-    --primary-foreground: 220 65% 8%;
-
-    /* Aquamarine - #6FFFE9 */
-    --secondary: 169 100% 72%;
-    --secondary-foreground: 220 65% 8%;
-
-    --muted: 220 45% 18%;
-    --muted-foreground: 180 20% 75%;
-
-    --accent: 220 45% 18%;
-    --accent-foreground: 180 30% 95%;
-
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 220 40% 22%;
-    --input: 220 40% 22%;
-    --ring: 179 47% 56%;
-
-    /* Sidebar - Maastricht Blue with bright text */
-    --sidebar-bg: 220 65% 10%;
-    --sidebar-fg: 0 0% 100%;
-    --sidebar-accent: 179 60% 70%;
-
-    --macro-protein: 0 84% 60%;
-    --macro-carb: 142 71% 45%;
-    --macro-fat: 38 92% 50%;
-
-    --gradient-primary: linear-gradient(135deg, hsl(179 47% 56%) 0%, hsl(169 100% 72%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(220 65% 8%) 0%, hsl(179 47% 56%) 100%);
-  }
-
-  .tokyo-nights {
-    /* TOKYO NIGHTS - Authentic Cyberpunk */
-    --background: 240 10% 8%;
-    --foreground: 180 100% 85%;
-
-    --card: 240 8% 12%;
-    --card-foreground: 180 100% 85%;
-
-    --popover: 240 8% 12%;
-    --popover-foreground: 180 100% 85%;
-
-    /* Electric Cyan */
-    --primary: 180 100% 60%;
-    --primary-foreground: 240 10% 8%;
-
-    /* Hot Pink */
-    --secondary: 330 100% 65%;
-    --secondary-foreground: 240 10% 8%;
-
-    --muted: 240 8% 18%;
-    --muted-foreground: 180 30% 70%;
-
-    --accent: 280 100% 70%;
-    --accent-foreground: 240 10% 8%;
-
-    --destructive: 0 100% 67%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 240 8% 22%;
-    --input: 240 8% 18%;
-    --ring: 180 100% 60%;
-
-    /* Sidebar - Pure Black with Cyan */
-    --sidebar-bg: 240 10% 4%;
-    --sidebar-fg: 180 100% 60%;
-    --sidebar-accent: 330 100% 65%;
-
-    --macro-protein: 0 100% 67%;
-    --macro-carb: 120 100% 60%;
-    --macro-fat: 45 100% 60%;
-
-    --gradient-primary: linear-gradient(135deg, hsl(180 100% 60%) 0%, hsl(330 100% 65%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(280 100% 70%) 0%, hsl(45 100% 60%) 100%);
-    --gradient-holographic: linear-gradient(135deg,
-        hsl(180 100% 60% / 0.2) 0%,
-        hsl(330 100% 65% / 0.2) 50%,
-        hsl(280 100% 70% / 0.2) 100%);
-  }
-
-  .zen-garden {
-    /* OCEAN SUNSET - Coolors Palette */
-    --background: 0 0% 100%;
-    --foreground: 195 70% 20%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 195 70% 20%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 195 70% 20%;
-
-    /* Blue Sapphire - #115E7C */
-    --primary: 195 75% 29%;
-    --primary-foreground: 0 0% 100%;
-
-    /* Coral/Tangelo - #EE4900 */
-    --secondary: 16 100% 47%;
-    --secondary-foreground: 0 0% 100%;
-
-    --muted: 186 30% 96%;
-    --muted-foreground: 195 40% 35%;
-
-    --accent: 45 100% 90%;
-    --accent-foreground: 195 70% 20%;
-
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 186 30% 88%;
-    --input: 186 30% 88%;
-    --ring: 195 75% 29%;
-
-    /* Sidebar - Rackley Blue with white text */
-    --sidebar-bg: 200 40% 45%;
-    --sidebar-fg: 0 0% 100%;
-    --sidebar-accent: 16 100% 70%;
-
-    --macro-protein: 0 72% 51%;
-    --macro-carb: 142 71% 45%;
-    --macro-fat: 45 100% 60%;
-
-    --gradient-primary: linear-gradient(135deg, hsl(195 75% 29%) 0%, hsl(16 100% 47%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(45 100% 90%) 0%, hsl(195 75% 29%) 100%);
-  }
-
-  /* Legacy support - map to new themes */
-  .light {
-    --background: 240 20% 98%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 221 83% 55%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 24 95% 55%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 221 83% 55%;
-    --macro-protein: 0 84% 60%;
-    --macro-carb: 142 71% 45%;
-    --macro-fat: 45 93% 47%;
+    /* Nutrient Macros */
+    --macro-protein: 0 80% 60%;
+    /* Vibrant Red */
+    --macro-carb: 150 60% 45%;
+    /* Emerald Green */
+    --macro-fat: 45 90% 55%;
+    /* Golden Yellow */
   }
 
   .dark {
-    --background: 222 84% 5%;
-    --foreground: 210 40% 98%;
-    --card: 217 33% 10%;
-    --card-foreground: 210 40% 98%;
-    --popover: 217 33% 10%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 65%;
-    --primary-foreground: 222 84% 5%;
-    --secondary: 0 79% 63%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 15%;
-    --muted-foreground: 215 20.2% 75%;
-    --accent: 217 33% 15%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 50%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 20%;
-    --input: 217 33% 20%;
-    --ring: 217 91% 65%;
-    --macro-protein: 0 90% 65%;
-    --macro-carb: 140 80% 60%;
-    --macro-fat: 50 90% 60%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-  }
+    /* ZONE OS - DARK MODE */
+    --base-hue: 220;
+    --base-sat: 14%;
 
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
+    --background: var(--base-hue) var(--base-sat) 4%;
+    /* Almost Black */
+    --foreground: var(--base-hue) 10% 90%;
+
+    --card: var(--base-hue) var(--base-sat) 8%;
+    --card-foreground: var(--base-hue) 10% 95%;
+
+    --popover: var(--base-hue) var(--base-sat) 8%;
+    --popover-foreground: var(--base-hue) 10% 95%;
+
+    --primary: 220 90% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 20% 16%;
+    --secondary-foreground: 220 10% 90%;
+
+    --muted: 220 20% 12%;
+    --muted-foreground: 220 10% 60%;
+
+    --accent: 220 20% 16%;
+    --accent-foreground: 220 10% 90%;
+
+    --destructive: 0 62% 30%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+
+    --border: 220 20% 12%;
+    --input: 220 20% 12%;
+    --ring: 220 90% 60%;
+
+    --sidebar-bg: var(--base-hue) var(--base-sat) 4%;
+    --sidebar-fg: var(--base-hue) 10% 60%;
+    --sidebar-fg-active: var(--base-hue) 10% 95%;
+    --sidebar-accent: 220 90% 60%;
   }
+
+  html.professional-light {
+    /* Ocean Serenity (Default Light) */
+    --background: 220 14% 98%;
+    --foreground: 220 14% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 14% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 14% 10%;
+    --primary: 220 90% 56%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 20% 90%;
+    --secondary-foreground: 220 40% 10%;
+    --muted: 220 20% 94%;
+    --muted-foreground: 220 20% 45%;
+    --accent: 220 90% 56%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 20% 90%;
+    --input: 220 20% 90%;
+    --ring: 220 90% 56%;
+    --sidebar-bg: 220 14% 98%;
+    --sidebar-fg: 220 14% 40%;
+    --sidebar-fg-active: 220 14% 10%;
+    --sidebar-accent: 220 90% 56%;
+  }
+
+  html.midnight-pro {
+    /* Deep Sea (High Contrast Dark Blue) */
+    --background: 222 47% 6%;
+    /* Darker background */
+    --foreground: 210 40% 98%;
+    --card: 222 45% 10%;
+    /* Darker card */
+    --card-foreground: 210 40% 98%;
+    --popover: 222 45% 10%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 199 89% 55%;
+    /* Cyan */
+    --primary-foreground: 222 47% 10%;
+    /* Dark text on Cyan */
+    --secondary: 217 30% 15%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 30% 15%;
+    --muted-foreground: 215 20% 80%;
+    /* Brighter muted text */
+    --accent: 199 89% 55%;
+    --accent-foreground: 222 47% 10%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 217 30% 20%;
+    --input: 217 30% 20%;
+    --ring: 199 89% 55%;
+    --sidebar-bg: 222 47% 4%;
+    --sidebar-fg: 215 20% 70%;
+    --sidebar-fg-active: 199 89% 55%;
+  }
+
+  html.tokyo-nights {
+    /* Cyberpunk (Neon/Violet - High Contrast) */
+    --background: 265 40% 4%;
+    /* Pitch black violet */
+    --foreground: 280 10% 98%;
+    --card: 265 40% 6%;
+    --card-foreground: 280 10% 98%;
+    --popover: 265 40% 6%;
+    --popover-foreground: 280 10% 98%;
+    --primary: 290 85% 65%;
+    /* Neon Purple */
+    --primary-foreground: 265 40% 5%;
+    /* Dark text on Neon Purple (FIXED) */
+    --secondary: 265 30% 12%;
+    --secondary-foreground: 280 10% 98%;
+    --muted: 265 30% 12%;
+    --muted-foreground: 265 20% 80%;
+    --accent: 180 90% 65%;
+    /* Cyan accent */
+    --accent-foreground: 265 40% 5%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 265 30% 20%;
+    --input: 265 30% 20%;
+    --ring: 290 85% 65%;
+    --sidebar-bg: 265 40% 3%;
+    --sidebar-fg: 265 20% 70%;
+    --sidebar-fg-active: 290 85% 65%;
+  }
+
+  html.zen-garden {
+    /* Zen Garden (Natural/Wellness) */
+    --background: 47 52% 93%;
+    /* Cream #F8F4E3 */
+    --foreground: 153 15% 15%;
+    /* Dark Green Text */
+    --card: 0 0% 100%;
+    --card-foreground: 153 15% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 153 15% 15%;
+    --primary: 153 25% 49%;
+    /* Sage Green #6B9080 (adjusted sat for pop) */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 13 68% 63%;
+    /* Terracotta #E07A5F */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 47 30% 88%;
+    --muted-foreground: 153 10% 40%;
+    --accent: 182 43% 76%;
+    /* Lavender/Blue #A8DADC */
+    --accent-foreground: 153 15% 15%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 47 20% 85%;
+    --input: 47 20% 85%;
+    --ring: 153 25% 49%;
+    --sidebar-bg: 47 52% 91%;
+    --sidebar-fg: 153 15% 40%;
+    --sidebar-fg-active: 13 68% 63%;
+    /* Active item is Terracotta */
+    --sidebar-accent: 153 25% 49%;
+  }
+
+
 }
-
-@layer base {
-  * {
-    border-color: hsl(var(--border));
-  }
-
-  body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-
-  /* Glassmorphism Utilities */
-  .glass-panel {
-    background-color: hsl(var(--background) / 0.6);
-    border-color: hsl(var(--border) / 0.5);
-    @apply backdrop-blur-xl border shadow-xl;
-  }
-
-  .glass-card {
-    background-color: hsl(var(--card) / 0.7);
-    border-color: hsl(var(--border) / 0.5);
-    @apply backdrop-blur-md border shadow-sm hover:shadow-md transition-all duration-300;
-  }
-
-  .neon-text {
-    text-shadow: 0 0 10px currentColor;
-  }
-
-  /* Gradient Animation */
-  @keyframes gradient {
-
-    0%,
-    100% {
-      background-position: 0% 50%;
-    }
-
-    50% {
-      background-position: 100% 50%;
-    }
-  }
-
-  .animate-gradient {
-    animation: gradient 3s ease infinite;
-  }
-
-  /* Modern Scrollbar */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  ::-webkit-scrollbar-track {
-    @apply bg-transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background-color: hsl(var(--muted-foreground) / 0.3);
-    border-radius: 9999px;
-    transition: background-color 0.3s;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: hsl(var(--muted-foreground) / 0.5);
-  }
-}
-
-@layer utilities {
-  .text-glow {
-    text-shadow: 0 0 20px hsl(var(--primary) / 0.5);
-  }
-
-  /* Gradient Text */
-  .gradient-text {
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .gradient-text-secondary {
-    background: var(--gradient-secondary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  /* Tokyo Nights EXTREME Neon Glow */
-  .tokyo-nights .neon-glow {
-    box-shadow:
-      0 0 5px hsl(var(--primary)),
-      0 0 15px hsl(var(--primary)),
-      0 0 30px hsl(var(--primary) / 0.8),
-      0 0 60px hsl(var(--primary) / 0.5),
-      0 0 100px hsl(var(--primary) / 0.3);
-    animation: glow-pulse 2s ease-in-out infinite;
-  }
-
-  .tokyo-nights .neon-glow-secondary {
-    box-shadow:
-      0 0 5px hsl(var(--secondary)),
-      0 0 15px hsl(var(--secondary)),
-      0 0 30px hsl(var(--secondary) / 0.8),
-      0 0 60px hsl(var(--secondary) / 0.5);
-  }
-
-  .tokyo-nights .neon-text {
-    text-shadow:
-      0 0 5px currentColor,
-      0 0 10px currentColor,
-      0 0 20px currentColor,
-      0 0 40px currentColor;
-    animation: glow-pulse 2s ease-in-out infinite alternate;
-  }
-
-  /* Tokyo Nights Border Glow */
-  .tokyo-nights {
-    border-color: hsl(180 100% 50% / 0.5) !important;
-  }
-
-  .tokyo-nights .border {
-    border-color: hsl(180 100% 50% / 0.3) !important;
-  }
-
-  /* Animated Gradient Border */
-  .gradient-border {
-    position: relative;
-    background: linear-gradient(135deg,
-        hsl(var(--primary)) 0%,
-        hsl(var(--secondary)) 100%);
-    background-size: 200% 200%;
-    animation: gradient-shift 3s ease infinite;
-  }
-
-  @keyframes gradient-shift {
-
-    0%,
-    100% {
-      background-position: 0% 50%;
-    }
-
-    50% {
-      background-position: 100% 50%;
-    }
-  }
-
-  /* Scanline Effect (Tokyo Nights) */
-  .tokyo-nights .scanlines {
-    position: relative;
-  }
-
-  .tokyo-nights .scanlines::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(0deg,
-        rgba(0, 240, 255, 0.03) 0px,
-        transparent 2px,
-        transparent 4px);
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  /* Holographic Background (Tokyo Nights) */
-  .tokyo-nights .holographic {
-    background: var(--gradient-holographic);
-  }
-
-  /* Shimmer Animation */
-  .shimmer {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .shimmer::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg,
-        transparent,
-        rgba(255, 255, 255, 0.1),
-        transparent);
-    animation: shimmer 2s infinite;
-  }
-
-  @keyframes shimmer {
-    0% {
-      left: -100%;
-    }
-
-    100% {
-      left: 100%;
-    }
-  }
-
-  /* Glow Pulse Animation */
-  .glow-pulse {
-    animation: glow-pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes glow-pulse {
-
-    0%,
-    100% {
-      box-shadow: 0 0 10px hsl(var(--primary) / 0.5);
-    }
-
-    50% {
-      box-shadow: 0 0 20px hsl(var(--primary) / 0.8);
-    }
-  }
-}
-
-
 
 @layer base {
   * {
@@ -499,6 +231,105 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground tracking-tight antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Typography Scale */
+  h1 {
+    @apply text-3xl font-bold tracking-tight text-foreground md:text-4xl;
+  }
+
+  h2 {
+    @apply text-2xl font-semibold tracking-tight text-foreground;
+  }
+
+  h3 {
+    @apply text-xl font-semibold tracking-tight text-foreground;
+  }
+
+  p {
+    @apply text-sm leading-7 text-muted-foreground;
+  }
+}
+
+@layer utilities {
+
+  /* Glassmorphism v2 - Refined */
+  .glass-panel {
+    @apply bg-white/70 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-sm;
+  }
+
+  /* Force Dark Glass for Custom Dark Themes (Fixes Transparency Issues) */
+  html.midnight-pro .glass-panel,
+  html.tokyo-nights .glass-panel {
+    background-color: rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .glass-card {
+    @apply bg-white/50 dark:bg-white/5 backdrop-blur-lg border border-white/20 dark:border-white/10 shadow-sm transition-all duration-300;
+  }
+
+  /* Force Dark Card for Custom Dark Themes */
+  html.midnight-pro .glass-card,
+  html.tokyo-nights .glass-card {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  html.midnight-pro .glass-card:hover,
+  html.tokyo-nights .glass-card:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Utility Animations */
+  .animate-in-up {
+    animation: fadeUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+
+  .animate-pulse-subtle {
+    animation: pulseSubtle 3s infinite ease-in-out;
+  }
+
+  /* Sparkle Effect */
+  .shimmer {
+    @apply relative overflow-hidden;
+  }
+
+  .shimmer::after {
+    @apply absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent;
+    content: '';
+    animation: shimmer 2s infinite;
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseSubtle {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
   }
 }

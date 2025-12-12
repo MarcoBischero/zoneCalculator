@@ -1,8 +1,26 @@
 
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 
+const ROLE_SUPER_ADMIN = 1;
+
 export async function GET(request: Request) {
+    const session = await getServerSession(authOptions);
+
+    // 1. Check Authentication
+    if (!session || !session.user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // 2. Check Authorization (RBAC)
+    const userRole = Number(session.user.role);
+    if (userRole !== ROLE_SUPER_ADMIN) {
+        console.warn(`[Security] Unauthorized access attempt to fix-meals by user ${session.user.id} (Role: ${userRole})`);
+        return NextResponse.json({ error: "Forbidden: Admins only" }, { status: 403 });
+    }
+
     try {
         // Map of old legacy indices to new string values
         const legacyMap: Record<string, string> = {

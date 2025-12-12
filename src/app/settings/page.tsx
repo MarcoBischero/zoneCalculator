@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, Lock, Settings as SettingsIcon, ShieldAlert, Loader2, Save } from 'lucide-react';
+import { useLanguage } from '@/lib/language-context';
 
 export default function SettingsPage() {
     const [isSaving, setIsSaving] = useState(false);
@@ -27,6 +28,8 @@ export default function SettingsPage() {
             .catch(err => setLoading(false));
     });
 
+    const { setLanguage } = useLanguage();
+
     const handleProfileUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setMessage('');
@@ -34,7 +37,7 @@ export default function SettingsPage() {
 
         const formData = new FormData(e.currentTarget);
         const nome = formData.get('nome');
-        const language = formData.get('language');
+        const language = formData.get('language') as string;
 
         try {
             const res = await fetch('/api/user', {
@@ -45,6 +48,10 @@ export default function SettingsPage() {
 
             if (res.ok) {
                 setMessage('Successo: Impostazioni salvate');
+                // Update Global Context
+                if (language === 'it' || language === 'en') {
+                    setLanguage(language as any);
+                }
                 router.refresh();
             } else {
                 setMessage('Errore: Impossibile salvare');

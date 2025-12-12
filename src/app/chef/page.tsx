@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Sparkles, ChefHat, ThermometerSun, Refrigerator, ArrowRight, Loader2, Utensils, Plus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { useLanguage } from '@/lib/language-context';
 
 // Mock DB for "fridge" ingredients (normally fetched from API or Food DB)
 // Mock DB for "fridge" ingredients (normally fetched from API or Food DB)
@@ -22,6 +23,7 @@ const SAMPLE_INGREDIENTS = [
 ];
 
 export default function ChefPage() {
+    const { t } = useLanguage();
     const [mode, setMode] = useState<'fridge' | 'zone'>('zone'); // Default to Zone mode as it's the unique selling point
 
     // Fridge Mode State
@@ -59,190 +61,45 @@ export default function ChefPage() {
         setManualIngredients(manualIngredients.filter((_, i) => i !== index));
     };
 
-    const handleGenerate = () => {
+    const handleGenerate = async () => {
         setIsGenerating(true);
         setGeneratedRecipe(null);
 
-        // Simulate AI Delay
-        setTimeout(() => {
-            if (mode === 'fridge') {
-                generateFridgeRecipe();
-            } else {
-                generateZoneRecipe();
-            }
-            setIsGenerating(false);
-        }, 2000);
-    };
+        try {
+            const body = mode === 'fridge'
+                ? {
+                    mode: 'fridge',
+                    ingredients: SAMPLE_INGREDIENTS.filter(i => selectedIngredients.includes(i.id)).map(i => i.name),
+                    manualIngredients,
+                    blocks: 3 // Default for fridge mode
+                }
+                : {
+                    mode: 'zone',
+                    blocks: zoneBlocks,
+                    mealTime,
+                    preference
+                };
 
-    const generateFridgeRecipe = () => {
-        // Mock logic: combine selected ingredients into a balanced meal if possible
-        const ingredients = SAMPLE_INGREDIENTS.filter(i => selectedIngredients.includes(i.id));
-        const allIngredientNames = [...ingredients.map(i => i.name), ...manualIngredients];
-
-        // If manual ingredients are present, we skip the strict P/C/F check for now or assume they fill gaps
-        const hasManual = manualIngredients.length > 0;
-
-        // Simple heuristic: Do we have P, C, and F?
-        const hasP = ingredients.some(i => i.type === 'PROTEIN');
-        const hasC = ingredients.some(i => i.type === 'CARBS');
-        const hasF = ingredients.some(i => i.type === 'FAT');
-
-        if ((!hasP || !hasC) && !hasManual) {
-            setGeneratedRecipe({
-                title: "Incomplete Meal Warning",
-                description: "You are missing key macronutrients (Protein/Carbs) for a Zone meal. Try adding more ingredients!",
-                blocks: 0,
-                ingredients: []
+            const res = await fetch('/api/chef', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
             });
-            return;
+
+            const result = await res.json();
+
+            if (!res.ok) {
+                throw new Error(result.error || 'Failed to generate recipe');
+            }
+
+            setGeneratedRecipe(result.data);
+
+        } catch (error: any) {
+            console.error(error);
+            alert(error.message || 'Error generating recipe. Please try again.');
+        } finally {
+            setIsGenerating(false);
         }
-
-        const blocks = 3; // Assuming a default of 3 blocks for fridge mode for now
-        const customText = manualIngredients.join(', '); // Combine manual ingredients into custom text
-
-        const prompt = `
-                Create a balanced Zone Diet meal using the following ingredients:
-                ${allIngredientNames.join(', ')}
-                ${customText ? `\nAdditional items/preferences: ${customText}` : ''}
-
-                TARGET BLOCKS: ${blocks} Blocks
-                
-                CRITICAL ZONE DIET RULES:
-                - 1 Block Protein = 7g Protein
-                - 1 Block Carbs = 9g Carbs
-                - 1 Block Fat = 1.5g Fat (assuming added fat to lean protein)
-
-                Total Macros Target for ${blocks} Blocks:
-                - Protein: ${blocks * 7}g
-                - Carbs: ${blocks * 9}g
-                - Fat: ${blocks * 1.5}g
-
-                Constraint: You must try to use the selected ingredients. If they are not enough to reach the target blocks, suggesting adding common Zone-friendly ingredients (e.g. Olive Oil, Almonds for fat; Apple, Spinach for carbs; Chicken, Tofu for protein).
-                
-                Return a JSON array of ingredients to build this meal. 
-                Format: [{"name": "Chicken Breast", "grams": 120, "macros": { "p": 26, "c": 0, "f": 1.5 }}]
-                The 'macros' in the JSON must be the values PER 100g of the food item.
-                Calculate 'grams' so that the total meal matches the target blocks.
-            `;
-        setGeneratedRecipe({
-            title: "Fridge Scramble Delight",
-            description: "A quick balanced mix of your available ingredients.",
-            blocks: blocks,
-            ingredients: [
-                ...ingredients.map(i => ({
-                    name: i.name,
-                    grams: 100, // Mock amount
-                    macros: { p: i.P, c: i.C, f: i.F }
-                })),
-                ...manualIngredients.map(name => ({
-                    name: name,
-                    grams: 50, // Estimate
-                    macros: { p: 7, c: 9, f: 3 } // Generic balanced assumption for demo
-                }))
-            ]
-        });
-    };
-
-    const generateZoneRecipe = () => {
-        let template: any[] = [];
-        let title = "";
-
-        // Randomization Arrays with correct macros per 100g
-        // Randomization Arrays with correct macros per 100g
-        const proteins = [
-            { name: 'Petto di Pollo', p: 23, c: 0, f: 1 },
-            { name: 'Fesa di Tacchino', p: 24, c: 0, f: 1 },
-            { name: 'Merluzzo', p: 18, c: 0, f: 1 },
-            { name: 'Salmone', p: 20, c: 0, f: 13 },
-            { name: 'Tofu', p: 8, c: 2, f: 4 },
-            { name: 'Albumi', p: 11, c: 1, f: 0 },
-            { name: 'Manzo Magro', p: 26, c: 0, f: 15 },
-        ];
-
-        const carbs = [
-            { name: 'Broccoli', p: 3, c: 7, f: 0 },
-            { name: 'Fagiolini', p: 2, c: 7, f: 0 },
-            { name: 'Spinaci', p: 3, c: 4, f: 0 },
-            { name: 'Mela', p: 0, c: 14, f: 0 },
-            { name: 'Pera', p: 0, c: 15, f: 0 },
-            { name: 'Avena', p: 16, c: 66, f: 7 },
-            { name: 'Orzo', p: 12, c: 73, f: 2 },
-        ];
-
-        const fats = [
-            { name: 'Olio d\'Oliva', p: 0, c: 0, f: 100 },
-            { name: 'Mandorle', p: 21, c: 22, f: 49 },
-            { name: 'Noci', p: 15, c: 14, f: 65 },
-            { name: 'Avocado', p: 2, c: 9, f: 15 },
-            { name: 'Noci Macadamia', p: 8, c: 14, f: 76 },
-        ];
-
-        // Filter by Preference
-        let validProteins = proteins;
-        if (preference === 'Vegetarian') validProteins = proteins.filter(p => ['Tofu', 'Egg Whites'].includes(p.name));
-        if (preference === 'Vegan') validProteins = proteins.filter(p => ['Tofu'].includes(p.name));
-        if (preference === 'Fish') validProteins = proteins.filter(p => ['Cod Fillet', 'Salmon'].includes(p.name));
-        if (preference === 'Meat') validProteins = proteins.filter(p => ['Chicken Breast', 'Turkey Breast', 'Lean Beef'].includes(p.name));
-
-        // Random Selection Helper
-        const pick = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)];
-
-        // 1. Pick Protein Source
-        const pSource = pick(validProteins);
-        // Calculate grams needed to hit TARGET PROTEIN BLOCKS
-        // targetP (g) = blocks * 7
-        // grams = (targetP * 100) / pSource.p
-        const pTargetGrams = zoneBlocks * 7;
-        const pGrams = (pTargetGrams * 100) / pSource.p;
-
-        // 2. Pick Carb Source
-        const cSource = pick(carbs);
-        // Calculate grams needed to hit TARGET CARB BLOCKS
-        // targetC (g) = blocks * 9
-        // grams = (targetC * 100) / cSource.c
-        const cTargetGrams = zoneBlocks * 9;
-        const cGrams = (cTargetGrams * 100) / cSource.c;
-
-        // 3. Pick Fat Source
-        const fSource = pick(fats);
-
-        // Calculate Fat contribution from Protein source (important for blocks!)
-        // Fat in Protein Source = (pGrams / 100) * pSource.f
-        const fatInProtein = (pGrams / 100) * pSource.f;
-        const fatBlocksInProtein = fatInProtein / 1.5; // 1.5g fat per block
-
-        // Remaining Fat Blocks needed
-        let fatBlocksNeeded = zoneBlocks - fatBlocksInProtein;
-        if (fatBlocksNeeded < 0) fatBlocksNeeded = 0; // If protein is very fatty (e.g. Salmon), no extra fat needed
-
-        // grams = (targetF_g * 100) / fSource.f
-        // targetF_g = fatBlocksNeeded * 1.5
-        const fGrams = (fatBlocksNeeded * 1.5 * 100) / fSource.f;
-
-        if (mealTime === 'Breakfast') {
-            title = `Colazione Zona: ${pSource.name} & ${cSource.name}`;
-        } else if (mealTime === 'Snack') {
-            title = `Spuntino Energetico: ${pSource.name} & ${cSource.name}`;
-        } else {
-            title = `Scelta dello Chef: ${pSource.name} con ${cSource.name}`;
-        }
-
-        template = [
-            { name: pSource.name, grams: Math.round(pGrams), macros: pSource },
-            { name: cSource.name, grams: Math.round(cGrams), macros: cSource },
-        ];
-
-        // Only add fat source if we actually need it (> 1g to be significant)
-        if (fGrams > 1) {
-            template.push({ name: fSource.name, grams: Math.round(fGrams), macros: fSource });
-        }
-
-        setGeneratedRecipe({
-            title,
-            description: `Un pasto perfettamente bilanciato da ${zoneBlocks} blocchi per ${mealTime} (${preference}).`,
-            blocks: zoneBlocks,
-            ingredients: template
-        });
     };
 
     const getExportUrl = () => {
@@ -337,7 +194,7 @@ export default function ChefPage() {
                                     className={cn(
                                         "p-3 rounded-lg border text-sm font-medium transition-all text-left flex flex-col justify-between h-20",
                                         selectedIngredients.includes(ing.id)
-                                            ? "border-zone-blue-500 bg-zone-blue-50 text-zone-blue-700 shadow-inner"
+                                            ? "border-blue-500 bg-blue-50 text-blue-700 shadow-inner"
                                             : "border-slate-200 hover:border-slate-300 text-slate-600 hover:bg-slate-50"
                                     )}
                                 >
@@ -381,7 +238,7 @@ export default function ChefPage() {
                                 size="lg"
                                 disabled={selectedIngredients.length === 0 || isGenerating}
                                 onClick={handleGenerate}
-                                className="bg-zone-blue-600 hover:bg-zone-blue-700 text-white font-bold"
+                                className="bg-blue-600 hover:bg-blue-700 text-white font-bold"
                             >
                                 {isGenerating ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : <Sparkles className="w-5 h-5 mr-2" />}
                                 {isGenerating ? "Cooking..." : "Generate Recipe"}
@@ -451,7 +308,7 @@ export default function ChefPage() {
                                 size="lg"
                                 disabled={isGenerating}
                                 onClick={handleGenerate}
-                                className="bg-zone-orange-500 hover:bg-zone-orange-600 text-white font-bold"
+                                className="bg-orange-500 hover:bg-orange-600 text-white font-bold"
                             >
                                 {isGenerating ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : <Sparkles className="w-5 h-5 mr-2" />}
                                 {isGenerating ? "Designing..." : "Create Perfect Meal"}
@@ -464,13 +321,13 @@ export default function ChefPage() {
             {/* Results Area */}
             {generatedRecipe && (
                 <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
-                    <div className="bg-slate-900 text-white p-6 border-b border-slate-800">
+                    <div className="bg-slate-900 p-6 border-b border-slate-800">
                         <div className="flex justify-between items-start">
                             <div>
-                                <h2 className="text-2xl font-bold mb-1">{generatedRecipe.title}</h2>
-                                <p className="text-slate-400">{generatedRecipe.description}</p>
+                                <h2 className="text-2xl font-bold mb-1 text-white">{generatedRecipe.title}</h2>
+                                <p className="text-slate-300">{generatedRecipe.description}</p>
                             </div>
-                            <div className="bg-zone-orange-500 text-white px-4 py-2 rounded-xl font-black text-xl shadow-lg">
+                            <div className="bg-orange-500 text-white px-4 py-2 rounded-xl font-black text-xl shadow-lg border border-orange-400">
                                 {generatedRecipe.blocks} BLK
                             </div>
                         </div>
@@ -480,25 +337,24 @@ export default function ChefPage() {
                         <table className="w-full text-sm">
                             <thead className="text-xs text-slate-500 uppercase bg-slate-50">
                                 <tr>
-                                    <th className="px-4 py-3 text-left font-bold">Ingredient</th>
-                                    <th className="px-4 py-3 text-right font-bold">Amount</th>
-                                    <th className="px-4 py-3 text-right font-bold hidden md:table-cell">Details</th>
+                                    <th className="px-4 py-3 text-left font-bold">{t('chef.ingredients_col')}</th>
+                                    <th className="px-4 py-3 text-right font-bold">{t('chef.amount_col')}</th>
+                                    <th className="px-4 py-3 text-right font-bold hidden md:table-cell">{t('chef.details_col')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
                                 {generatedRecipe.ingredients.map((ing: any, i: number) => (
                                     <tr key={i} className="hover:bg-slate-50/50">
                                         <td className="px-4 py-3 font-medium text-slate-800">{ing.name}</td>
-                                        <td className="px-4 py-3 text-right font-bold text-zone-blue-600">{Math.round(ing.grams)}g</td>
+                                        <td className="px-4 py-3 text-right font-bold text-blue-600">{Math.round(ing.grams)}g</td>
                                         <td className="px-4 py-3 text-right text-slate-400 text-xs hidden md:table-cell">
                                             High quality source
                                         </td>
                                     </tr>
                                 ))}
                                 {/* Totals Footer */}
-                                {/* Totals Footer */}
                                 <tr className="bg-slate-50 font-bold border-t-2 border-slate-200">
-                                    <td className="px-4 py-3 text-slate-700">Totale Nutrienti</td>
+                                    <td className="px-4 py-3 text-slate-700">{t('chef.total_nutrients')}</td>
                                     <td className="px-4 py-3 text-right text-slate-900" colSpan={2}>
                                         <span className="text-red-500 mr-3">P: {Math.round(parseFloat(String(totals.p)) * 7)}g</span>
                                         <span className="text-green-500 mr-3">C: {Math.round(parseFloat(String(totals.c)) * 9)}g</span>
@@ -509,10 +365,10 @@ export default function ChefPage() {
                         </table>
 
                         <div className="mt-8 flex justify-end gap-3">
-                            <Button variant="outline">Save to Favorites</Button>
+                            <Button variant="outline">{t('common.save')}</Button>
                             <Link href={getExportUrl()}>
                                 <Button className="bg-green-600 hover:bg-green-700 text-white">
-                                    <Utensils className="w-4 h-4 mr-2" /> Send to Meal Builder
+                                    <Utensils className="w-4 h-4 mr-2" /> {t('chef.send_to_builder')}
                                 </Button>
                             </Link>
                         </div>

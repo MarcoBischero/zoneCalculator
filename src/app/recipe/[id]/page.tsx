@@ -19,10 +19,11 @@ export default function RecipePage() {
 
     useEffect(() => {
         if (id) {
-            fetch('/api/meals')
+            fetch(`/api/meals?id=${id}`)
                 .then(res => res.json())
-                .then(meals => {
-                    const found = meals.find((m: any) => m.codicePasto === parseInt(id as string));
+                .then(data => {
+                    const list = Array.isArray(data) ? data : (data.meals || []);
+                    const found = list.find((m: any) => m.codicePasto === parseInt(id as string));
                     if (found) {
                         setMeal(found);
                     }

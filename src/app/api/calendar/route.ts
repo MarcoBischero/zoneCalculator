@@ -71,7 +71,10 @@ export async function POST(request: Request) {
                 return NextResponse.json({ error: "Non hai abbastanza pasti salvati per generare un piano. Creane almeno 3!" }, { status: 400 });
             }
 
-            const mealListInfo = meals.map(m => `- ID: ${m.codicePasto}, Name: ${m.nome}, Blocks: ${m.blocks}, Type: ${m.mealType || 'Generic'}`).join('\n');
+            // Security: Sanitize inputs to prevent Prompt Injection
+            const sanitize = (str: string) => str.replace(/[{}\[\]:;"]/g, '').replace(/\n/g, ' ').substring(0, 50);
+
+            const mealListInfo = meals.map(m => `- ID: ${m.codicePasto}, Name: ${sanitize(m.nome || 'unnamed')}, Blocks: ${m.blocks}, Type: ${m.mealType || 'Generic'}`).join('\n');
             console.log(`Generating plan with ${meals.length} meals`);
 
             if (!process.env.GEMINI_API_KEY) {

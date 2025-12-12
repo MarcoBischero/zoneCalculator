@@ -73,11 +73,14 @@ export default function AdminUsersPage() {
         u.email?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const getRoleBadge = (roleId: number) => {
-        switch (roleId) {
-            case 1: return <span className="px-2 py-1 rounded text-xs font-bold bg-red-100 text-red-700 flex items-center w-fit"><Shield className="w-3 h-3 mr-1" /> ADMIN</span>;
-            case 2: return <span className="px-2 py-1 rounded text-xs font-bold bg-green-100 text-green-700 flex items-center w-fit"><Stethoscope className="w-3 h-3 mr-1" /> DIETISTA</span>;
-            default: return <span className="px-2 py-1 rounded text-xs font-bold bg-slate-100 text-slate-600">USER</span>;
+    const getRoleBadge = (roleId: number | string) => {
+        const id = Number(roleId);
+        switch (id) {
+            case 1: return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-700 border border-purple-200"><Shield className="w-3 h-3 fill-current" /> SUPER ADMIN</span>;
+            case 2: return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700 border border-blue-200"><Stethoscope className="w-3 h-3" /> DIETISTA</span>;
+            case 3: return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 border border-green-200">PAZIENTE</span>;
+            case 0: return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 border border-green-200">PAZIENTE</span>;
+            default: return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">USER (ID: {roleId})</span>;
         }
     };
 
@@ -122,7 +125,6 @@ export default function AdminUsersPage() {
                 <table className="w-full text-left text-sm">
                     <thead className="bg-slate-50 text-slate-500">
                         <tr>
-                            <th className="p-4 font-medium">ID</th>
                             <th className="p-4 font-medium">Username</th>
                             <th className="p-4 font-medium">Email</th>
                             <th className="p-4 font-medium">Ruolo</th>
@@ -133,11 +135,10 @@ export default function AdminUsersPage() {
                     <tbody className="divide-y divide-slate-100">
                         {filteredUsers.map(user => (
                             <tr key={user.id} className="hover:bg-slate-50 transition-colors">
-                                <td className="p-4 text-slate-500">#{user.id}</td>
                                 <td className="p-4 font-medium text-slate-900">{user.username}</td>
                                 <td className="p-4 text-slate-500">{user.email || '-'}</td>
                                 <td className="p-4">
-                                    {getRoleBadge(user.idRuolo)}
+                                    {getRoleBadge(user.roleId)}
                                 </td>
                                 <td className="p-4 text-slate-400 font-mono text-xs">
                                     {user.lastaccess ? new Date(user.lastaccess * 1000).toLocaleDateString() : '-'}

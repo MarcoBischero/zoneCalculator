@@ -21,7 +21,7 @@ export function AddUserDialog({ isOpen, onClose, onSuccess, userToEdit }: AddUse
         username: '',
         email: '',
         password: '',
-        role: '0'
+        role: '3'
     });
 
     // Load data on open
@@ -44,11 +44,11 @@ export function AddUserDialog({ isOpen, onClose, onSuccess, userToEdit }: AddUse
             username: userToEdit.username,
             email: userToEdit.email || '',
             password: '',
-            role: userToEdit.roleId?.toString() || '0'
+            role: userToEdit.roleId?.toString() || '3'
         });
         setPrevId(userToEdit.id);
     } else if (isOpen && !userToEdit && prevId !== null) {
-        setFormData({ username: '', email: '', password: '', role: '0' });
+        setFormData({ username: '', email: '', password: '', role: '3' });
         setPrevId(null);
     }
 
@@ -68,7 +68,7 @@ export function AddUserDialog({ isOpen, onClose, onSuccess, userToEdit }: AddUse
             });
 
             if (res.ok) {
-                setFormData({ username: '', email: '', password: '', role: '0' });
+                setFormData({ username: '', email: '', password: '', role: '3' });
                 onSuccess();
                 onClose();
             } else {
@@ -148,7 +148,7 @@ export function AddUserDialog({ isOpen, onClose, onSuccess, userToEdit }: AddUse
                                 value={formData.role}
                                 onChange={e => setFormData({ ...formData, role: e.target.value })}
                             >
-                                <option value="0">Utente Standard</option>
+                                <option value="3">Paziente</option>
                                 <option value="1">Amministratore</option>
                                 <option value="2">Dietista</option>
                             </select>

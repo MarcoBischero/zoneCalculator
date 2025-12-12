@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Loader2, Utensils } from 'lucide-react';
+import { Loader2, Utensils, UtensilsCrossed } from 'lucide-react';
 import Link from 'next/link';
 
 export function RecentMeals() {
@@ -28,8 +28,19 @@ export function RecentMeals() {
     );
 
     if (meals.length === 0) return (
-        <div className="text-center py-6 text-slate-400 text-sm">
-            Nessun pasto recente.
+        <div className="text-center py-10 flex flex-col items-center justify-center space-y-3 opacity-60 hover:opacity-100 transition-opacity">
+            <div className="p-3 bg-white/5 rounded-full ring-1 ring-white/10">
+                <UtensilsCrossed className="w-6 h-6 text-muted-foreground" />
+            </div>
+            <div>
+                <p className="text-sm font-medium text-foreground">Nessun pasto recente</p>
+                <p className="text-xs text-muted-foreground">Inizia a creare il tuo primo pasto in Zona!</p>
+            </div>
+            <Link href="/meals/new">
+                <Button variant="outline" size="sm">
+                    Crea il tuo primo pasto
+                </Button>
+            </Link>
         </div>
     );
 

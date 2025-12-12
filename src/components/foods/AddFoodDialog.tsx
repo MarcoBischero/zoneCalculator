@@ -175,8 +175,8 @@ export function AddFoodDialog(props: AddFoodDialogProps) {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in duration-200">
-            <div className="glass-card w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 rounded-2xl border-white/10 shadow-2xl">
-                <div className="flex justify-between items-center p-5 border-b border-border/40 bg-white/5">
+            <div className="bg-popover w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 rounded-2xl border border-border shadow-2xl">
+                <div className="flex justify-between items-center p-5 border-b border-border">
                     <h3 className="font-bold text-lg bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">
                         {foodToEdit ? 'Modifica Alimento' : 'Aggiungi Nuovo Alimento'}
                     </h3>
@@ -188,47 +188,18 @@ export function AddFoodDialog(props: AddFoodDialogProps) {
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
                     {/* Old Name Input Removed - Replaced by New UI below */}
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Tipo (Auto-Rilevato)</label>
-                            <select
-                                className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-                                value={formData.codTipo || ''}
-                                onChange={(e) => setFormData({ ...formData, codTipo: e.target.value })}
-                            >
-                                <option value="">Seleziona Tipo</option>
-                                <option value="1">Proteine</option>
-                                <option value="2">Carboidrati</option>
-                                <option value="3">Grassi</option>
-                                <option value="4">Misto/Bilanciato</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Qualità Fonte</label>
-                            <select
-                                className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-                                value={formData.codFonte || ''}
-                                onChange={(e) => setFormData({ ...formData, codFonte: e.target.value })}
-                            >
-                                <option value="">Seleziona Qualità</option>
-                                <option value="1">Ottima</option>
-                                <option value="2">Accettabile</option>
-                                <option value="3">Da Evitare</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="flex gap-2 items-end">
+                    <div className="flex gap-2 items-end mb-4">
                         <div className="grid gap-2 flex-1">
-                            <Label htmlFor="name" className="text-right">
-                                Nome
+                            <Label htmlFor="name" className="text-left font-semibold">
+                                Nome Alimento
                             </Label>
                             <Input
                                 id="name"
                                 value={formData.nome}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, nome: e.target.value })}
-                                className="col-span-3"
+                                className="col-span-3 text-lg"
                                 placeholder="Es. Petto di pollo"
+                                autoFocus
                             />
                         </div>
                         <Button
@@ -236,11 +207,45 @@ export function AddFoodDialog(props: AddFoodDialogProps) {
                             variant="default"
                             onClick={handleAiEstimate}
                             disabled={isEstimating || formData.nome.length < 3}
-                            className="mb-0.5 bg-indigo-600 hover:bg-indigo-700 text-white"
+                            className="mb-0.5 bg-indigo-600 hover:bg-indigo-700 text-white h-10 w-10 p-0 rounded-lg shadow-md"
+                            title="Auto-Detect Macros"
                         >
-                            {isEstimating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-                            <span className="sr-only">Auto-Fill</span>
+                            {isEstimating ? <Loader2 className="h-5 w-5 animate-spin" /> : <Wand2 className="h-5 w-5" />}
                         </Button>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div className="space-y-1.5">
+                            <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider">Tipo (Auto)</label>
+                            <div className="relative">
+                                <select
+                                    className="w-full p-2.5 text-sm border border-border bg-background rounded-lg focus:ring-2 focus:ring-primary outline-none appearance-none cursor-pointer hover:bg-accent/5 transition-colors"
+                                    value={formData.codTipo || ''}
+                                    onChange={(e) => setFormData({ ...formData, codTipo: e.target.value })}
+                                >
+                                    <option value="">Seleziona Tipo...</option>
+                                    <option value="1">🥩 Proteine</option>
+                                    <option value="2">🍞 Carboidrati</option>
+                                    <option value="3">🥑 Grassi</option>
+                                    <option value="4">⚖️ Bilanciato</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider">Qualità</label>
+                            <div className="relative">
+                                <select
+                                    className="w-full p-2.5 text-sm border border-border bg-background rounded-lg focus:ring-2 focus:ring-primary outline-none appearance-none cursor-pointer hover:bg-accent/5 transition-colors"
+                                    value={formData.codFonte || ''}
+                                    onChange={(e) => setFormData({ ...formData, codFonte: e.target.value })}
+                                >
+                                    <option value="">Seleziona...</option>
+                                    <option value="1">🌟 Ottima (1)</option>
+                                    <option value="2">✅ Accettabile (2)</option>
+                                    <option value="3">⚠️ Da Evitare (3)</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div className="grid grid-cols-3 gap-4">
                         <div>
@@ -250,7 +255,7 @@ export function AddFoodDialog(props: AddFoodDialogProps) {
                                     required
                                     type="number"
                                     step="0.1"
-                                    className="w-full p-2 border border-border/50 bg-background/50 rounded-lg focus:ring-2 focus:ring-protein outline-none transition-all"
+                                    className="w-full p-2 border border-border bg-background rounded-lg focus:ring-2 focus:ring-protein outline-none transition-all"
                                     value={formData.proteine}
                                     onChange={(e) => setFormData({ ...formData, proteine: e.target.value })}
                                 />
@@ -264,7 +269,7 @@ export function AddFoodDialog(props: AddFoodDialogProps) {
                                     required
                                     type="number"
                                     step="0.1"
-                                    className="w-full p-2 border border-border/50 bg-background/50 rounded-lg focus:ring-2 focus:ring-carb outline-none transition-all"
+                                    className="w-full p-2 border border-border bg-background rounded-lg focus:ring-2 focus:ring-carb outline-none transition-all"
                                     value={formData.carboidrati}
                                     onChange={(e) => setFormData({ ...formData, carboidrati: e.target.value })}
                                 />
@@ -278,7 +283,7 @@ export function AddFoodDialog(props: AddFoodDialogProps) {
                                     required
                                     type="number"
                                     step="0.1"
-                                    className="w-full p-2 border border-border/50 bg-background/50 rounded-lg focus:ring-2 focus:ring-fat outline-none transition-all"
+                                    className="w-full p-2 border border-border bg-background rounded-lg focus:ring-2 focus:ring-fat outline-none transition-all"
                                     value={formData.grassi}
                                     onChange={(e) => setFormData({ ...formData, grassi: e.target.value })}
                                 />

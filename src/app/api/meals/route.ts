@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { generateRecipeContent } from '@/lib/recipe-generator';
+import { rateLimit } from '@/lib/rate-limit';
 
 export async function GET(request: Request) {
     const session = await getServerSession(authOptions);
@@ -32,6 +33,7 @@ export async function GET(request: Request) {
 
         // Pagination parameters
         const { searchParams } = new URL(request.url);
+        const mealIdParam = searchParams.get('id');
         const page = parseInt(searchParams.get('page') || '1');
         const limit = parseInt(searchParams.get('limit') || '20');
         const skip = (page - 1) * limit;
@@ -42,6 +44,11 @@ export async function GET(request: Request) {
                 { codUser: user.id },
             ]
         };
+
+        if (mealIdParam) {
+            // Precise fetch
+            whereClause.codicePasto = parseInt(mealIdParam);
+        }
 
         if (user.dieticianId) {
             whereClause.OR.push({
@@ -96,7 +103,22 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json();
+
         const { id, name, mealType, blocks, rows } = body;
+
+        const userId = parseInt(session.user.id);
+
+        // Security: Rate Limit (10 requests per minute)
+        const limitCheck = rateLimit(`meal-create-${userId}`, 10, 60000);
+        if (!limitCheck.success) return limitCheck.error;
+
+        // Security: Input Validation
+        if (!name || name.length > 100) {
+            return NextResponse.json({ error: 'Validation Error: Name is too long or empty' }, { status: 400 });
+        }
+        if (parseFloat(blocks) < 0) {
+            return NextResponse.json({ error: 'Validation Error: Blocks cannot be negative' }, { status: 400 });
+        }
 
         // Fetch user
         const user = await prisma.user.findFirst({
@@ -109,13 +131,45 @@ export async function POST(request: Request) {
         let mealId = id ? parseInt(id) : undefined;
 
         // To properly aggregate, we need the IDs first.
-        const distinctNames = Array.from(new Set(rows.map((r: any) => r.foodName).filter(Boolean)));
+        const distinctNames = Array.from(new Set(rows.map((r: any) => r.foodName).filter((n: any) => n && typeof n === 'string' && n.trim().length > 0)));
 
         // OPTIMIZATION: Single query to fetch all foods at once
         const foods = await prisma.alimento.findMany({
             where: { nome: { in: distinctNames as string[] } },
             select: { codiceAlimento: true, nome: true }
         });
+
+        const foundNames = new Set(foods.map(f => f.nome));
+        const missingNames = distinctNames.filter(name => !foundNames.has(name as string));
+
+        // Auto-create missing foods
+        if (missingNames.length > 0) {
+            console.log(`Auto-creating ${missingNames.length} missing foods:`, missingNames);
+
+            for (const missingName of missingNames) {
+                // Find the source row to get macros
+                const sourceRow = rows.find((r: any) => r.foodName === missingName);
+                if (sourceRow) {
+                    try {
+                        const newFood = await prisma.alimento.create({
+                            data: {
+                                nome: missingName as string,
+                                proteine: parseFloat(sourceRow.protein) || 0,
+                                carboidrati: parseFloat(sourceRow.carbs) || 0,
+                                grassi: parseFloat(sourceRow.fat) || 0,
+                                codTipo: 1, // Default to "Proteine" or generic
+                                codFonte: 1
+                            }
+                        });
+                        // Add to our local list so the rest of the logic works
+                        foods.push({ codiceAlimento: newFood.codiceAlimento, nome: newFood.nome });
+                    } catch (err) {
+                        console.error(`Failed to auto-create food ${missingName}:`, err);
+                        // Continue, but this ingredient will be skipped in mapping
+                    }
+                }
+            }
+        }
 
         // Build lookup maps for O(1) access
         const foodMap = new Map<string, number>();
@@ -129,10 +183,17 @@ export async function POST(request: Request) {
         const ingredientsMap = new Map<number, number>();
         for (const row of rows) {
             if (!row.foodName) continue;
+
+            // Security: Validate grams
+            const grams = parseFloat(row.grams);
+            if (isNaN(grams) || grams < 0) {
+                return NextResponse.json({ error: 'Validation Error: Ingredient grams cannot be negative' }, { status: 400 });
+            }
+
             const cod = foodMap.get(row.foodName);
             if (cod) {
                 const current = ingredientsMap.get(cod) || 0;
-                ingredientsMap.set(cod, current + parseFloat(row.grams));
+                ingredientsMap.set(cod, current + grams);
             }
         }
 
@@ -246,16 +307,38 @@ export async function DELETE(request: Request) {
     if (!id) return NextResponse.json({ error: 'Meal ID required' }, { status: 400 });
 
     try {
+        const mealId = parseInt(id);
+        const userId = parseInt(session.user.id);
+        const userRole = Number((session.user as any).role);
+
+        // Security Check: Verify Ownership
+        const meal = await prisma.pasto.findUnique({
+            where: { codicePasto: mealId },
+            select: { codUser: true }
+        });
+
+        if (!meal) {
+            return NextResponse.json({ error: 'Meal not found' }, { status: 404 });
+        }
+
+        // Allow delete if Owner OR Super Admin (Role 1)
+        // User Request: "dietist can delete only his/her meals" -> covered by (meal.codUser === userId)
+        // User Request: "superdmin can see everything" (and presumably manage) -> covered by (userRole === 1)
+        if (meal.codUser !== userId && userRole !== 1) {
+            return NextResponse.json({ error: 'Forbidden: You do not own this meal' }, { status: 403 });
+        }
+
         await prisma.pastoAlimento.deleteMany({
-            where: { codPasto: parseInt(id) }
+            where: { codPasto: mealId }
         });
 
         await prisma.pasto.delete({
-            where: { codicePasto: parseInt(id) }
+            where: { codicePasto: mealId }
         });
 
         return NextResponse.json({ message: 'Deleted successfully' });
     } catch (error) {
+        logger.error('Error deleting meal', error);
         return NextResponse.json({ error: 'Failed to delete' }, { status: 500 });
     }
 }

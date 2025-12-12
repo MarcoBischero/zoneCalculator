@@ -29,7 +29,8 @@ export default function AdminPage() {
                 return;
             }
 
-            fetchUsers();
+            // Redirect to the main users management page
+            router.push('/admin/users');
         } else if (status === 'unauthenticated') {
             router.push('/login');
         }

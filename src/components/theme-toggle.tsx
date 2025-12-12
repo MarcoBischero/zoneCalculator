@@ -38,11 +38,11 @@ const themes = [
     },
     {
         id: "zen-garden",
-        name: "Ocean Sunset",
+        name: "Zen Garden",
         icon: Leaf,
-        preview: "from-blue-600 via-orange-500 to-yellow-300",
-        description: "Tramonto sul mare",
-        emoji: "🌅"
+        preview: "from-[#F8F4E3] via-[#6B9080] to-[#E07A5F]",
+        description: "Naturale e rilassante",
+        emoji: "🌿"
     },
 ]
 

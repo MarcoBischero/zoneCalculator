@@ -1,154 +1,239 @@
 'use client';
+
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+    LayoutDashboard,
+    UtensilsCrossed,
+    Calculator,
+    Trophy,
+    Medal,
+    FileText,
+    Settings,
+    Menu,
+    X,
+    Zap,
+    Leaf,
+    CalendarDays,
+    Search,
+    Users,
+    Sparkles
+} from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { signOut } from "next-auth/react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { LayoutDashboard, Utensils, Calculator, Calendar, Settings, LogOut, ChevronRight, User, PieChart, Ruler, FileText, Sparkles, Shield, Trophy } from 'lucide-react';
-import { cn } from "@/lib/utils";
+import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/theme-toggle';
 
-const navigation = [
-    { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-    { name: 'Meal Builder', href: '/calculator', icon: Calculator },
-    { name: 'My Meals', href: '/meals', icon: Utensils },
-    { name: 'Protein Calc', href: '/protein', icon: Ruler },
-    { name: 'Weekly Planner', href: '/calendar', icon: Calendar },
-    { name: 'Food Database', href: '/foods', icon: Utensils },
-    { name: 'AI Chef', href: '/chef', icon: Sparkles },
-    { name: 'Leaderboard', href: '/leaderboard', icon: Trophy }, // Gamification
-    { name: 'My Reports', href: '/reports', icon: FileText },
-    { name: 'Settings', href: '/settings', icon: Settings },
-];
-
-import { ThemeToggle } from "@/components/theme-toggle";
-
-import { useSession } from "next-auth/react";
+import { useLanguage } from '@/lib/language-context';
 
 export function Sidebar() {
+    const { t } = useLanguage();
     const pathname = usePathname();
-    const { data: session, status } = useSession();
     const [isMobileOpen, setIsMobileOpen] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
-    // Completely hide sidebar if not authenticated
-    if (status !== 'authenticated') return null;
+    useEffect(() => setMounted(true), []);
 
-    const userRole = (session?.user as any)?.role;
-    const username = (session?.user as any)?.username || 'User';
+    if (!mounted) return null;
+
+    const mainNav = [
+        { name: t('sidebar.dashboard'), href: '/', icon: LayoutDashboard },
+        { name: t('sidebar.calculator'), href: '/calculator', icon: Calculator },
+        { name: t('sidebar.calendar'), href: '/calendar', icon: CalendarDays },
+        { name: t('sidebar.shopping'), href: '/shopping-list', icon: UtensilsCrossed }, // Note: shopping key in dict
+        { name: t('sidebar.foods'), href: '/foods', icon: Search },
+        { name: t('sidebar.meals'), href: '/meals', icon: UtensilsCrossed },
+        { name: t('sidebar.chef'), href: '/chef', icon: Sparkles },
+    ];
+
+    const gameNav = [
+        { name: 'Achievements', href: '/achievements', icon: Trophy }, // TODO: Add keys
+        { name: 'Leaderboard', href: '/leaderboard', icon: Medal },
+    ];
+
+    const adminNav = [
+        { name: t('sidebar.admin'), href: '/admin/users', icon: Users },
+    ];
+
+    const systemNav = [
+        { name: 'Reports', href: '/reports', icon: FileText },
+        { name: t('sidebar.settings'), href: '/settings', icon: Settings },
+    ];
+
+    const NavItem = ({ item }: { item: any }) => {
+        // ... (NavItem implementation remains)
+        const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+        return (
+            <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setIsMobileOpen(false)}
+                className={cn(
+                    "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group relative overflow-hidden",
+                    isActive
+                        ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                        : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                )}
+            >
+                <item.icon className={cn("w-5 h-5", isActive ? "animate-pulse-subtle" : "group-hover:scale-110 transition-transform")} />
+                <span>{item.name}</span>
+                {isActive && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent pointer-events-none" />
+                )}
+            </Link>
+        );
+    };
 
     return (
         <>
-            {/* Mobile Hamburger Button */}
-            <button
-                onClick={() => setIsMobileOpen(!isMobileOpen)}
-                className="md:hidden fixed top-4 left-4 z-50 p-2 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700"
-            >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
+            {/* Mobile Trigger */}
+            <div className="lg:hidden fixed top-4 left-4 z-50">
+                <Button variant="outline" size="icon" onClick={() => setIsMobileOpen(!isMobileOpen)} className="glass-panel">
+                    {isMobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                </Button>
+            </div>
 
-            {/* Overlay on mobile when open */}
-            {isMobileOpen && (
-                <div
-                    className="md:hidden fixed inset-0 bg-black/50 z-40"
-                    onClick={() => setIsMobileOpen(false)}
-                />
-            )}
+            {/* Mobile Sidebar & Backdrop */}
+            <AnimatePresence>
+                {isMobileOpen && (
+                    <>
+                        {/* Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+                            onClick={() => setIsMobileOpen(false)}
+                        />
 
-            {/* Sidebar */}
-            <aside style={{
-                backgroundColor: `hsl(var(--sidebar-bg))`,
-                color: `hsl(var(--sidebar-fg))`
-            }} className={`
-                ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
-                md:translate-x-0
-                fixed md:sticky top-0 left-0 h-screen
-                w-64 border-r shadow-2xl
-                flex flex-col transition-all duration-300 ease-in-out z-40
-            `}>
-                {/* Header */}
-                <div className="flex h-20 items-center px-6 border-b border-white/10">
-                    <div className="flex flex-col">
-                        <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: `hsl(var(--sidebar-fg))` }}>
-                            Zone<span className="opacity-70">Calc</span>
-                        </h1>
-                        <div className="flex items-center gap-2">
-                            <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse"></span>
-                            <span className="text-[10px] font-semibold uppercase tracking-widest opacity-70">System Online</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Nav */}
-                <nav className="flex-1 space-y-1 px-4 py-6 overflow-y-auto">
-                    {navigation.map((item) => {
-                        const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
-                        return (
-                            <Link
-                                key={item.name}
-                                href={item.href}
-                                onClick={() => setIsMobileOpen(false)}
-                                className={cn(
-                                    "group flex items-center rounded-xl px-4 py-3.5 text-sm font-medium transition-all duration-200 ease-in-out border border-transparent",
-                                    isActive
-                                        ? "bg-white/20 border-white/30 shadow-sm"
-                                        : "hover:bg-white/10"
-                                )}
-                            >
-                                <item.icon
-                                    className={cn(
-                                        "mr-3 h-5 w-5 flex-shrink-0 transition-colors",
-                                        isActive ? "opacity-100" : "opacity-70 group-hover:opacity-100"
-                                    )}
-                                    aria-hidden="true"
-                                />
-                                <span className={cn(isActive ? "opacity-100" : "opacity-80 group-hover:opacity-100")}>
-                                    {item.name}
-                                </span>
-                            </Link>
-                        );
-                    })}
-
-                    {(userRole === 1 || userRole === 2) && (
-                        <div className="mt-6 pt-6 border-t border-border">
-                            <p className="px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Admin</p>
-                            <Link
-                                href="/admin/users"
-                                className={cn(
-                                    "group flex items-center rounded-xl px-4 py-3.5 text-sm font-medium transition-all duration-200 ease-in-out border border-transparent",
-                                    pathname === '/admin/users'
-                                        ? "bg-red-500/10 text-red-500 border-red-500/20"
-                                        : "text-muted-foreground hover:bg-muted hover:text-red-500"
-                                )}
-                            >
-                                <Shield className="mr-3 h-5 w-5 flex-shrink-0" />
-                                User Management
-                            </Link>
-                        </div>
-                    )}
-                </nav>
-
-                {/* User Section */}
-                <div className="p-4 bg-muted/30 border-t border-border">
-                    <div className="mb-4">
-                        <ThemeToggle />
-                    </div>
-                    <div className="flex items-center gap-3 rounded-xl bg-card p-3 shadow-sm border border-border group hover:border-primary/50 transition-colors cursor-pointer">
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-primary-foreground font-bold shadow-md ring-2 ring-background">
-                            {username.substring(0, 2).toUpperCase()}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-card-foreground truncate group-hover:text-primary transition-colors">{username}</p>
-                            <p className="text-xs text-muted-foreground truncate">{userRole === 1 ? 'Administrator' : 'Pro Membership'}</p>
-                        </div>
-                        <button
-                            type="button"
-                            onClick={() => signOut({ callbackUrl: '/login' })}
-                            className="text-muted-foreground hover:text-destructive transition-colors p-1"
-                            title="Sign Out"
+                        {/* Sidebar Container */}
+                        <motion.aside
+                            initial={{ x: "-100%" }}
+                            animate={{ x: 0 }}
+                            exit={{ x: "-100%" }}
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            className="fixed inset-y-0 left-0 z-50 w-72 h-full p-4 flex flex-col lg:hidden"
                         >
-                            <LogOut className="h-5 w-5" />
-                        </button>
+                            <div className="h-full glass-panel rounded-2xl flex flex-col overflow-hidden shadow-2xl">
+                                {/* Header */}
+                                <div className="p-6 border-b border-border/10">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                                            <Zap className="text-white w-6 h-6 fill-current" />
+                                        </div>
+                                        <div>
+                                            <h1 className="font-bold text-xl tracking-tight leading-none">ZoneOS</h1>
+                                            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Pro Platform</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Navigation */}
+                                <nav className="flex-1 overflow-y-auto px-4 py-6 flex flex-col">
+                                    {/* Main App */}
+                                    <div className="space-y-1">
+                                        {mainNav.map((item) => <NavItem key={item.href} item={item} />)}
+                                    </div>
+
+                                    <div className="mt-auto space-y-6 pt-6">
+                                        {/* Gamification Section */}
+                                        <div className="space-y-1">
+                                            <div className="px-4 text-xs font-bold text-muted-foreground/40 uppercase tracking-widest mb-2">
+                                                Gamification
+                                            </div>
+                                            {gameNav.map((item) => <NavItem key={item.href} item={item} />)}
+                                        </div>
+
+                                        {/* User Section */}
+                                        <div className="space-y-1">
+                                            <div className="px-4 text-xs font-bold text-muted-foreground/40 uppercase tracking-widest mb-2">
+                                                User
+                                            </div>
+                                            {systemNav.map((item) => <NavItem key={item.href} item={item} />)}
+                                        </div>
+
+                                        {/* Admin Section */}
+                                        <div className="space-y-1">
+                                            <div className="px-4 text-xs font-bold text-muted-foreground/40 uppercase tracking-widest mb-2">
+                                                Admin
+                                            </div>
+                                            {adminNav.map((item) => <NavItem key={item.href} item={item} />)}
+                                        </div>
+                                    </div>
+                                </nav>
+
+                                {/* Footer / Theme Toggle */}
+                                <div className="p-4 border-t border-border/10">
+                                    <div className="glass-card p-4 rounded-xl flex items-center justify-between">
+                                        <span className="text-xs font-medium text-muted-foreground">Theme</span>
+                                        <ThemeToggle />
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.aside>
+                    </>
+                )}
+            </AnimatePresence>
+
+            {/* Desktop Sidebar (Static) */}
+            <aside className="hidden lg:flex relative inset-y-0 left-0 z-50 w-72 flex-col h-full p-4 gap-4">
+                <div className="h-full glass-panel rounded-2xl flex flex-col overflow-hidden">
+
+
+                    {/* Header */}
+                    <div className="p-6 border-b border-border/10">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                                <Zap className="text-white w-6 h-6 fill-current" />
+                            </div>
+                            <div>
+                                <h1 className="font-bold text-xl tracking-tight leading-none">ZoneOS</h1>
+                                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Pro Platform</span>
+                            </div>
+                        </div>
                     </div>
+
+                    {/* Navigation */}
+                    <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-1">
+                        {mainNav.map((item) => <NavItem key={item.href} item={item} />)}
+                    </nav>
+
+                    {/* Bottom Sections (Gamification, User, Admin) */}
+                    <div className="px-4 pb-2 mt-auto space-y-6">
+                        {/* Gamification Section */}
+                        <div>
+                            <div className="mb-2 px-4 text-xs font-bold text-muted-foreground/40 uppercase tracking-widest">
+                                Gamification
+                            </div>
+                            {gameNav.map((item) => <NavItem key={item.href} item={item} />)}
+                        </div>
+
+                        {/* User Section */}
+                        <div>
+                            <div className="mb-2 px-4 text-xs font-bold text-muted-foreground/40 uppercase tracking-widest">
+                                User
+                            </div>
+                            {systemNav.map((item) => <NavItem key={item.href} item={item} />)}
+                        </div>
+
+                        {/* Admin Section */}
+                        <div>
+                            <div className="mb-2 px-4 text-xs font-bold text-muted-foreground/40 uppercase tracking-widest">
+                                Admin
+                            </div>
+                            {adminNav.map((item) => <NavItem key={item.href} item={item} />)}
+                        </div>
+                    </div>
+
+                    {/* Footer / Theme Toggle */}
+                    <div className="p-4 border-t border-border/10">
+                        <div className="glass-card p-4 rounded-xl flex items-center justify-between">
+                            <span className="text-xs font-medium text-muted-foreground">Theme</span>
+                            <ThemeToggle />
+                        </div>
+                    </div>
+
                 </div>
             </aside>
         </>

@@ -9,7 +9,10 @@ const rateLimitMap = new Map<string, RateLimitEntry>();
 
 /**
  * Simple in-memory rate limiter
- * For production, consider using Redis for distributed rate limiting
+ * WARN: In Serverless/Vercel, this state is NOT shared across functions.
+ * Attacker can bypass this by hitting different cold instances.
+ * FIX: Use Redis (Upstash) or Database for distributed state.
+ * For this demo/MVP, in-memory is acceptable specific barrier.
  * 
  * @param identifier - Unique identifier (e.g., user ID, IP address)
  * @param limit - Maximum number of requests allowed in the window

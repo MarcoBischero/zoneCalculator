@@ -22,6 +22,13 @@ export function PhotoMealModal({ isOpen, onClose, onMealGenerated }: PhotoMealMo
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            // Validate MIME type for Gemini
+            const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+            if (!validTypes.includes(file.type)) {
+                alert(`Unsupported image format (${file.type}). Please use JPEG, PNG, or WebP.`);
+                return;
+            }
+
             const reader = new FileReader();
             reader.onloadend = () => {
                 setImage(reader.result as string);
@@ -43,32 +50,37 @@ export function PhotoMealModal({ isOpen, onClose, onMealGenerated }: PhotoMealMo
             const result = await res.json();
 
             if (!res.ok) {
-                console.error(result.error);
-                alert('Failed to analyze image: ' + (result.error || 'Unknown error'));
+                console.error(result.error, result.details);
+                alert(`Error: ${result.details || result.error || 'Unknown error'}`);
                 setAnalyzing(false);
                 return;
             }
 
             const apiData = result.data;
-            if (Array.isArray(apiData)) {
+            console.log("Vision API Data:", apiData);
+
+            if (Array.isArray(apiData) && apiData.length > 0) {
                 const newRows = apiData.map((item: any, index: number) => ({
                     id: index + 1,
-                    foodName: item.foodName,
-                    protein: item.protein,
-                    carbs: item.carbs,
-                    fat: item.fat,
-                    grams: item.grams,
+                    foodName: item.foodName || "Unknown Item",
+                    protein: Number(item.protein) || 0,
+                    carbs: Number(item.carbs) || 0,
+                    fat: Number(item.fat) || 0,
+                    grams: Number(item.grams) || 100,
                     blocks: 0
                 }));
                 onMealGenerated(newRows);
                 onClose();
                 setStep('upload');
                 setImage(null);
+            } else {
+                console.error("Invalid data format received:", apiData);
+                alert("The AI couldn't identify any food in this image. Please try a clearer photo.");
             }
 
         } catch (e) {
             console.error(e);
-            alert('Network error analyzing image');
+            alert('Network error analyzing image. Check console for details.');
         } finally {
             setAnalyzing(false);
         }
@@ -86,19 +98,19 @@ export function PhotoMealModal({ isOpen, onClose, onMealGenerated }: PhotoMealMo
 
                 <div className="space-y-6 py-4">
                     {step === 'upload' && !analyzing && (
-                        <div className="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 rounded-xl p-8 bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer relative">
+                        <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 rounded-xl p-8 bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer relative group">
                             <input
                                 type="file"
-                                accept="image/*"
-                                className="absolute inset-0 opacity-0 cursor-pointer"
+                                accept="image/jpeg, image/png, image/webp, image/heic"
+                                className="hidden" // Completely hide it 
                                 onChange={handleImageUpload}
                             />
-                            <div className="bg-white p-4 rounded-full shadow-sm mb-4">
-                                <Upload className="w-8 h-8 text-zone-blue-500" />
+                            <div className="bg-white p-4 rounded-full shadow-sm mb-4 group-hover:scale-110 transition-transform">
+                                <Upload className="w-8 h-8 text-primary" />
                             </div>
                             <p className="text-sm font-medium text-slate-700">Click to upload meal photo</p>
                             <p className="text-xs text-slate-500 mt-1">or drag and drop here</p>
-                        </div>
+                        </label>
                     )}
 
                     {(analyzing || (step === 'upload' && image)) && (
@@ -140,7 +152,7 @@ export function PhotoMealModal({ isOpen, onClose, onMealGenerated }: PhotoMealMo
                                 <p className="text-xs text-slate-500 mt-2">The AI will use this target to calculate portion sizes for the identified foods.</p>
                             </div>
 
-                            <Button onClick={handleConfirm} className="w-full bg-zone-blue-600 hover:bg-zone-blue-700 text-white font-bold h-12 text-lg">
+                            <Button onClick={handleConfirm} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-12 text-lg shadow-lg shadow-primary/20">
                                 <Sparkles className="w-5 h-5 mr-2" /> Generate Meal
                             </Button>
                         </div>

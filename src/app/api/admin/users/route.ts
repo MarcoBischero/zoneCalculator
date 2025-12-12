@@ -139,7 +139,7 @@ export async function POST(req: Request) {
     let assignedDietician: number | null = null; // Explicit type
 
     if (roleId === ROLE_DIETICIAN) {
-        newRole = ROLE_PATIENT;
+        newRole = ROLE_PATIENT; // Enforced: Dietician can ONLY create Patients (Role 3)
         assignedDietician = myId;
     } else if (roleId === ROLE_SUPER_ADMIN) {
         // Admin specified role

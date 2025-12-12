@@ -15,35 +15,40 @@ export async function awardPoints(userId: number, actionKey: keyof typeof GAMIFI
         const action = GAMIFICATION_ACTIONS[actionKey];
         if (!action) return;
 
-        // Get Schema Data
-        const profile = await prisma.gamificationProfile.findUnique({
-            where: { userId }
-        });
+        // Local limit check to prevent massive spam (optional, good practice)
+        // ...
 
-        if (!profile) {
-            // Should exist from user creation, but fallback safety
-            await prisma.gamificationProfile.create({
-                data: { userId, points: action.points }
-            });
-            return;
-        }
-
-        // Calculate New State
-        const newPoints = profile.points + action.points;
-        const newLevel = Math.floor(newPoints / 100) + 1; // Simple Leveling: Every 100 pts
-
-        // Streak Logic could go here (e.g. check lastAction date)
-
-        await prisma.gamificationProfile.update({
+        // ATOMIC UPSERT: Handles Race Conditions by letting the DB manage concurrency
+        const profile = await prisma.gamificationProfile.upsert({
             where: { userId },
-            data: {
-                points: newPoints,
-                level: newLevel,
+            create: {
+                userId,
+                points: action.points,
+                level: 1,
+                lastAction: new Date()
+            },
+            update: {
+                points: { increment: action.points },
                 lastAction: new Date()
             }
         });
 
-        console.log(`[GAMIFICATION] User ${userId} awarded ${action.points} pts for ${action.label}. Total: ${newPoints} (Lvl ${newLevel})`);
+        // Level Sync (Post-Atomic Update)
+        // If points incremented, we check if level needs update.
+        // This is safe because points are already secured.
+        const expectedLevel = Math.floor(profile.points / 100) + 1;
+        if (profile.level !== expectedLevel) {
+            await prisma.gamificationProfile.update({
+                where: { userId },
+                data: { level: expectedLevel }
+            });
+            // Update local object for logging
+            profile.level = expectedLevel;
+        }
+
+        console.log(`[GAMIFICATION] User ${userId} awarded ${action.points} pts for ${action.label}. Total: ${profile.points} (Lvl ${profile.level})`); // Log from DB profile
+
+
 
     } catch (e) {
         console.error("[GAMIFICATION ERROR]", e);
