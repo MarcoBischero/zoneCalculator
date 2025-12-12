@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { rateLimit } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
+import { getAIModel } from "@/lib/ai-config";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
@@ -50,8 +51,9 @@ export async function POST(req: Request) {
         }
 
         // Use stable Gemini model for vision
+        const modelName = await getAIModel();
         const model = genAI.getGenerativeModel({
-            model: "gemini-flash-latest",
+            model: modelName,
             // Safety settings to prevent blocking food images
             safetySettings: [
                 { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },

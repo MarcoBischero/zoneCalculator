@@ -52,7 +52,14 @@ function CalculatorContent() {
 
         if (importParam) {
             try {
-                const parsed = JSON.parse(decodeURIComponent(importParam));
+                let decoded = importParam;
+                try {
+                    decoded = decodeURIComponent(importParam);
+                } catch (e) {
+                    console.warn("URI decode failed, attempting to parse raw string", e);
+                }
+
+                const parsed = JSON.parse(decoded);
                 console.log("Importing meal data:", parsed);
                 if (parsed.name) setMealName(parsed.name);
                 if (Array.isArray(parsed.ingredients)) {

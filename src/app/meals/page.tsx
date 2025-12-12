@@ -55,7 +55,8 @@ export default function MealsListPage() {
             if (res.ok) {
                 setMeals(meals.filter(m => m.codicePasto !== id));
             } else {
-                alert('Failed to delete meal');
+                const data = await res.json().catch(() => ({}));
+                alert(data.error || 'Failed to delete meal');
             }
         } catch (error) {
             console.error('Error deleting meal:', error);

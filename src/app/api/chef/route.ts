@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { rateLimit } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
+import { getAIModel } from "@/lib/ai-config";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
@@ -25,7 +26,8 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "GEMINI_API_KEY not configured" }, { status: 500 });
         }
 
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const modelName = await getAIModel();
+        const model = genAI.getGenerativeModel({ model: modelName });
 
         let prompt = "";
 

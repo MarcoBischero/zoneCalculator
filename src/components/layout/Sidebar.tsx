@@ -53,7 +53,8 @@ export function Sidebar() {
     ];
 
     const adminNav = [
-        { name: t('sidebar.admin'), href: '/admin/users', icon: Users },
+        { name: t('sidebar.admin_users'), href: '/admin/users', icon: Users },
+        { name: t('sidebar.admin_settings'), href: '/admin/settings', icon: Settings },
     ];
 
     const systemNav = [

@@ -104,7 +104,14 @@ export async function POST(request: Request) {
     try {
         const body = await request.json();
 
-        const { id, name, mealType, blocks, rows } = body;
+        const { id, name, mealType, blocks } = body;
+        // Use 'foods' from payload, but alias to 'rows' to match existing logic if needed,
+        // or just use a new variable. Existing logic uses 'rows'.
+        const rows = body.foods || body.rows || []; // Support both for backward compatibility
+
+        if (!Array.isArray(rows)) {
+            return NextResponse.json({ error: 'Validation Error: Invalid foods data' }, { status: 400 });
+        }
 
         const userId = parseInt(session.user.id);
 

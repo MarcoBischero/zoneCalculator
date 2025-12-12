@@ -32,7 +32,7 @@ export default function ChefPage() {
     // Zone Mode State
     const [zoneBlocks, setZoneBlocks] = useState(3);
     const [mealTime, setMealTime] = useState('Lunch');
-    const [preference, setPreference] = useState('Any');
+    const [preference, setPreference] = useState<string[]>(['any']);
 
     // Generation State
     const [isGenerating, setIsGenerating] = useState(false);
@@ -136,9 +136,9 @@ export default function ChefPage() {
                 <div>
                     <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
                         <Sparkles className="w-8 h-8 text-zone-orange-500" />
-                        AI Chef
+                        {t('chef.title')}
                     </h1>
-                    <p className="text-slate-500">Let our advanced algorithms design your perfect Zone meal.</p>
+                    <p className="text-slate-500">{t('chef.subtitle')}</p>
                 </div>
             </div>
 
@@ -156,8 +156,8 @@ export default function ChefPage() {
                             <Refrigerator className="w-8 h-8" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-lg text-slate-900">What&apos;s in my Fridge?</h3>
-                            <p className="text-slate-500 text-sm">I have ingredients, I need a recipe.</p>
+                            <h3 className="font-bold text-lg text-slate-900">{t('chef.fridge_mode')}</h3>
+                            <p className="text-slate-500 text-sm">{t('chef.fridge_desc')}</p>
                         </div>
                     </div>
                 </div>
@@ -174,8 +174,8 @@ export default function ChefPage() {
                             <ChefHat className="w-8 h-8" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-lg text-slate-900">I feel ZonEd</h3>
-                            <p className="text-slate-500 text-sm">I have a block target, surprise me.</p>
+                            <h3 className="font-bold text-lg text-slate-900">{t('chef.zone_mode')}</h3>
+                            <p className="text-slate-500 text-sm">{t('chef.zone_desc')}</p>
                         </div>
                     </div>
                 </div>
@@ -247,10 +247,10 @@ export default function ChefPage() {
                     </div>
                 ) : (
                     <div className="space-y-6">
-                        <h2 className="text-xl font-bold text-slate-800">Configure Your Zone Experience</h2>
+                        <h2 className="text-xl font-bold text-slate-800">{t('chef.configure_title')}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">How hungry are you? (Blocks)</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">{t('chef.hunger_label')}</label>
                                 <div className="flex items-center gap-4">
                                     <input
                                         type="range"
@@ -265,40 +265,42 @@ export default function ChefPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Meal Time</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">{t('chef.meal_time_label')}</label>
                                 <div className="flex gap-2">
-                                    {['Breakfast', 'Lunch', 'Snack', 'Dinner'].map(t => (
+                                    {['breakfast', 'lunch', 'snack', 'dinner'].map(time => (
                                         <button
-                                            key={t}
-                                            onClick={() => setMealTime(t)}
-                                            className={cn(
-                                                "flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors border",
-                                                mealTime === t
-                                                    ? "bg-slate-800 text-white border-slate-800"
-                                                    : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-                                            )}
+                                            key={time}
+                                            onClick={() => setMealTime(time)}
+                                            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${mealTime === time
+                                                ? 'bg-slate-800 text-white'
+                                                : 'bg-white border text-slate-600 hover:bg-slate-50'
+                                                }`}
                                         >
-                                            {t}
+                                            {t(`chef.meal_times.${time}`)}
                                         </button>
                                     ))}
                                 </div>
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Dietary Preference</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">{t('chef.dietary_label')}</label>
                             <div className="flex gap-2 flex-wrap">
-                                {['Any', 'Meat', 'Fish', 'Vegetarian', 'Vegan'].map(p => (
+                                {['any', 'meat', 'fish', 'vegetarian', 'vegan'].map(pref => (
                                     <button
-                                        key={p}
-                                        onClick={() => setPreference(p)}
-                                        className={cn(
-                                            "py-2 px-3 rounded-lg text-sm font-medium transition-colors border",
-                                            preference === p
-                                                ? "bg-slate-800 text-white border-slate-800"
-                                                : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-                                        )}
+                                        key={pref}
+                                        onClick={() => setPreference(prev => {
+                                            if (pref === 'any') return ['any'];
+                                            const newPrefs = prev.includes(pref)
+                                                ? prev.filter(p => p !== pref)
+                                                : [...prev.filter(p => p !== 'any'), pref];
+                                            return newPrefs.length === 0 ? ['any'] : newPrefs;
+                                        })}
+                                        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${preference.includes(pref)
+                                            ? 'bg-slate-800 text-white'
+                                            : 'bg-white border text-slate-600 hover:bg-slate-50'
+                                            }`}
                                     >
-                                        {p}
+                                        {t(`chef.dietary.${pref}`)}
                                     </button>
                                 ))}
                             </div>
@@ -311,7 +313,7 @@ export default function ChefPage() {
                                 className="bg-orange-500 hover:bg-orange-600 text-white font-bold"
                             >
                                 {isGenerating ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : <Sparkles className="w-5 h-5 mr-2" />}
-                                {isGenerating ? "Designing..." : "Create Perfect Meal"}
+                                {isGenerating ? t('chef.designing_button') : t('chef.create_button')}
                             </Button>
                         </div>
                     </div>

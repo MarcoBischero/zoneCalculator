@@ -1,13 +1,16 @@
 'use client';
 
 import { Trophy, Medal, Star, Target, Zap, Crown } from 'lucide-react';
+import { useLanguage } from '@/lib/language-context';
 
 export default function AchievementsPage() {
+    const { t } = useLanguage();
+
     const achievements = [
         {
             id: 1,
-            title: "Zone Starter",
-            description: "Completed your first balanced meal",
+            title: t('achievements.cards.starter_title'),
+            description: t('achievements.cards.starter_desc'),
             icon: Trophy,
             color: "text-yellow-500",
             bg: "bg-yellow-500/10",
@@ -16,8 +19,8 @@ export default function AchievementsPage() {
         },
         {
             id: 2,
-            title: "Protein Pro",
-            description: "Hit protein targets for 7 days straight",
+            title: t('achievements.cards.protein_title'),
+            description: t('achievements.cards.protein_desc'),
             icon: Medal,
             color: "text-blue-500",
             bg: "bg-blue-500/10",
@@ -26,8 +29,8 @@ export default function AchievementsPage() {
         },
         {
             id: 3,
-            title: "Master Chef",
-            description: "Created 50 custom meals",
+            title: t('achievements.cards.master_title'),
+            description: t('achievements.cards.master_desc'),
             icon: Crown,
             color: "text-purple-500",
             bg: "bg-purple-500/10",
@@ -36,8 +39,8 @@ export default function AchievementsPage() {
         },
         {
             id: 4,
-            title: "Consistent Zoner",
-            description: "Logged meals for 30 consecutive days",
+            title: t('achievements.cards.consistent_title'),
+            description: t('achievements.cards.consistent_desc'),
             icon: Target,
             color: "text-green-500",
             bg: "bg-green-500/10",
@@ -46,8 +49,8 @@ export default function AchievementsPage() {
         },
         {
             id: 5,
-            title: "Precision",
-            description: "Achieved perfect block balance in a meal",
+            title: t('achievements.cards.precision_title'),
+            description: t('achievements.cards.precision_desc'),
             icon: Star,
             color: "text-orange-500",
             bg: "bg-orange-500/10",
@@ -56,8 +59,8 @@ export default function AchievementsPage() {
         },
         {
             id: 6,
-            title: "Speed Demon",
-            description: "Created a meal in under 30 seconds",
+            title: t('achievements.cards.speed_title'),
+            description: t('achievements.cards.speed_desc'),
             icon: Zap,
             color: "text-red-500",
             bg: "bg-red-500/10",
@@ -68,8 +71,8 @@ export default function AchievementsPage() {
     return (
         <div className="container mx-auto p-4 md:p-8 space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col gap-2">
-                <h1 className="text-3xl font-bold tracking-tight">Achievements</h1>
-                <p className="text-muted-foreground">Track your progress and unlock rewards as you master the Zone Diet.</p>
+                <h1 className="text-3xl font-bold tracking-tight">{t('achievements.title')}</h1>
+                <p className="text-muted-foreground">{t('achievements.subtitle')}</p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -94,11 +97,11 @@ export default function AchievementsPage() {
                             </div>
                             {achievement.unlocked ? (
                                 <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-900">
-                                    UNLOCKED
+                                    {t('achievements.unlocked')}
                                 </span>
                             ) : (
                                 <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-500 border border-slate-300 dark:border-slate-700">
-                                    LOCKED
+                                    {t('achievements.locked')}
                                 </span>
                             )}
                         </div>
@@ -111,7 +114,7 @@ export default function AchievementsPage() {
                         {!achievement.unlocked && achievement.progress !== undefined && (
                             <div className="space-y-1.5">
                                 <div className="flex justify-between text-xs text-muted-foreground">
-                                    <span>Progress</span>
+                                    <span>{t('achievements.progress')}</span>
                                     <span>{achievement.progress}/50</span>
                                 </div>
                                 <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -125,7 +128,7 @@ export default function AchievementsPage() {
 
                         {achievement.unlocked && achievement.date && (
                             <div className="text-xs text-muted-foreground font-mono">
-                                Unlocked on {achievement.date}
+                                {t('achievements.unlocked_on')} {achievement.date}
                             </div>
                         )}
                     </div>

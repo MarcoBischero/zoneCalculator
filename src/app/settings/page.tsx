@@ -28,36 +28,37 @@ export default function SettingsPage() {
             .catch(err => setLoading(false));
     });
 
-    const { setLanguage } = useLanguage();
+    const { t, language, setLanguage } = useLanguage();
 
     const handleProfileUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
+        // ... (keep existing logic)
         e.preventDefault();
         setMessage('');
         setIsSaving(true);
 
         const formData = new FormData(e.currentTarget);
         const nome = formData.get('nome');
-        const language = formData.get('language') as string;
+        const lang = formData.get('language') as string;
 
         try {
             const res = await fetch('/api/user', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nome, language })
+                body: JSON.stringify({ nome, language: lang })
             });
 
             if (res.ok) {
-                setMessage('Successo: Impostazioni salvate');
+                setMessage(language === 'it' ? 'Successo: Impostazioni salvate' : 'Success: Settings saved');
                 // Update Global Context
-                if (language === 'it' || language === 'en') {
-                    setLanguage(language as any);
+                if (lang === 'it' || lang === 'en') {
+                    setLanguage(lang as any);
                 }
                 router.refresh();
             } else {
-                setMessage('Errore: Impossibile salvare');
+                setMessage(language === 'it' ? 'Errore: Impossibile salvare' : 'Error: Could not save');
             }
         } catch (error) {
-            setMessage('Errore di Connessione');
+            setMessage(language === 'it' ? 'Errore di Connessione' : 'Connection Error');
         } finally {
             setIsSaving(false);
         }
@@ -71,7 +72,7 @@ export default function SettingsPage() {
         const confirm = formData.get('confirm') as string;
 
         if (password !== confirm) {
-            setMessage('Le password non corrispondono');
+            setMessage(language === 'it' ? 'Le password non corrispondono' : 'Passwords do not match');
             setIsSaving(false);
             return;
         }
@@ -84,13 +85,13 @@ export default function SettingsPage() {
             });
 
             if (res.ok) {
-                setMessage('Successo: Password aggiornata');
+                setMessage(language === 'it' ? 'Successo: Password aggiornata' : 'Success: Password updated');
                 (e.target as HTMLFormElement).reset();
             } else {
-                setMessage('Errore: Impossibile aggiornare la password');
+                setMessage(language === 'it' ? 'Errore: Impossibile aggiornare la password' : 'Error: Could not update password');
             }
         } catch (error) {
-            setMessage('Errore di Reata');
+            setMessage(language === 'it' ? 'Errore di Rete' : 'Network Error');
         } finally {
             setIsSaving(false);
         }
@@ -102,20 +103,26 @@ export default function SettingsPage() {
         </div>
     );
 
+    const getRoleLabel = (role: number) => {
+        if (role === 1) return t('settings.role_admin');
+        if (role === 2) return t('settings.role_dietician');
+        return t('settings.role_patient');
+    };
+
     return (
         <div className="p-4 md:p-8 space-y-8 min-h-screen bg-slate-50/50">
             <div>
-                <h1 className="text-3xl font-black text-slate-900 tracking-tight">Impostazioni</h1>
-                <p className="text-slate-500 mt-2">Gestisci il tuo profilo, preferenze e sicurezza.</p>
+                <h1 className="text-3xl font-black text-slate-900 tracking-tight">{t('settings.title')}</h1>
+                <p className="text-slate-500 mt-2">{t('settings.subtitle')}</p>
             </div>
 
             <Tabs defaultValue="profile" className="space-y-6">
                 <TabsList className="bg-white border p-1 rounded-xl shadow-sm w-full md:w-auto grid grid-cols-2 md:inline-flex">
                     <TabsTrigger value="profile" className="data-[state=active]:bg-zone-blue-50 data-[state=active]:text-zone-blue-700 gap-2">
-                        <User className="w-4 h-4" /> Profilo
+                        <User className="w-4 h-4" /> {t('settings.profile')}
                     </TabsTrigger>
                     <TabsTrigger value="security" className="data-[state=active]:bg-orange-50 data-[state=active]:text-orange-700 gap-2">
-                        <Lock className="w-4 h-4" /> Sicurezza
+                        <Lock className="w-4 h-4" /> {t('settings.security')}
                     </TabsTrigger>
                 </TabsList>
 
@@ -123,13 +130,13 @@ export default function SettingsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <Card>
                             <CardHeader>
-                                <CardTitle>Informazioni Personali</CardTitle>
-                                <CardDescription>Aggiorna i tuoi dati di base.</CardDescription>
+                                <CardTitle>{t('settings.profile')}</CardTitle>
+                                <CardDescription>{t('settings.subtitle')}</CardDescription>
                             </CardHeader>
                             <form onSubmit={handleProfileUpdate}>
                                 <CardContent className="space-y-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="nome">Nome Visualizzato</Label>
+                                        <Label htmlFor="nome">Nome Visualizzato (Display Name)</Label>
                                         <Input id="nome" name="nome" defaultValue={user?.nome || ''} required />
                                     </div>
                                     <div className="space-y-2">
@@ -137,7 +144,7 @@ export default function SettingsPage() {
                                         <Input id="email" value={user?.email || ''} disabled className="bg-slate-50" />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label htmlFor="language">Lingua</Label>
+                                        <Label htmlFor="language">{t('settings.language')}</Label>
                                         <select
                                             id="language"
                                             name="language"
@@ -148,12 +155,12 @@ export default function SettingsPage() {
                                             <option value="en">English 🇬🇧</option>
                                         </select>
                                     </div>
-                                    {message && <p className={`text-sm font-medium ${message.includes('Successo') ? 'text-green-600' : 'text-red-600'}`}>{message}</p>}
+                                    {message && <p className={`text-sm font-medium ${message.includes('Success') || message.includes('Successo') ? 'text-green-600' : 'text-red-600'}`}>{message}</p>}
                                 </CardContent>
                                 <CardFooter>
                                     <Button type="submit" disabled={isSaving} className="bg-zone-blue-600 hover:bg-zone-blue-700">
                                         {isSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
-                                        Salva Modifiche
+                                        {t('settings.save_changes')}
                                     </Button>
                                 </CardFooter>
                             </form>
@@ -161,18 +168,18 @@ export default function SettingsPage() {
 
                         <Card>
                             <CardHeader>
-                                <CardTitle>Configurazione Zona</CardTitle>
-                                <CardDescription>I tuoi parametri nutrizionali attuali.</CardDescription>
+                                <CardTitle>{t('settings.title')}</CardTitle>
+                                <CardDescription>{t('settings.subtitle')}</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-100">
-                                    <span className="text-sm font-medium text-slate-600">Blocchi Giornalieri</span>
+                                    <span className="text-sm font-medium text-slate-600">{t('settings.daily_blocks')}</span>
                                     <span className="text-2xl font-bold text-zone-blue-600">11.0</span>
                                 </div>
                                 <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-100">
-                                    <span className="text-sm font-medium text-slate-600">Modalità</span>
+                                    <span className="text-sm font-medium text-slate-600">{t('settings.mode_label')}</span>
                                     <span className="text-sm font-bold text-slate-900 bg-white px-3 py-1 rounded border shadow-sm">
-                                        {user?.role === 1 ? 'Super Admin' : user?.role === 2 ? 'Dietista' : 'Utente Standard'}
+                                        {getRoleLabel(user?.role)}
                                     </span>
                                 </div>
                             </CardContent>
@@ -183,25 +190,25 @@ export default function SettingsPage() {
                 <TabsContent value="security">
                     <Card className="max-w-md">
                         <CardHeader>
-                            <CardTitle>Cambia Password</CardTitle>
-                            <CardDescription>Aggiorna la password del tuo account.</CardDescription>
+                            <CardTitle>{t('settings.update_password')}</CardTitle>
+                            <CardDescription>{t('settings.subtitle')}</CardDescription>
                         </CardHeader>
                         <form onSubmit={handlePasswordChange}>
                             <CardContent className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="password">Nuova Password</Label>
+                                    <Label htmlFor="password">{t('settings.update_password')}</Label>
                                     <Input id="password" name="password" type="password" required minLength={8} />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="confirm">Conferma Password</Label>
+                                    <Label htmlFor="confirm">Confirm Password</Label>
                                     <Input id="confirm" name="confirm" type="password" required minLength={8} />
                                 </div>
-                                {message && <p className={`text-sm font-medium ${message.includes('Successo') ? 'text-green-600' : 'text-red-600'}`}>{message}</p>}
+                                {message && <p className={`text-sm font-medium ${message.includes('Success') || message.includes('Successo') ? 'text-green-600' : 'text-red-600'}`}>{message}</p>}
                             </CardContent>
                             <CardFooter>
                                 <Button type="submit" disabled={isSaving} variant="outline" className="w-full">
                                     {isSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Lock className="w-4 h-4 mr-2" />}
-                                    Aggiorna Password
+                                    {t('settings.update_password')}
                                 </Button>
                             </CardFooter>
                         </form>
