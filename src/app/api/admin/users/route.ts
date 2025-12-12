@@ -41,7 +41,7 @@ export async function GET(req: Request) {
         }
 
         // Clean user objects (remove password)
-        const safeUsers = users.map(u => {
+        const safeUsers = users.map((u: any) => {
             console.log(`User ${u.id}: idRuolo=${u.idRuolo}, ruolo=`, u.ruolo);
             return {
                 id: u.id,
