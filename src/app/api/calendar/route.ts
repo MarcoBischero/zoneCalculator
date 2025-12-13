@@ -75,7 +75,7 @@ export async function POST(request: Request) {
             // Security: Sanitize inputs to prevent Prompt Injection
             const sanitize = (str: string) => str.replace(/[{}\[\]:;"]/g, '').replace(/\n/g, ' ').substring(0, 50);
 
-            const mealListInfo = meals.map(m => `- ID: ${m.codicePasto}, Name: ${sanitize(m.nome || 'unnamed')}, Blocks: ${m.blocks}, Type: ${m.mealType || 'Generic'}`).join('\n');
+            const mealListInfo = meals.map((m: any) => `- ID: ${m.codicePasto}, Name: ${sanitize(m.nome || 'unnamed')}, Blocks: ${m.blocks}, Type: ${m.mealType || 'Generic'}`).join('\n');
             console.log(`Generating plan with ${meals.length} meals`);
 
             if (!process.env.GEMINI_API_KEY) {
