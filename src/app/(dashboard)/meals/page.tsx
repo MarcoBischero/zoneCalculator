@@ -5,6 +5,7 @@ import { Trash2, Edit, ChevronDown, ChevronUp, Loader2, Search, Users, Utensils,
 import Link from 'next/link';
 import he from 'he';
 import { Badge } from '@/components/ui/badge';
+import { getMealTypeLabel } from '@/lib/meal-types';
 
 interface Meal {
     codicePasto: number;
@@ -148,7 +149,7 @@ export default function MealsListPage() {
                                         </td>
                                         <td className="px-6 py-4 text-muted-foreground">
                                             <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-xs font-medium uppercase text-muted-foreground/80">
-                                                {meal.mealType || 'Mixed'}
+                                                {getMealTypeLabel(meal.mealType)}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-center">
