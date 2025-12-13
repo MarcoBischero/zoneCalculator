@@ -13,7 +13,7 @@ resource "google_monitoring_dashboard" "cost_control_dashboard" {
           "timeSeriesQuery": {
             "timeSeriesQueryLanguage": "SELECT fetch billing.googleapis.com/billing/total_cost | group_by [], sum(value.total_cost) | within 1h"
           },
-          "sparkChartView": "SPARK_LINE"
+          "sparkChartView": "SPARK_CHART_VIEW_SPARK_LINE"
         }
       },
       {
@@ -22,7 +22,7 @@ resource "google_monitoring_dashboard" "cost_control_dashboard" {
           "timeSeriesQuery": {
             "timeSeriesQueryLanguage": "SELECT fetch billing.googleapis.com/billing/total_cost | group_by [], sum(value.total_cost) | prediction 30d"
           },
-          "sparkChartView": "SPARK_BAR"
+          "sparkChartView": "SPARK_CHART_VIEW_SPARK_BAR"
         }
       },
       {
