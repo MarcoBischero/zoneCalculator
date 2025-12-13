@@ -215,7 +215,7 @@ export async function POST(request: Request) {
             // Option: Clear and re-create (simulates a "refresh")
             await prisma.calendarItem.deleteMany({ where: { idUser: userId } });
 
-            const newItems = currentItems.map(item => ({
+            const newItems = currentItems.map((item: any) => ({
                 idUser: userId,
                 column: item.column,
                 order: item.order,
