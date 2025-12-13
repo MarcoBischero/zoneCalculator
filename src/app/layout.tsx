@@ -27,7 +27,7 @@ export default function RootLayout({
                     <LanguageProvider>
                         <ThemeProvider
                             attribute="class"
-                            defaultTheme="professional-light"
+                            defaultTheme="system"
                             enableSystem
                             disableTransitionOnChange
                             themes={["professional-light", "midnight-pro", "tokyo-nights", "zen-garden", "light", "dark"]}
