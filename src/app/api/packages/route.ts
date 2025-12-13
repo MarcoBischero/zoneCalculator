@@ -35,14 +35,15 @@ export async function GET(request: Request) {
             if (userRole === 3) {
                 return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
             }
-            // Show System + Own
-            whereClause.OR = [
-                { isSystem: true },
-                { ownerId: userId }
-            ];
-            // If SuperAdmin, maybe show everything?
+            // SuperAdmin sees EVERYTHING
             if (userRole === 1) {
-                delete whereClause.OR; // Show all
+                // No filter - show all packages
+            } else {
+                // Dietician: Show System + Own
+                whereClause.OR = [
+                    { isSystemPackage: true },
+                    { ownerId: userId }
+                ];
             }
         }
 
@@ -88,7 +89,7 @@ export async function POST(request: Request) {
                 description,
                 type: type, // 'FOOD' or 'MEAL'
                 ownerId: parseInt(session.user.id),
-                isSystem: (userRole === 1 && body.isSystem) ? true : false // Only admin can create system packages
+                isSystemPackage: (userRole === 1 && body.isSystem) ? true : false // Only admin can create system packages
             }
         });
 
