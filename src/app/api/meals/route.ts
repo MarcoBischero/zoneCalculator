@@ -107,7 +107,15 @@ export async function POST(request: Request) {
         const { id, name, mealType, blocks } = body;
         // Use 'foods' from payload, but alias to 'rows' to match existing logic if needed,
         // or just use a new variable. Existing logic uses 'rows'.
-        const rows = body.foods || body.rows || []; // Support both for backward compatibility
+        // Use 'foods' from payload, but alias to 'rows' to match existing logic if needed,
+        // or just use a new variable. Existing logic uses 'rows'.
+        const rawRows = body.foods || body.rows || []; // Support both for backward compatibility
+
+        // Normalize rows to ensure foodName is present
+        const rows = Array.isArray(rawRows) ? rawRows.map((r: any) => ({
+            ...r,
+            foodName: r.foodName || r.nome // Fix for frontend sending 'nome'
+        })) : [];
 
         if (!Array.isArray(rows)) {
             return NextResponse.json({ error: 'Validation Error: Invalid foods data' }, { status: 400 });

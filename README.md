@@ -257,6 +257,15 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines.
 
 [View full roadmap →](https://github.com/MarcoBischero/zoneCalculator/projects)
 
+### 🚀 Roadmap 2.0: The "Killer App" Evolution
+We are targeting 4 strategic pillars to revolutionize Zone Diet management:
+1. **Hyper-Personalization (Digital Twin)**
+2. **Frictionless Logging (Voice & Vision)**
+3. **AI Nutritionist Coach (ZoneMentor)**
+4. **Professional Marketplace**
+
+[👉 Read the full Strategic Vision](./docs/ROADMAP_2.0.md)
+
 ---
 
 ## 📊 Stats

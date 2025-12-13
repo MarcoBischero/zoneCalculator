@@ -45,6 +45,7 @@ export function Sidebar() {
         { name: t('sidebar.foods'), href: '/foods', icon: Search },
         { name: t('sidebar.meals'), href: '/meals', icon: UtensilsCrossed },
         { name: t('sidebar.chef'), href: '/chef', icon: Sparkles },
+        { name: t('sidebar.coach'), href: '/coach', icon: Sparkles },
     ];
 
     const gameNav = [
