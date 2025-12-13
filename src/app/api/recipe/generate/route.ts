@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { prisma } from "@/lib/prisma";
+import { getAIModel } from '@/lib/ai-config';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
@@ -24,7 +25,8 @@ export async function POST(req: Request) {
         if (!meal) return NextResponse.json({ error: "Meal not found" }, { status: 404 });
 
         // 1. Generate Procedure via Gemini
-        const model = genAI.getGenerativeModel({ model: "gemini-3-pro-preview" });
+        const modelName = await getAIModel();
+        const model = genAI.getGenerativeModel({ model: modelName });
         const ingredientsList = meal.alimenti.map((a: any) => `${a.grAlimento}g ${a.alimento.nome}`).join(", ");
 
         const prompt = `Act as a professional chef. Create a detailed step-by-step cooking procedure for a meal named "${meal.nome}" containing strictly these ingredients: ${ingredientsList}.

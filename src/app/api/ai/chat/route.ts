@@ -2,6 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { getAIModel } from '@/lib/ai-config';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
@@ -50,7 +51,8 @@ ${mealsContext}
 
 Be motivating, precise, and concise. Use emojis 🐿️`;
 
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const modelName = await getAIModel();
+        const model = genAI.getGenerativeModel({ model: modelName });
         const fullPrompt = `${systemPrompt}\n\n${messages.map((m: any) => `${m.role}: ${m.content}`).join('\n')}\nassistant:`;
 
         const result = await model.generateContentStream(fullPrompt);

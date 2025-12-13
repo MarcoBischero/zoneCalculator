@@ -5,6 +5,7 @@ import { authOptions } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 import { rateLimit } from '@/lib/rate-limit';
 import { logger } from '@/lib/logger';
+import { getAIModel } from '@/lib/ai-config';
 
 export async function GET(request: Request) {
     const session = await getServerSession(authOptions);
@@ -83,9 +84,8 @@ export async function POST(request: Request) {
             }
 
             const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-            // Available models: gemini-2.0-flash, gemini-2.5-flash, gemini-flash-latest
-            // Using gemini-2.0-flash for speed and stability
-            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+            const modelName = await getAIModel();
+            const model = genAI.getGenerativeModel({ model: modelName });
 
             const prompt = `
             Act as a Zone Diet Nutritionist.

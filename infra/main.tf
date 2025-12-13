@@ -1,8 +1,17 @@
+# Terraform 1.x+ Configuration
+# Modern, secure configuration for GCP
+
 terraform {
+  required_version = ">= 1.0"
+  
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = ">= 4.0.0"
+      version = "~> 6.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6"
     }
   }
 }
@@ -12,28 +21,7 @@ provider "google" {
   region  = var.region
 }
 
-variable "project_id" {
-  description = "The GCP Project ID"
-  type        = string
-}
 
-variable "region" {
-  description = "Region for resources"
-  type        = string
-  default     = "europe-west1"
-}
-
-variable "service_name" {
-  description = "Cloud Run Service Name"
-  type        = string
-  default     = "zone-calculator-pro"
-}
-
-variable "db_password" {
-  description = "Password for the database user"
-  type        = string
-  sensitive   = true
-}
 
 # 1. Artifact Registry
 resource "google_artifact_registry_repository" "repo" {
@@ -44,21 +32,46 @@ resource "google_artifact_registry_repository" "repo" {
 }
 
 # 2. Cloud SQL (MySQL)
-# CAUTION: Tier db-f1-micro is deprecated in some newer regions but valid for testing.
-# For prod, consider db-custom-1-3840 or similar.
+# FinOps: Minimal configuration for cost reduction
+# WARNING: Backups disabled - manual backups recommended
 resource "google_sql_database_instance" "master" {
-  name             = "zone-calc-db-instance-${random_id.db_suffix.hex}"
-  database_version = "MYSQL_8_0"
-  region           = var.region
-  deletion_protection = false # For demo ease, set true for prod
+  name                = "zone-calc-db-instance-${random_id.db_suffix.hex}"
+  database_version    = "MYSQL_8_0"
+  region              = var.region
+  deletion_protection = false
 
   settings {
-    tier = "db-f1-micro"
+    tier              = "db-f1-micro"
     availability_type = "ZONAL"
     
+    disk_autoresize       = true
+    disk_autoresize_limit = 10
+    disk_size             = 10
+    disk_type             = "PD_SSD"
+    
+    # FinOps: Backup configuration
+    backup_configuration {
+      enabled            = var.enable_sql_backups
+      binary_log_enabled = false
+    }
+    
+    # Maintenance window
+    maintenance_window {
+      day          = 7
+      hour         = 3
+      update_track = "stable"
+    }
+    
     ip_configuration {
-      ipv4_enabled    = true # Public IP for GitHub Actions direct access (secure via Auth Proxy preferred)
-      # authorized_networks could be added here
+      ipv4_enabled = true
+    }
+    
+    # Instance labels (inside settings for SQL)
+    user_labels = {
+      environment  = "production"
+      application  = "zone-calculator-pro"
+      managed-by   = "terraform"
+      cost-center  = "finops"
     }
   }
 }
@@ -84,9 +97,39 @@ resource "google_cloud_run_service" "default" {
   location = var.region
 
   template {
+    metadata {
+      annotations = {
+        # FinOps: Aggressive cost minimization
+        "autoscaling.knative.dev/maxScale"        = tostring(var.max_cloud_run_instances)
+        "autoscaling.knative.dev/minScale"        = "0"
+        "run.googleapis.com/cpu-throttling"       = "true"
+        "run.googleapis.com/startup-cpu-boost"    = "false"
+        "run.googleapis.com/cpu-allocation"       = "only-during-request-processing"
+        "run.googleapis.com/cloudsql-instances"   = google_sql_database_instance.master.connection_name
+        "run.googleapis.com/client-name"          = "terraform"
+      }
+      
+      labels = {
+        environment  = "production"
+        application  = "zone-calculator-pro"
+        managed-by   = "terraform"
+        cost-center  = "finops"
+      }
+    }
+    
     spec {
+      container_concurrency = 100
+      timeout_seconds       = 30
+      
       containers {
         image = "${var.region}-docker.pkg.dev/${var.project_id}/${google_artifact_registry_repository.repo.repository_id}/${var.service_name}:latest"
+        
+        resources {
+          limits = {
+            cpu    = var.cloud_run_cpu
+            memory = var.cloud_run_memory
+          }
+        }
         
         env {
           name  = "DATABASE_URL"
@@ -102,13 +145,6 @@ resource "google_cloud_run_service" "default" {
           name = "NEXTAUTH_SECRET"
           value = "production_secret_here_change_me"
         }
-      }
-    }
-    
-    metadata {
-      annotations = {
-        "run.googleapis.com/cloudsql-instances" = google_sql_database_instance.master.connection_name
-        "run.googleapis.com/client-name"        = "terraform"
       }
     }
   }

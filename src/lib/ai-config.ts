@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 
-export const DEFAULT_AI_MODEL = "gemini-1.5-flash";
+export const DEFAULT_AI_MODEL = "gemini-2.0-flash-exp";
 
 export async function getAIModel(): Promise<string> {
     try {

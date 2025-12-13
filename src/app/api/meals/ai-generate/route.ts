@@ -6,6 +6,7 @@ import { authOptions } from '@/lib/auth';
 import { aiMealGenerationSchema } from '@/lib/validation';
 import { rateLimit } from '@/lib/rate-limit';
 import { logger } from '@/lib/logger';
+import { getAIModel } from '@/lib/ai-config';
 
 export async function POST(request: Request) {
     const session = await getServerSession(authOptions);
@@ -36,7 +37,8 @@ export async function POST(request: Request) {
         }
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const modelName = await getAIModel();
+        const model = genAI.getGenerativeModel({ model: modelName });
 
         const prompt = `
             Act as a Zone Diet Expert Chef.

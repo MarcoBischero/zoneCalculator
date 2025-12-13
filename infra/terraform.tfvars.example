@@ -1,0 +1,22 @@
+# Example Terraform Variables File
+# Copy this file to terraform.tfvars and fill in your values
+
+# GCP Project Configuration
+project_id = "gen-lang-client-0322370238"
+region     = "europe-west1"
+
+# Database Configuration
+db_password = "CHANGE_ME_TO_SECURE_PASSWORD"
+
+# FinOps Configuration
+billing_account_id = "XXXXXX-XXXXXX-XXXXXX"  # Your GCP Billing Account ID
+budget_amount      = 10                        # Monthly budget in EUR
+alert_email        = "your-email@example.com"  # Email for budget alerts
+
+# Cloud Run Configuration (Cost Optimization)
+max_cloud_run_instances = 1        # Max instances (1 = no scaling)
+cloud_run_memory        = "256Mi"  # Memory limit
+cloud_run_cpu           = "1000m"  # CPU limit (1 vCPU)
+
+# Cloud SQL Configuration
+enable_sql_backups = false  # Set to true to enable backups (+30% cost)

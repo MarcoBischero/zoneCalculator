@@ -65,11 +65,14 @@ export default function DailyNewsPage() {
                     className="object-cover"
                     priority
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                {/* Balanced overlay: dark enough for contrast, light enough to see image */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-black/20" />
+                {/* Additional dark box at bottom for text */}
+                <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-black/80 to-transparent" />
 
                 <div className="absolute top-6 left-6 right-6 flex justify-between items-center">
                     <Link href="/">
-                        <Button variant="ghost" className="text-white hover:bg-white/20 hover:text-white rounded-full">
+                        <Button variant="ghost" className="text-white hover:bg-white/20 hover:text-white rounded-full shadow-lg backdrop-blur-sm">
                             <ChevronLeft className="w-5 h-5 mr-1" /> Dashboard
                         </Button>
                     </Link>
@@ -77,7 +80,7 @@ export default function DailyNewsPage() {
                     <Button
                         onClick={handleRefresh}
                         variant="ghost"
-                        className="text-white hover:bg-white/20 hover:text-white rounded-full bg-black/20 backdrop-blur-sm"
+                        className="text-white hover:bg-white/20 hover:text-white rounded-full bg-black/30 backdrop-blur-sm shadow-lg"
                     >
                         <RefreshCw className="w-4 h-4 mr-2" /> Nuova News
                     </Button>
@@ -88,10 +91,10 @@ export default function DailyNewsPage() {
                         <span className="bg-indigo-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4 inline-block shadow-lg">
                             Science Daily
                         </span>
-                        <h1 className="text-3xl md:text-5xl font-black leading-tight mb-4 drop-shadow-sm">
+                        <h1 className="text-3xl md:text-5xl font-black leading-tight mb-4 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
                             {article.title}
                         </h1>
-                        <div className="flex flex-wrap items-center gap-6 text-sm md:text-base opacity-90 font-medium">
+                        <div className="flex flex-wrap items-center gap-6 text-sm md:text-base opacity-90 font-medium drop-shadow-lg">
                             <span className="flex items-center gap-2"><User className="w-4 h-4" /> {article.author}</span>
                             <span className="flex items-center gap-2"><Calendar className="w-4 h-4" /> Oggi</span>
                             <span className="flex items-center gap-2"><Clock className="w-4 h-4" /> {article.readTime}</span>

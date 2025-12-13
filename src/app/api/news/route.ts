@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { getAIModel } from '@/lib/ai-config';
 
 export async function GET() {
     const session = await getServerSession(authOptions);
@@ -17,7 +18,8 @@ export async function GET() {
         }
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-3-pro-preview" });
+        const modelName = await getAIModel();
+        const model = genAI.getGenerativeModel({ model: modelName });
 
         const prompt = `Generate a helpful, easy-to-read daily nutrition article about the Zone Diet (Dieta a Zona).
         Target Audience: Everyday users / dieters. NOT scientists.

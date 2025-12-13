@@ -59,6 +59,12 @@ gcp-key.json
 *.sqlite
 *.sqlite3
 
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.backup
+
 # Temporary files
 .tmp/
 temp/
