@@ -13,7 +13,7 @@ export async function GET() {
         // 1. Run DB Push (Schema Sync)
         try {
             console.log("Running 'npx prisma db push'...");
-            const { stdout, stderr } = await execAsync('npx prisma@5.22.0 db push --accept-data-loss');
+            const { stdout, stderr } = await execAsync('./node_modules/.bin/prisma db push --accept-data-loss');
             console.log("DB Push Output:", stdout);
             if (stderr) console.error("DB Push Error:", stderr);
         } catch (e: any) {
