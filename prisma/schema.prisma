@@ -9,7 +9,7 @@ datasource db {
 }
 
 model Alimento {
-  nome           String @db.Text
+  nome           String @db.VarChar(255)
   proteine       Float  @default(0.00) @db.Float
   carboidrati    Float  @default(0.00) @db.Float
   grassi         Float  @default(0.00) @db.Float
@@ -19,6 +19,7 @@ model Alimento {
   tipo           Tipo?  @relation(fields: [codTipo], references: [codiceTipo])
   fonte          Fonte? @relation(fields: [codFonte], references: [codiceFonte])
   pasti          PastoAlimento[]
+  packageItems   PackageItem[]
 
   @@index([nome], map: "alimento_nome_idx")
   @@map("alimenti")
@@ -85,6 +86,7 @@ model Pasto {
   user        User?          @relation(fields: [codUser], references: [id])
   calendarItems CalendarItem[]
   alimenti    PastoAlimento[]
+  packageItems PackageItem[]
 
   @@index([codUser], map: "cod_user")
   @@index([codUser, isShared], map: "pasto_user_shared_idx")
@@ -161,6 +163,8 @@ model User {
   pasti            Pasto[]
   calendarItems    CalendarItem[]
   protNeeds        ProtNeed[]
+  assignedPackages UserPackage[]
+  packagesCreated  Package[]    @relation("PackageOwner")
 
   @@index([id], map: "id")
   @@index([idRuolo], map: "id_ruolo")
@@ -224,4 +228,70 @@ model random_key {
 enum risorse_sesso {
   uomo
   donna
+}
+
+// --- PACKAGE MANAGEMENT SYSTEM ---
+
+model Package {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(100)
+  description String?   @db.Text
+  type        PackageType
+  isSystem    Boolean   @default(false) @map("is_system")
+  ownerId     Int?      @map("owner_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  owner       User?     @relation("PackageOwner", fields: [ownerId], references: [id])
+  items       PackageItem[]
+  assignedTo  UserPackage[]
+
+  @@index([ownerId])
+  @@index([isSystem])
+  @@map("packages")
+}
+
+enum PackageType {
+  FOOD
+  MEAL
+}
+
+model PackageItem {
+  id          Int      @id @default(autoincrement())
+  packageId   Int      @map("package_id")
+  foodId      Int?     @map("food_id")
+  mealId      Int?     @map("meal_id")
+  
+  package     Package  @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  // Logic: either foodId or mealId is set, depending on package type. 
+  // We can't easily enforce strict FK if we want loose coupling or if we want to support both in one table easily 
+  // without circular logic issues, but standard relations are fine.
+  // Note: We don't have explicit relations to Alimento/Pasto here because you didn't ask to modify them 
+  // BUT we need them for queries. Let's add them if possible, or just store IDs. 
+  // Ideally, valid FKs.
+  // Adding relations requires modifying Alimento and Pasto models too? 
+  // No, we can define relation here and 'User' side updates automatically or we just add the relation field.
+  // Let's try to add relation fields properly.
+  
+  pasto       Pasto?    @relation(fields: [mealId], references: [codicePasto])
+  alimento    Alimento? @relation(fields: [foodId], references: [codiceAlimento])
+
+  @@index([packageId])
+  @@index([mealId])
+  @@index([foodId])
+  @@map("package_items")
+}
+
+model UserPackage {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  packageId  Int      @map("package_id")
+  assignedBy Int?     @map("assigned_by")
+  assignedAt DateTime @default(now()) @map("assigned_at")
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  package    Package  @relation(fields: [packageId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, packageId])
+  @@map("user_packages")
 }
