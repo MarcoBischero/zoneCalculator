@@ -4,12 +4,19 @@ import { Button } from '@/components/ui/button';
 import { Trash2, Edit, ChevronDown, ChevronUp, Loader2, Search, Users, Utensils, Pencil, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import he from 'he';
+import { Badge } from '@/components/ui/badge';
 
 interface Meal {
     codicePasto: number;
     nome: string;
     mealType: string;
     blocks: number;
+    packageItems?: {
+        package: {
+            name: string;
+            isSystem: boolean;
+        }
+    }[];
 }
 
 export default function MealsListPage() {
@@ -125,7 +132,20 @@ export default function MealsListPage() {
                             ) : (
                                 filteredMeals.map((meal) => (
                                     <tr key={meal.codicePasto} className="hover:bg-white/5 transition-colors group">
-                                        <td className="px-6 py-4 font-semibold text-foreground group-hover:text-primary transition-colors">{he.decode(meal.nome)}</td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex flex-col">
+                                                <span className="font-semibold text-foreground group-hover:text-primary transition-colors">{he.decode(meal.nome)}</span>
+                                                {meal.packageItems && meal.packageItems.length > 0 && (
+                                                    <div className="flex gap-1 mt-1 flex-wrap">
+                                                        {meal.packageItems.map((pi, idx) => (
+                                                            <Badge key={idx} variant="outline" className="text-[10px] h-4 px-1 border-primary/20 text-primary/80">
+                                                                {pi.package.name}
+                                                            </Badge>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </td>
                                         <td className="px-6 py-4 text-muted-foreground">
                                             <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-xs font-medium uppercase text-muted-foreground/80">
                                                 {meal.mealType || 'Mixed'}

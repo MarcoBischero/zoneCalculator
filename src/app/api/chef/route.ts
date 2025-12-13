@@ -90,6 +90,12 @@ export async function POST(req: Request) {
 
         const data = JSON.parse(jsonString);
 
+        // SMART FEATURE: Auto-balance the meal
+        if (data.ingredients && Array.isArray(data.ingredients)) {
+            const { autoBalanceMeal } = require('@/lib/zone-logic');
+            data.ingredients = autoBalanceMeal(data.ingredients, blocks || 3);
+        }
+
         return NextResponse.json({ success: true, data });
 
     } catch (error: any) {

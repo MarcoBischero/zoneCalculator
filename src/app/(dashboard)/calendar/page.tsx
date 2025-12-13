@@ -206,6 +206,59 @@ export default function CalendarPage() {
         }
     };
 
+    const moveForward = async (day: string, type: string) => {
+        const currentIdx = DAYS.indexOf(day);
+        if (currentIdx >= 6) return; // Can't move from Sunday
+
+        const nextDay = DAYS[currentIdx + 1];
+        const nextKey = `${nextDay}-${type}`;
+        const currentKey = `${day}-${type}`;
+        const meal = plan[currentKey];
+
+        if (!meal) return;
+
+        if (plan[nextKey]) {
+            if (!confirm(`Lo slot ${nextDay} - ${type} è occupato. Sovrascrivere?`)) return;
+        }
+
+        // Optimistic update
+        const newPlan = { ...plan };
+        delete newPlan[currentKey];
+        newPlan[nextKey] = meal;
+        setPlan(newPlan);
+
+        try {
+            const currentTypeIdx = MEAL_TYPES.indexOf(type);
+
+            // Remove from current
+            await fetch('/api/calendar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'remove',
+                    day: currentIdx,
+                    type: currentTypeIdx
+                })
+            });
+
+            // Add to next
+            await fetch('/api/calendar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'add',
+                    day: currentIdx + 1,
+                    type: currentTypeIdx,
+                    mealId: meal.codicePasto
+                })
+            });
+        } catch (e) {
+            console.error(e);
+            alert('Errore durante lo spostamento');
+            loadCalendar(); // Revert on error
+        }
+    };
+
     return (
         <div className="p-6 lg:p-10 space-y-8 animate-in-up pb-20">
             <div className="flex flex-col md:flex-row justify-between items-end gap-4">
@@ -244,24 +297,44 @@ export default function CalendarPage() {
                         onDragEnd={handleDragEnd}
                     >
                         <div className="mt-6 grid grid-cols-7 gap-4 min-w-[1000px] overflow-x-auto pb-4">
-                            {DAYS.map((day) => (
-                                <div key={day} className="flex flex-col gap-3">
-                                    <div className="text-center font-bold text-sm text-foreground/80 py-3 bg-white/5 rounded-xl border border-white/10">
-                                        {day}
+                            {DAYS.map((day) => {
+                                const dayTotal = MEAL_TYPES.reduce((acc, type) => {
+                                    const meal = plan[`${day}-${type}`];
+                                    return acc + (meal ? (parseFloat(meal.blocks as any) || 0) : 0);
+                                }, 0);
+
+                                const isTargetReached = dayTotal >= 11; // Example target, could be dynamic later
+
+                                return (
+                                    <div key={day} className="flex flex-col gap-3">
+                                        <div className={`
+                                            flex items-center justify-between px-3 py-2 rounded-xl border transition-colors
+                                            ${isTargetReached
+                                                ? 'bg-green-500/10 border-green-500/20 text-green-700 dark:text-green-400'
+                                                : 'bg-white/5 border-white/10 text-foreground/80'}
+                                        `}>
+                                            <span className="font-bold text-sm">{day}</span>
+                                            <span className={`text-xs font-mono font-medium ${isTargetReached ? 'text-green-600 dark:text-green-400' : 'opacity-60'}`}>
+                                                {dayTotal > 0 ? `${dayTotal} Blk` : '-'}
+                                            </span>
+                                        </div>
+                                        {MEAL_TYPES.map((type) => (
+                                            <CalendarSlot
+                                                key={`${day}-${type}`}
+                                                day={day}
+                                                type={type}
+                                                plan={plan}
+                                                // @ts-ignore
+                                                meals={meals} // Passing meals for smart suggestions
+                                                handleSelectMeal={handleSelectMeal}
+                                                setSelectingFor={setSelectingFor}
+                                                clearSlot={clearSlot}
+                                                moveForward={moveForward}
+                                            />
+                                        ))}
                                     </div>
-                                    {MEAL_TYPES.map((type) => (
-                                        <CalendarSlot
-                                            key={`${day}-${type}`}
-                                            day={day}
-                                            type={type}
-                                            plan={plan}
-                                            handleSelectMeal={handleSelectMeal}
-                                            setSelectingFor={setSelectingFor}
-                                            clearSlot={clearSlot}
-                                        />
-                                    ))}
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </DndContext>
                 )}

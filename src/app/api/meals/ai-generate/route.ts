@@ -90,7 +90,12 @@ export async function POST(request: Request) {
 
         const ingredients = JSON.parse(jsonString);
 
-        return NextResponse.json({ success: true, ingredients });
+        // SMART FEATURE: Auto-balance the meal
+        // Import dynamically if needed, or assume it's available. We will add import at top next.
+        const { autoBalanceMeal } = require('@/lib/zone-logic');
+        const balancedIngredients = autoBalanceMeal(ingredients, blocks);
+
+        return NextResponse.json({ success: true, ingredients: balancedIngredients });
 
     } catch (error: any) {
         logger.error('AI Meal Gen Error', error);

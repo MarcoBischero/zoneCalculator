@@ -128,17 +128,6 @@ resource "google_bigquery_table" "tagging_compliance" {
   
   view {
     query = <<-SQL
-      WITH resource_tags AS (
-        SELECT
-          project.id as project_id,
-          service.description as service_name,
-          sku.description as resource_description,
-          labels,
-          cost,
-          CASE
-            WHEN ARRAY_LENGTH(labels) > 0 THEN true
-            ELSE false
-          END as has_labels
         FROM `${var.project_id}.billing_export.gcp_billing_export_v1_*`
         WHERE _TABLE_SUFFIX >= FORMAT_DATE('%Y%m%d', DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY))
           AND cost > 0
@@ -146,11 +135,11 @@ resource "google_bigquery_table" "tagging_compliance" {
       SELECT
         service_name,
         COUNT(*) as total_resources,
-        COUNTIF(has_labels) as tagged_resources,
-        COUNTIF(NOT has_labels) as untagged_resources,
-        ROUND(SAFE_DIVIDE(COUNTIF(has_labels), COUNT(*)) * 100, 2) as compliance_percentage,
+        COUNTIF(EXISTS(SELECT 1 FROM UNNEST(labels) WHERE key = 'cost-center')) as compliant_resources,
+        COUNTIF(NOT EXISTS(SELECT 1 FROM UNNEST(labels) WHERE key = 'cost-center')) as non_compliant_resources,
+        ROUND(SAFE_DIVIDE(COUNTIF(EXISTS(SELECT 1 FROM UNNEST(labels) WHERE key = 'cost-center')), COUNT(*)) * 100, 2) as compliance_percentage,
         SUM(cost) as total_cost,
-        SUM(IF(NOT has_labels, cost, 0)) as untagged_cost
+        SUM(IF(NOT EXISTS(SELECT 1 FROM UNNEST(labels) WHERE key = 'cost-center'), cost, 0)) as non_compliant_cost
       FROM resource_tags
       GROUP BY service_name
       ORDER BY total_cost DESC

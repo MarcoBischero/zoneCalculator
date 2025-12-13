@@ -19,7 +19,8 @@ import {
     CalendarDays,
     Search,
     Users,
-    Sparkles
+    Sparkles,
+    Package
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -55,6 +56,7 @@ export function Sidebar() {
 
     const adminNav = [
         { name: t('sidebar.admin_users'), href: '/admin/users', icon: Users },
+        { name: 'Packages', href: '/admin/packages', icon: Package },
         { name: t('sidebar.admin_settings'), href: '/admin/settings', icon: Settings },
     ];
 

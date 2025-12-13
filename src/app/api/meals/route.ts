@@ -14,20 +14,14 @@ export async function GET(request: Request) {
     }
 
     try {
-        const userId = session.user.id;
-        let user: any;
+        const userId = parseInt(session.user.id);
+        const userRole = (session.user as any).role;
+        const isAdmin = (userRole === 1);
 
-        if (userId) {
-            user = await prisma.user.findUnique({
-                where: { id: parseInt(userId) },
-                select: { id: true, dieticianId: true }
-            });
-        } else {
-            user = await prisma.user.findFirst({
-                where: { email: session.user.email },
-                select: { id: true, dieticianId: true }
-            });
-        }
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { id: true, dieticianId: true }
+        });
 
         if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
@@ -38,26 +32,67 @@ export async function GET(request: Request) {
         const limit = parseInt(searchParams.get('limit') || '20');
         const skip = (page - 1) * limit;
 
-        // Logic: Fetch MY meals OR (My Dietician's meals where isShared=true)
-        const whereClause: any = {
-            OR: [
-                { codUser: user.id },
-            ]
-        };
+        // --- PACKAGE LOGIC ---
+        // Fetch assigned Meal Packages
+        // We want to verify if we should fetch package meals.
+        // Logic: Always fetch Own Meals + Package Meals.
 
-        if (mealIdParam) {
-            // Precise fetch
-            whereClause.codicePasto = parseInt(mealIdParam);
+        let packageMealIds: number[] = [];
+        if (!isAdmin) {
+            const userPackages = await prisma.userPackage.findMany({
+                where: {
+                    userId: userId,
+                    package: { type: 'MEAL' }
+                },
+                include: { package: { include: { items: { select: { mealId: true } } } } }
+            });
+
+            // Collect Meal IDs from packages
+            userPackages.forEach((up: any) => {
+                up.package.items.forEach((item: any) => {
+                    if (item.mealId) packageMealIds.push(item.mealId);
+                });
+            });
         }
 
+        // --- QUERY CONSTRUCTION ---
+        const whereClause: any = {};
+
+        // 1. Precise ID Fetch
+        if (mealIdParam) {
+            whereClause.codicePasto = parseInt(mealIdParam);
+            // Security: Even if precise ID, must be accessible (Own OR Package OR Shared)
+            // But 'OR' logic below handles availability.
+            // If we set codPasto here, we still need to verify access permissions via the OR groups.
+            // So we should combine conditions.
+        }
+
+        // 2. Access Conditions
+        const accessConditions: any[] = [
+            { codUser: user.id } // My Meals
+        ];
+
+        // Add Package Meals
+        if (packageMealIds.length > 0) {
+            accessConditions.push({ codicePasto: { in: packageMealIds } });
+        }
+
+        // Legacy "Shared by Dietician" fallback (optional, if we want to support non-package sharing)
         if (user.dieticianId) {
-            whereClause.OR.push({
+            accessConditions.push({
                 codUser: user.dieticianId,
                 isShared: true
             });
         }
 
-        // Get total count for pagination metadata
+        // Combine Access Conditions
+        whereClause.OR = accessConditions;
+
+        // If we have a specific ID, we must intersect it with access conditions
+        // Prisma doesn't support "Where ID=X AND (Cond A OR Cond B)" cleanly if Cond A/B are unrelated to ID in structure?
+        // Actually it does: where: { codicePasto: X, OR: [...] }
+
+        // Get total count
         const total = await prisma.pasto.count({ where: whereClause });
 
         const meals = await prisma.pasto.findMany({
@@ -68,7 +103,10 @@ export async function GET(request: Request) {
                         alimento: true
                     }
                 },
-                user: { select: { username: true } } // Include author name
+                user: { select: { username: true } }, // Include author name
+                packageItems: {
+                    include: { package: true }
+                }
             },
             orderBy: {
                 codicePasto: 'desc'
@@ -76,6 +114,12 @@ export async function GET(request: Request) {
             skip,
             take: limit
         });
+
+        // Enrich meals with "packageName" if listed via package
+        // The meal might be in multiple packages.
+        // We can map this on the backend or frontend. 
+        // Let's add a virtual field or just return the packageItems (already included).
+        // Frontend will parse packageItems[0].package.name
 
         return NextResponse.json({
             meals,

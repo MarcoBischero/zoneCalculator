@@ -22,9 +22,9 @@ HZduNK7ssRF0rxjvb3CqoXuMygYb8+kinxYZAdsT3pg=
 
 ### `NEXTAUTH_URL`
 ```
-https://zone-calculator-pro-XXXX.run.app
+https://zone-calculator-pro-643174162787.europe-west1.run.app
 ```
-Replace `XXXX` with your actual Cloud Run service URL after first deployment.
+(Confirmed via Cloud Run Dashboard)
 
 ## AI Configuration
 

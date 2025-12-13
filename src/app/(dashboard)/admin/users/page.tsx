@@ -5,12 +5,15 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { UserPlus, Shield, Trash2, Search, Stethoscope, Loader2 } from 'lucide-react';
 import { AddUserDialog } from '@/components/admin/AddUserDialog';
+import { ManagePackagesDialog } from '@/components/admin/ManagePackagesDialog';
+import { Package } from 'lucide-react';
 
 export default function AdminUsersPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
     const [users, setUsers] = useState<any[]>([]);
     const [isAdding, setIsAdding] = useState(false);
+    const [isPackageDialog, setIsPackageDialog] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -68,6 +71,11 @@ export default function AdminUsersPage() {
         setIsAdding(true);
     };
 
+    const openManagePackages = (u: any) => {
+        setEditingUser(u);
+        setIsPackageDialog(true);
+    }
+
     const filteredUsers = users.filter(u =>
         u.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         u.email?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -111,6 +119,12 @@ export default function AdminUsersPage() {
                 }}
             />
 
+            <ManagePackagesDialog
+                isOpen={isPackageDialog}
+                onClose={() => setIsPackageDialog(false)}
+                user={editingUser}
+            />
+
             {/* User List */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <div className="p-4 border-b border-slate-100 flex items-center gap-4">
@@ -144,9 +158,14 @@ export default function AdminUsersPage() {
                                     {user.lastaccess ? new Date(user.lastaccess * 1000).toLocaleDateString() : '-'}
                                 </td>
                                 <td className="p-4 text-right">
-                                    <Button variant="ghost" size="sm" onClick={() => openEditUser(user)}>
-                                        Modifica
-                                    </Button>
+                                    <div className="flex justify-end gap-2">
+                                        <Button variant="outline" size="sm" onClick={() => openManagePackages(user)} title="Manage Packages">
+                                            <Package className="w-4 h-4 text-blue-600" />
+                                        </Button>
+                                        <Button variant="ghost" size="sm" onClick={() => openEditUser(user)}>
+                                            Modifica
+                                        </Button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
