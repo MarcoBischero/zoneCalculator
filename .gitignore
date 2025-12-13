@@ -64,6 +64,7 @@ gcp-key.json
 .terraform.lock.hcl
 *.tfstate
 *.tfstate.backup
+*.tfvars
 
 # Temporary files
 .tmp/
@@ -74,3 +75,9 @@ test-results/
 playwright-report/
 blob-report/
 playwright/.cache/
+
+# Heavies
+google-cloud-sdk/
+*.tar.gz
+.gemini/
+.gemini
