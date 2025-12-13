@@ -67,23 +67,19 @@ export async function GET(request: Request) {
             // So we should combine conditions.
         }
 
-        // 2. Access Conditions
+        // 2. Access Conditions - STRICT MODE
         const accessConditions: any[] = [
-            { codUser: user.id } // My Meals
+            { codUser: user.id } // My Meals (always allowed)
         ];
 
-        // Add Package Meals
+        // Add Package Meals (if user has packages)
         if (packageMealIds.length > 0) {
             accessConditions.push({ codicePasto: { in: packageMealIds } });
         }
 
-        // Legacy "Shared by Dietician" fallback (optional, if we want to support non-package sharing)
-        if (user.dieticianId) {
-            accessConditions.push({
-                codUser: user.dieticianId,
-                isShared: true
-            });
-        }
+        // REMOVED: Legacy dietician shared meals fallback
+        // Users must have packages assigned to see shared meals
+        // This enforces strict package visibility
 
         // Combine Access Conditions
         whereClause.OR = accessConditions;

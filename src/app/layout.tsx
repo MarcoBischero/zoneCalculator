@@ -7,6 +7,7 @@ import { GlobalErrorBoundary } from "@/components/error-boundary";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import { LanguageProvider } from "@/lib/language-context";
+import UserIndicator from "@/components/layout/UserIndicator";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -36,6 +37,7 @@ export default function RootLayout({
                                 {children}
                                 <SpeedInsights />
                                 <Analytics />
+                                <UserIndicator />
                             </GlobalErrorBoundary>
                         </ThemeProvider>
                     </LanguageProvider>

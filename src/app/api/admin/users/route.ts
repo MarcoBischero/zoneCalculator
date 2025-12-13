@@ -148,22 +148,18 @@ export async function POST(req: Request) {
 
     // Generate random password if not provided (default behavior now)
     const autoPassword = password || Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
-    const finalPassword = autoPassword;
 
     try {
-        const hashedPassword = await bcrypt.hash(finalPassword, 10);
+        const hashedPassword = await bcrypt.hash(autoPassword, 10);
 
         const newUser = await prisma.user.create({
             data: {
                 username,
                 password: hashedPassword,
-                email,
+                email: email || `${username}@example.com`,
                 idRuolo: newRole,
-                dieticianId: assignedDietician,
                 randKey: Math.random().toString(36).substring(7),
-                ip: '127.0.0.1',
-                ipupdate: '127.0.0.1',
-                mode: '0' // Ensure they need onboarding
+                dieticianId: assignedDietician
             }
         });
 
@@ -172,6 +168,29 @@ export async function POST(req: Request) {
             await prisma.gamificationProfile.create({
                 data: { userId: newUser.id }
             });
+        }
+
+        // AUTO-ASSIGN BASE PACKAGES (unless explicitly disabled via body.assignBasePackages === false)
+        const shouldAssignPackages = body.assignBasePackages !== false; // Default: true
+
+        if (shouldAssignPackages) {
+            // Fetch Base Packages (isSystemPackage = 1)
+            const basePackages = await prisma.package.findMany({
+                where: { isSystemPackage: true }
+            });
+
+            if (basePackages.length > 0) {
+                // Assign all base packages to new user
+                await prisma.userPackage.createMany({
+                    data: basePackages.map(pkg => ({
+                        userId: newUser.id,
+                        packageId: pkg.id,
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                    }))
+                });
+                console.log(`Auto-assigned ${basePackages.length} base packages to user ${newUser.id}`);
+            }
         }
 
         // MOCK EMAIL SENDING (Password intentionally NOT logged for security)

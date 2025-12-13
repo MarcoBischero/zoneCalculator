@@ -66,15 +66,18 @@ export async function GET(request: Request) {
         whereClause.nome = { contains: q };
     }
 
-    // PACKAGE FILTERING LOGIC
-    if (!isAdmin && hasPackages) {
-        // Check if we already have a clause
-        // We need to AND the package restriction
-        whereClause.codiceAlimento = { in: userPkgIds };
+    // PACKAGE FILTERING LOGIC - STRICT MODE
+    // Admin sees everything
+    // Users with packages see only their assigned foods
+    // Users WITHOUT packages see NOTHING (no legacy fallback)
+    if (!isAdmin) {
+        if (hasPackages) {
+            whereClause.codiceAlimento = { in: userPkgIds };
+        } else {
+            // No packages = No data (strict mode)
+            whereClause.codiceAlimento = { in: [-1] }; // Invalid ID = empty result
+        }
     }
-    // If (!isAdmin && !hasPackages), we fall back to "Show All" (Legacy) 
-    // OR we could show "None" if we wanted strictness. 
-    // Implementation Decision: Show All for transition.
 
     try {
         const foods = await prisma.alimento.findMany({

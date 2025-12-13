@@ -11,6 +11,13 @@ We have deployed a **native Cloud Monitoring Dashboard** for Cost Control.
 For the full interactive experience requested, connect Looker Studio to our pre-defined BigQuery Views.
 
 ### Prerequisites
+> [!IMPORTANT]
+> **Action Required**: You must enable Billing Export in the Google Cloud Console for data to flow.
+> 1. Go to [Billing > Billing Export](https://console.cloud.google.com/billing/export).
+> 2. Select "Standard usage cost" (standard) or "Detailed usage cost" (detailed).
+> 3. Select Project: `gen-lang-client-0322370238`.
+> 4. Select Dataset: `billing_export` (created by Terraform).
+
 - Terraform has created the `finops_analytics` dataset and the following views:
   - `monthly_cost_by_service`
   - `daily_cost_summary`

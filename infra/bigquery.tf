@@ -132,13 +132,8 @@ resource "google_bigquery_table" "tagging_compliance" {
         SELECT
           project.id as project_id,
           service.description as service_name,
-          sku.description as resource_description,
           labels,
-          cost,
-          CASE
-            WHEN ARRAY_LENGTH(labels) > 0 THEN true
-            ELSE false
-          END as has_labels
+          cost
         FROM `${var.project_id}.billing_export.gcp_billing_export_v1_*`
         WHERE _TABLE_SUFFIX >= FORMAT_DATE('%Y%m%d', DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY))
           AND cost > 0
