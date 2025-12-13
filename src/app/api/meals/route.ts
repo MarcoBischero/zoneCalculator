@@ -68,21 +68,27 @@ export async function GET(request: Request) {
         }
 
         // 2. Access Conditions - STRICT MODE
-        const accessConditions: any[] = [
-            { codUser: user.id } // My Meals (always allowed)
-        ];
+        // SuperAdmin sees ALL meals (no filter)
+        // Other users see: Own Meals + Package Meals
 
-        // Add Package Meals (if user has packages)
-        if (packageMealIds.length > 0) {
-            accessConditions.push({ codicePasto: { in: packageMealIds } });
+        if (!isAdmin) {
+            const accessConditions: any[] = [
+                { codUser: user.id } // My Meals (always allowed)
+            ];
+
+            // Add Package Meals (if user has packages)
+            if (packageMealIds.length > 0) {
+                accessConditions.push({ codicePasto: { in: packageMealIds } });
+            }
+
+            // REMOVED: Legacy dietician shared meals fallback
+            // Users must have packages assigned to see shared meals
+            // This enforces strict package visibility
+
+            // Combine Access Conditions
+            whereClause.OR = accessConditions;
         }
-
-        // REMOVED: Legacy dietician shared meals fallback
-        // Users must have packages assigned to see shared meals
-        // This enforces strict package visibility
-
-        // Combine Access Conditions
-        whereClause.OR = accessConditions;
+        // If isAdmin, whereClause.OR is undefined, so all meals are shown
 
         // If we have a specific ID, we must intersect it with access conditions
         // Prisma doesn't support "Where ID=X AND (Cond A OR Cond B)" cleanly if Cond A/B are unrelated to ID in structure?
