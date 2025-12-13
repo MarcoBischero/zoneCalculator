@@ -39,7 +39,7 @@ export async function POST(req: Request) {
                     include: { alimenti: { include: { alimento: true } } }
                 });
 
-                mealsContext = "Recent Meals:\n" + recentMeals.map(m =>
+                mealsContext = "Recent Meals:\n" + recentMeals.map((m: any) =>
                     `- ${m.nome} (${m.blocks} blocks)`
                 ).join('\n');
             }
