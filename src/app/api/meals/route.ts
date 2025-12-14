@@ -181,9 +181,9 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Validation Error: Blocks cannot be negative' }, { status: 400 });
         }
 
-        // Validate mealType: only 0/1/2/3 allowed for meals (4/5 are calendar-only)
-        const validMealTypes = ['0', '1', '2', '3'];
-        if (mealType && !validMealTypes.includes(String(mealType))) {
+        // Validate mealType: only 0/1/2/3 allowed for meals
+        const validMealTypes = [0, 1, 2, 3];
+        if (mealType !== undefined && mealType !== null && !validMealTypes.includes(Number(mealType))) {
             return NextResponse.json({
                 error: 'Validation Error: Invalid meal type. Must be 0 (COLAZIONE), 1 (PRANZO), 2 (CENA), or 3 (SPUNTINO)'
             }, { status: 400 });

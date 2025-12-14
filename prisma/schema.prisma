@@ -76,7 +76,7 @@ model Opzione {
 model Pasto {
   codicePasto Int            @id @default(autoincrement()) @map("codice_pasto")
   dow         String?     @map("dow")
-  mealType    String      @map("mealType") @default("0")
+  mealType    Int      @map("mealType") @default(0) @db.TinyInt
   nome        String         @db.VarChar(50)
   note        String?        @db.Text
   description String?        @db.LongText // For AI Procedure
@@ -238,7 +238,7 @@ model Package {
   name        String    @db.VarChar(100)
   description String?   @db.Text
   type        PackageType
-  isSystem    Boolean   @default(false) @map("is_system")
+  isSystemPackage Boolean   @default(false) @map("is_system")
   ownerId     Int?      @map("owner_id")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
@@ -248,7 +248,7 @@ model Package {
   assignedTo  UserPackage[]
 
   @@index([ownerId])
-  @@index([isSystem])
+  @@index([isSystemPackage])
   @@map("packages")
 }
 
