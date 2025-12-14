@@ -282,7 +282,7 @@ export async function POST(request: Request) {
                     where: { codicePasto: mealId },
                     data: {
                         nome: name,
-                        mealType: body.mealType || '0',
+                        mealType: body.mealType || 0,
                         blocks: parseFloat(blocks),
                         // SECURITY: Only Dieticians (Role 2) can share meals
                         isShared: (user.idRuolo === 2) ? (body.isShared || false) : false
@@ -298,7 +298,7 @@ export async function POST(request: Request) {
                     data: {
                         codUser: user.id,
                         nome: name,
-                        mealType: body.mealType || '0',
+                        mealType: body.mealType || 0,
                         blocks: parseFloat(blocks),
                         // SECURITY: Only Dieticians (Role 2) can share meals
                         isShared: (user.idRuolo === 2) ? (body.isShared || false) : false
