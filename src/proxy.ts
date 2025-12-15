@@ -48,6 +48,6 @@ export const config = {
          * - _next/image (image optimization files)
          * - favicon.ico (favicon file)
          */
-        "/((?!login|api/seed|api/auth|_next/static|_next/image|favicon.ico).*)",
+        "/((?!login|api/seed|api/auth|api/quick-reset|_next/static|_next/image|favicon.ico).*)",
     ],
 };
