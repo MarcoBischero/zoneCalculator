@@ -113,6 +113,5 @@ export const authOptions: NextAuthOptions = {
             return session;
         }
     },
-    secret: process.env.NEXTAUTH_SECRET || "changeme_dev_secret",
-    trustHost: true  // Required for Firebase Hosting / Cloud Run proxy
+    secret: process.env.NEXTAUTH_SECRET || "changeme_dev_secret"
 };

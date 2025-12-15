@@ -148,7 +148,7 @@ export default function RecipePage() {
                     <div className="flex justify-between items-start border-b-4 border-zone-blue-600 pb-6 mb-8">
                         <div>
                             <div className="inline-flex items-center space-x-2 text-zone-blue-600 font-bold uppercase tracking-wider text-[10px] md:text-xs mb-2">
-                                <Sparkles className="w-3 h-3" />
+                                <span className="text-sm">✦</span>
                                 <span>Ricetta Ufficiale Zona</span>
                             </div>
                             <h1 className="text-3xl md:text-4xl font-serif font-black text-slate-900 leading-tight mb-2">
