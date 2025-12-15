@@ -4,8 +4,6 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { GlobalErrorBoundary } from "@/components/error-boundary";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Analytics } from "@vercel/analytics/react";
 import { LanguageProvider } from "@/lib/language-context";
 import UserIndicator from "@/components/layout/UserIndicator";
 
@@ -35,8 +33,6 @@ export default function RootLayout({
                         >
                             <GlobalErrorBoundary>
                                 {children}
-                                <SpeedInsights />
-                                <Analytics />
                                 <UserIndicator />
                             </GlobalErrorBoundary>
                         </ThemeProvider>
