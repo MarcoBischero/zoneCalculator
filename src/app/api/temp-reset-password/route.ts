@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 // TEMPORARY ENDPOINT - DELETE AFTER USE
+// Force dynamic to bypass middleware
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: Request) {
     try {
         const { secret } = await req.json();
