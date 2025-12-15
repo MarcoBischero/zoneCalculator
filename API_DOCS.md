@@ -154,6 +154,173 @@ Generate AI recipe with Gemini
 }
 ```
 
+#### `POST /api/ai/chat`
+**Enhanced** - AI Coach with rich context
+
+**Auth:** Required  
+**Request:**
+```json
+{
+  "messages": [
+    { "role": "user", "content": "What should I eat for lunch?" }
+  ]
+}
+```
+
+**Response:** Streaming text response
+
+**Context Injection:**
+- User profile (name, blocks, weight, goals)
+- Dietary preferences and allergies
+- Today's nutrition summary (blocks, macros)
+- Recent meal history (last 5 meals)
+- Educational mode enabled/disabled
+
+---
+
+### 🤖 ZoneMentor Coach
+
+#### `GET /api/coach/suggestions`
+Get active proactive suggestions
+
+**Auth:** Required  
+**Response:**
+```json
+[
+  {
+    "id": 123,
+    "type": "LOW_PROTEIN",
+    "message": "🍗 You've only had 42g of protein today (target: 84g). Consider adding lean protein!",
+    "priority": "HIGH",
+    "isRead": false,
+    "isDismissed": false,
+    "createdAt": "2025-12-15T13:00:00Z"
+  }
+]
+```
+
+#### `POST /api/coach/suggestions`
+Generate new suggestions (once per day)
+
+**Auth:** Required  
+**Response:**
+```json
+{
+  "generated": true,
+  "count": 3,
+  "suggestions": [...]
+}
+```
+
+#### `PATCH /api/coach/suggestions`
+Mark suggestion as read or dismissed
+
+**Auth:** Required  
+**Request:**
+```json
+{
+  "id": 123,
+  "action": "dismiss"  // or "read"
+}
+```
+
+#### `GET /api/user/preferences`
+Get user dietary preferences
+
+**Auth:** Required  
+**Response:**
+```json
+{
+  "dietaryPreferences": ["vegetarian", "low-carb"],
+  "allergies": ["nuts", "shellfish"],
+  "intolerances": ["lactose"],
+  "favoriteFoods": ["chicken"],
+  "dislikedFoods": ["mushrooms"],
+  "enableProactiveTips": true,
+  "enableEducationalMode": true
+}
+```
+
+#### `PUT /api/user/preferences`
+Update user preferences
+
+**Auth:** Required  
+**Request:**
+```json
+{
+  "dietaryPreferences": ["vegetarian"],
+  "allergies": ["nuts"],
+  "intolerances": [],
+  "favoriteFoods": [],
+  "dislikedFoods": [],
+  "enableProactiveTips": true,
+  "enableEducationalMode": false
+}
+```
+
+#### `GET /api/user/goals`
+Get active nutrition goals
+
+**Auth:** Required  
+**Response:**
+```json
+[
+  {
+    "id": 1,
+    "goalType": "WEIGHT_LOSS",
+    "targetWeight": 70,
+    "targetDate": "2025-06-01",
+    "notes": "Beach season prep",
+    "isActive": true,
+    "createdAt": "2025-12-15T10:00:00Z"
+  }
+]
+```
+
+**Goal Types:**
+- `WEIGHT_LOSS`
+- `WEIGHT_GAIN`
+- `MAINTENANCE`
+- `MUSCLE_BUILDING`
+- `PERFORMANCE`
+- `GENERAL_HEALTH`
+
+#### `POST /api/user/goals`
+Create new nutrition goal
+
+**Auth:** Required  
+**Request:**
+```json
+{
+  "goalType": "WEIGHT_LOSS",
+  "targetWeight": 70,
+  "targetDate": "2025-06-01",
+  "notes": "Beach season prep"
+}
+```
+
+#### `PUT /api/user/goals`
+Update existing goal
+
+**Auth:** Required  
+**Request:**
+```json
+{
+  "id": 1,
+  "targetWeight": 68,
+  "isActive": false
+}
+```
+
+#### `DELETE /api/user/goals?id=1`
+Delete goal
+
+**Auth:** Required  
+
+---
+
+### 🤖 AI Features
+
 #### `POST /api/meals/ai-generate`
 Generate complete meal with AI
 

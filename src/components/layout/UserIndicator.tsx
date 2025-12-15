@@ -16,7 +16,7 @@ export default function UserIndicator() {
                 </div>
                 <div className="flex flex-col">
                     <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                        {session.user.name || session.user.email}
+                        {session.user.username || session.user.email}
                     </span>
                     <span className="text-xs text-gray-500 dark:text-gray-400">
                         Logged in

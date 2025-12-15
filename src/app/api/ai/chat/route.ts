@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { getAIModel } from '@/lib/ai-config';
+import { buildUserContext, buildMealContext, buildEducationalPrompt } from '@/lib/context-builder';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
@@ -11,48 +12,51 @@ export async function POST(req: Request) {
         const session = await getServerSession(authOptions);
         const { messages } = await req.json();
 
-        let userContext = "User is a guest.";
-        let mealsContext = "No meal data available.";
-
-        if (session?.user?.email) {
-            const user = await prisma.user.findFirst({
-                where: { email: session.user.email },
-                include: {
-                    protNeeds: {
-                        orderBy: { lastCheck: 'desc' },
-                        take: 1
-                    }
-                }
+        if (!session?.user?.email) {
+            return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+                status: 401,
+                headers: { 'Content-Type': 'application/json' }
             });
-
-            if (user) {
-                const profile = user.protNeeds?.[0];
-
-                if (profile) {
-                    userContext = `User: ${user.nome || 'User'}, Blocks: ${profile.blocchi}, Weight: ${profile.peso}kg`;
-                }
-
-                const recentMeals = await prisma.pasto.findMany({
-                    where: { codUser: user.id },
-                    orderBy: { codicePasto: 'desc' },
-                    take: 5,
-                    include: { alimenti: { include: { alimento: true } } }
-                });
-
-                mealsContext = "Recent Meals:\n" + recentMeals.map((m: any) =>
-                    `- ${m.nome} (${m.blocks} blocks)`
-                ).join('\n');
-            }
         }
 
-        const systemPrompt = `You are "ZoneMentor", an expert Zone Diet nutritionist.
-${userContext}
-${mealsContext}
+        // Get user ID
+        const user = await prisma.user.findFirst({
+            where: { email: session.user.email }
+        });
 
-Be motivating, precise, and concise. Use emojis 🐿️`;
+        if (!user) {
+            return new Response(JSON.stringify({ error: 'User not found' }), {
+                status: 404,
+                headers: { 'Content-Type': 'application/json' }
+            });
+        }
+
+        // Build rich context
+        let systemPrompt = "You are ZoneMentor, an expert Zone Diet nutritionist. Be helpful and concise.";
+
+        try {
+            const [userContext, mealContext] = await Promise.all([
+                buildUserContext(user.id),
+                buildMealContext(user.id, 7)
+            ]);
+
+            // Check if educational mode is enabled
+            const preferences = await prisma.userPreferences.findUnique({
+                where: { userId: user.id }
+            });
+
+            const enableEducational = preferences?.enableEducationalMode ?? true;
+
+            systemPrompt = buildEducationalPrompt(userContext, mealContext, enableEducational);
+        } catch (error) {
+            console.error('Error building context:', error);
+            // Fallback to basic prompt if context building fails
+        }
 
         const modelName = await getAIModel();
         const model = genAI.getGenerativeModel({ model: modelName });
+
+        // Build conversation with system prompt
         const fullPrompt = `${systemPrompt}\n\n${messages.map((m: any) => `${m.role}: ${m.content}`).join('\n')}\nassistant:`;
 
         const result = await model.generateContentStream(fullPrompt);
@@ -80,3 +84,4 @@ Be motivating, precise, and concise. Use emojis 🐿️`;
         });
     }
 }
+

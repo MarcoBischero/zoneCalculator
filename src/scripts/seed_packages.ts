@@ -13,7 +13,7 @@ async function main() {
             name: 'Base Foods',
             description: 'Standard System Foods',
             type: 'FOOD', // Use string if enum not exported correctly, but usually it is
-            isSystem: true,
+            isSystemPackage: true,
             ownerId: 1 // Assign to Super Admin (ID 1 usually)
         }
     });
@@ -53,7 +53,7 @@ async function main() {
             name: 'Base Meals',
             description: 'Standard System Meals',
             type: 'MEAL',
-            isSystem: true,
+            isSystemPackage: true,
             ownerId: 1
         }
     });

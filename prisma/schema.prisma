@@ -166,6 +166,11 @@ model User {
   protNeeds        ProtNeed[]
   assignedPackages UserPackage[]
   packagesCreated  Package[]    @relation("PackageOwner")
+  
+  // ZoneMentor Enhancement
+  preferences      UserPreferences?
+  goals            NutritionGoal[]
+  coachSuggestions CoachSuggestion[]
 
   @@index([id], map: "id")
   @@index([idRuolo], map: "id_ruolo")
@@ -296,3 +301,89 @@ model UserPackage {
   @@unique([userId, packageId])
   @@map("user_packages")
 }
+
+// --- ZONEMENTOR AI COACH ENHANCEMENT ---
+
+model UserPreferences {
+  id                   Int      @id @default(autoincrement())
+  userId               Int      @unique @map("user_id")
+  dietaryPreferences   String?  @db.Text // JSON: ["vegetarian", "low-carb", etc.]
+  allergies            String?  @db.Text // JSON: ["nuts", "dairy", "shellfish"]
+  intolerances         String?  @db.Text // JSON: ["lactose", "gluten"]
+  favoritefoods        String?  @db.Text // JSON: ["chicken", "broccoli"]
+  dislikedFoods        String?  @db.Text // JSON: ["mushrooms", "olives"]
+  enableProactiveTips  Boolean  @default(true) @map("enable_proactive_tips")
+  enableEducationalMode Boolean @default(true) @map("enable_educational_mode")
+  lastSuggestionDate   DateTime? @map("last_suggestion_date") @db.Date
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_preferences")
+}
+
+model NutritionGoal {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  goalType    GoalType @map("goal_type")
+  targetWeight Int?    @map("target_weight") // in kg
+  targetDate  DateTime? @map("target_date") @db.Date
+  notes       String?  @db.Text
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, isActive])
+  @@map("nutrition_goals")
+}
+
+enum GoalType {
+  WEIGHT_LOSS
+  WEIGHT_GAIN
+  MAINTENANCE
+  MUSCLE_BUILDING
+  PERFORMANCE
+  GENERAL_HEALTH
+}
+
+model CoachSuggestion {
+  id         Int              @id @default(autoincrement())
+  userId     Int              @map("user_id")
+  type       SuggestionType
+  message    String           @db.Text
+  priority   SuggestionPriority @default(MEDIUM)
+  isRead     Boolean          @default(false) @map("is_read")
+  isDismissed Boolean         @default(false) @map("is_dismissed")
+  metadata   String?          @db.Text // JSON: additional context
+  createdAt  DateTime         @default(now()) @map("created_at")
+
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+  @@map("coach_suggestions")
+}
+
+enum SuggestionType {
+  LOW_PROTEIN
+  LOW_CARBS
+  LOW_FATS
+  MACRO_IMBALANCE
+  EXCEEDING_BLOCKS
+  STREAK_REMINDER
+  HYDRATION_REMINDER
+  MEAL_TIMING
+  GENERAL_TIP
+}
+
+enum SuggestionPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+

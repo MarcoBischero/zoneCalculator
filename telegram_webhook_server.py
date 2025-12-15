@@ -36,6 +36,24 @@ logger = logging.getLogger(__name__)
 TASKS_DIR = Path('.telegram_tasks')
 TASKS_DIR.mkdir(exist_ok=True)
 
+# User conversation states
+user_states = {}  # {user_id: {"state": "waiting_task_description", "type": "immediate"}}
+
+def set_user_state(user_id: int, state: str, task_type: str = None):
+    """Imposta lo stato conversazione utente"""
+    user_states[user_id] = {"state": state, "type": task_type}
+    logger.info(f"State set for {user_id}: {state} ({task_type})")
+
+def get_user_state(user_id: int):
+    """Recupera stato conversazione utente"""
+    return user_states.get(user_id, {"state": "idle", "type": None})
+
+def clear_user_state(user_id: int):
+    """Pulisce stato utente"""
+    if user_id in user_states:
+        del user_states[user_id]
+        logger.info(f"State cleared for {user_id}")
+
 # FastAPI app
 app = FastAPI(title="Telegram Webhook Server", version="1.0.0")
 
@@ -294,6 +312,7 @@ async def process_telegram_message(message: TelegramMessage):
     username = message.from_user.username
     text = message.text or ""
     chat_id = message.chat.id
+    user_id = message.from_user.id
     
     # Verifica autenticazione
     if username != ALLOWED_USERNAME:
@@ -302,6 +321,30 @@ async def process_telegram_message(message: TelegramMessage):
         return
     
     logger.info(f"Messaggio da @{username}: {text}")
+    
+    # Controlla se l'utente è in uno state particolare
+    user_state = get_user_state(user_id)
+    
+    # Se sta aspettando descrizione task
+    if user_state["state"] == "waiting_task_description":
+        task_type = user_state["type"]
+        description = text
+        
+        # Crea la task
+        task = create_task(username, description, None if task_type == "immediate" else None)
+        
+        response = (
+            f"✅ *Task {task_type.title()} Creata!*\\\\n\\\\n"
+            f"📝 {description}\\\\n\\\\n"
+            f"ID: `{task.id.split('_')[-1]}`\\\\n"
+            "Scheduler la processerà! 🚀"
+        )
+        await send_telegram_message(chat_id, response)
+        
+        # Pulisci lo state
+        clear_user_state(user_id)
+        logger.info(f"Task creata via menu: {task.id}")
+        return
     
     # Comando /start
     if text.startswith("/start"):
@@ -552,6 +595,7 @@ async def process_callback_query(callback: CallbackQuery):
     
     # Task Type - Immediata
     elif callback_data == "tasktype_immediate":
+        set_user_state(chat_id, "waiting_task_description", "immediate")
         await send_telegram_message(
             chat_id,
             "⚡ *Task Immediata*\\\\n\\\\nInvia la descrizione della task:"
@@ -559,9 +603,10 @@ async def process_callback_query(callback: CallbackQuery):
     
     # Task Type - Programmata
     elif callback_data == "tasktype_scheduled":
+        set_user_state(chat_id, "waiting_task_description", "scheduled")
         await send_telegram_message(
             chat_id,
-            "⏰ *Task Programmata*\\\\n\\\\nUsa il formato:\\\\n`/task HH:MM descrizione`"
+            "⏰ *Task Programmata*\\\\n\\\\nInvia la descrizione e l'orario:\\\\n`HH:MM Descrizione task`"
         )
     
     # Task Type - Ricorrente

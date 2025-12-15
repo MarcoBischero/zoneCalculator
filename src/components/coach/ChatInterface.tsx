@@ -5,6 +5,7 @@ import { Send, User, Bot, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/lib/language-context';
+import { ProactiveSuggestions } from './ProactiveSuggestions';
 
 const SUGGESTED_PROMPTS = [
     "Quanti blocchi mi rimangono oggi?",
@@ -76,6 +77,18 @@ export function ChatInterface() {
         setInput(prompt);
     };
 
+    const handlePromptFromSuggestion = (message: string) => {
+        setInput(message);
+        // Automatically send the message
+        setTimeout(() => {
+            const form = document.querySelector('form');
+            if (form) {
+                const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+                form.dispatchEvent(submitEvent);
+            }
+        }, 100);
+    };
+
     return (
         <div className="p-6 lg:p-10 max-w-5xl mx-auto space-y-8 animate-in-up pb-32">
 
@@ -89,6 +102,9 @@ export function ChatInterface() {
                     <p className="text-muted-foreground mt-2">Il tuo coach personale, sempre attivo 24/7 per aiutarti a restare in Zona.</p>
                 </div>
             </div>
+
+            {/* Proactive Suggestions */}
+            <ProactiveSuggestions onAskAbout={handlePromptFromSuggestion} />
 
             {/* Chat Container */}
             <div className="border rounded-2xl overflow-hidden bg-card shadow-sm">
@@ -133,8 +149,8 @@ export function ChatInterface() {
 
                             <div
                                 className={`rounded-2xl px-4 py-2 max-w-[80%] text-sm leading-relaxed ${m.role === 'user'
-                                        ? 'bg-primary text-primary-foreground'
-                                        : 'bg-muted'
+                                    ? 'bg-primary text-primary-foreground'
+                                    : 'bg-muted'
                                     }`}
                             >
                                 {m.content}

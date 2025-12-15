@@ -19,7 +19,7 @@ interface Package {
     name: string;
     description: string;
     type: 'FOOD' | 'MEAL';
-    isSystem: boolean;
+    isSystemPackage: boolean;
     ownerId: number;
     _count?: {
         items: number;
@@ -35,7 +35,7 @@ export default function PackagesPage() {
 
     // Create Modal State
     const [isCreateOpen, setIsCreateOpen] = useState(false);
-    const [newPackage, setNewPackage] = useState({ name: '', description: '', type: 'MEAL' as 'FOOD' | 'MEAL', isSystem: false });
+    const [newPackage, setNewPackage] = useState({ name: '', description: '', type: 'MEAL' as 'FOOD' | 'MEAL', isSystemPackage: false });
 
     // Manage Items Modal State
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
@@ -73,7 +73,7 @@ export default function PackagesPage() {
 
             toast.success('Package created');
             setIsCreateOpen(false);
-            setNewPackage({ name: '', description: '', type: 'MEAL', isSystem: false });
+            setNewPackage({ name: '', description: '', type: 'MEAL', isSystemPackage: false });
             fetchPackages();
         } catch (error) {
             toast.error('Failed to create package');
@@ -142,8 +142,8 @@ export default function PackagesPage() {
                                     <div className="flex items-center gap-2">
                                         <Checkbox
                                             id="isSystem"
-                                            checked={newPackage.isSystem}
-                                            onCheckedChange={(checked) => setNewPackage({ ...newPackage, isSystem: !!checked })}
+                                            checked={newPackage.isSystemPackage}
+                                            onCheckedChange={(checked) => setNewPackage({ ...newPackage, isSystemPackage: !!checked })}
                                         />
                                         <label htmlFor="isSystem" className="text-sm cursor-pointer select-none">System Base Package</label>
                                     </div>
@@ -181,7 +181,7 @@ export default function PackagesPage() {
                                     <div>
                                         <div className="flex items-center gap-2">
                                             <CardTitle className="text-lg">{pkg.name}</CardTitle>
-                                            {pkg.isSystem && <Badge variant="secondary" className="text-[10px]">SYSTEM</Badge>}
+                                            {pkg.isSystemPackage && <Badge variant="secondary" className="text-[10px]">SYSTEM</Badge>}
                                         </div>
                                         <CardDescription className="line-clamp-2 mt-1 min-h-[40px]">
                                             {pkg.description || "No description"}

@@ -10,7 +10,7 @@ interface Package {
     id: number;
     name: string;
     type: 'FOOD' | 'MEAL';
-    isSystem: boolean;
+    isSystemPackage: boolean;
 }
 
 interface ManagePackagesDialogProps {
@@ -101,7 +101,7 @@ export function ManagePackagesDialog({ isOpen, onClose, user }: ManagePackagesDi
                                             <div className="flex-1">
                                                 <label htmlFor={`pkg-${pkg.id}`} className="text-sm font-medium cursor-pointer select-none block">
                                                     {pkg.name}
-                                                    {pkg.isSystem && <Badge variant="secondary" className="ml-2 text-[10px]">SYSTEM</Badge>}
+                                                    {pkg.isSystemPackage && <Badge variant="secondary" className="ml-2 text-[10px]">SYSTEM</Badge>}
                                                 </label>
                                             </div>
                                         </div>
@@ -124,7 +124,7 @@ export function ManagePackagesDialog({ isOpen, onClose, user }: ManagePackagesDi
                                             <div className="flex-1">
                                                 <label htmlFor={`pkg-${pkg.id}`} className="text-sm font-medium cursor-pointer select-none block">
                                                     {pkg.name}
-                                                    {pkg.isSystem && <Badge variant="secondary" className="ml-2 text-[10px]">SYSTEM</Badge>}
+                                                    {pkg.isSystemPackage && <Badge variant="secondary" className="ml-2 text-[10px]">SYSTEM</Badge>}
                                                 </label>
                                             </div>
                                         </div>

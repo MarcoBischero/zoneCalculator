@@ -20,9 +20,9 @@ export async function GET(request: Request, context: any) {
     // Access: Owner OR Admin OR (maybe Dietician can spy? No, only allow owner/admin to manage)
     if (pkg.ownerId !== userId && userRole !== 1) {
         // If it's a system package, only Admin can manage content
-        if (pkg.isSystem && userRole !== 1) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        if (pkg.isSystemPackage && userRole !== 1) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         // If generic restriction
-        if (!pkg.isSystem && pkg.ownerId !== userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        if (!pkg.isSystemPackage && pkg.ownerId !== userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const items = await prisma.packageItem.findMany({

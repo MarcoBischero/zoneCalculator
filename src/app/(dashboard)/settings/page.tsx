@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, Lock, Settings as SettingsIcon, ShieldAlert, Loader2, Save } from 'lucide-react';
 import { useLanguage } from '@/lib/language-context';
+import { DietaryPreferencesForm } from '@/components/settings/DietaryPreferencesForm';
 
 export default function SettingsPage() {
     const [isSaving, setIsSaving] = useState(false);
@@ -117,9 +118,12 @@ export default function SettingsPage() {
             </div>
 
             <Tabs defaultValue="profile" className="space-y-6">
-                <TabsList className="bg-white border p-1 rounded-xl shadow-sm w-full md:w-auto grid grid-cols-2 md:inline-flex">
+                <TabsList className="bg-white border p-1 rounded-xl shadow-sm w-full md:w-auto grid grid-cols-3 md:inline-flex">
                     <TabsTrigger value="profile" className="data-[state=active]:bg-zone-blue-50 data-[state=active]:text-zone-blue-700 gap-2">
                         <User className="w-4 h-4" /> {t('settings.profile')}
+                    </TabsTrigger>
+                    <TabsTrigger value="preferences" className="data-[state=active]:bg-green-50 data-[state=active]:text-green-700 gap-2">
+                        <SettingsIcon className="w-4 h-4" /> Preferences
                     </TabsTrigger>
                     <TabsTrigger value="security" className="data-[state=active]:bg-orange-50 data-[state=active]:text-orange-700 gap-2">
                         <Lock className="w-4 h-4" /> {t('settings.security')}
@@ -185,6 +189,10 @@ export default function SettingsPage() {
                             </CardContent>
                         </Card>
                     </div>
+                </TabsContent>
+
+                <TabsContent value="preferences">
+                    <DietaryPreferencesForm />
                 </TabsContent>
 
                 <TabsContent value="security">

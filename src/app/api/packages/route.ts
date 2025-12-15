@@ -89,7 +89,7 @@ export async function POST(request: Request) {
                 description,
                 type: type, // 'FOOD' or 'MEAL'
                 ownerId: parseInt(session.user.id),
-                isSystemPackage: (userRole === 1 && body.isSystem) ? true : false // Only admin can create system packages
+                isSystemPackage: (userRole === 1 && body.isSystemPackage) ? true : false // Only admin can create system packages
             }
         });
 

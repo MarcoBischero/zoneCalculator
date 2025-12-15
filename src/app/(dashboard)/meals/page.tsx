@@ -15,7 +15,7 @@ interface Meal {
     packageItems?: {
         package: {
             name: string;
-            isSystem: boolean;
+            isSystemPackage: boolean;
         }
     }[];
 }
