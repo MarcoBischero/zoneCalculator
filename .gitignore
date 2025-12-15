@@ -4,6 +4,7 @@
 .env.development.local
 .env.test.local
 .env.production.local
+.env.telegram
 
 # Dependencies
 node_modules/
@@ -81,3 +82,15 @@ google-cloud-sdk/
 *.tar.gz
 .gemini/
 .gemini
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Telegram Bot
+telegram_bot_logs/
+.telegram_tasks/
+.antigravity_notifications/

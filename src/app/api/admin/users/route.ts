@@ -159,7 +159,9 @@ export async function POST(req: Request) {
                 email: email || `${username}@example.com`,
                 idRuolo: newRole,
                 randKey: Math.random().toString(36).substring(7),
-                dieticianId: assignedDietician
+                dieticianId: assignedDietician,
+                ip: "",
+                ipupdate: ""
             }
         });
 

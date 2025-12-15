@@ -32,6 +32,19 @@ export default function LoginPage() {
                 setError('Credenziali non valide');
                 setIsLoading(false);
             } else {
+                // Track login: update IP and access timestamps
+                try {
+                    await fetch('/api/auth/track-login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                } catch (trackError) {
+                    // Non-blocking error - login still succeeded
+                    console.warn('Failed to track login:', trackError);
+                }
+
                 router.push('/');
                 router.refresh();
             }

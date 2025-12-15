@@ -22,25 +22,22 @@ export async function GET(request: Request) {
     }
 
     try {
-        // Map of old legacy indices to new string values
-        const legacyMap: Record<string, string> = {
-            "0": "Colazione",
-            "1": "Spuntino 1",
-            "2": "Pranzo",
-            "3": "Spuntino 2",
-            "4": "Cena",
-            "5": "Spuntino 3"
+        // Map of old legacy indices to new numeric values (0-3)
+        // Note: mealType is now Int (0=Colazione, 1=Spuntino, 2=Pranzo, 3=Cena)
+        const legacyMap: Record<number, number> = {
+            4: 3, // Cena (old index 4 -> new index 3)
+            5: 1, // Spuntino 3 (old index 5 -> Spuntino, index 1)
         };
 
         const updates = [];
 
-        // 1. Fetch all meals
+        // 1. Fetch all meals that need migration
         const meals = await prisma.pasto.findMany();
         let count = 0;
 
         for (const meal of meals) {
-            // Check if mealType matches a legacy key
-            if (legacyMap[meal.mealType]) {
+            // Check if mealType needs migration (values > 3)
+            if (meal.mealType > 3 && legacyMap[meal.mealType]) {
                 updates.push(prisma.pasto.update({
                     where: { codicePasto: meal.codicePasto },
                     data: { mealType: legacyMap[meal.mealType] }

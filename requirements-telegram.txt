@@ -1,0 +1,5 @@
+# Dipendenze Python per il Telegram Bot
+# Installare con: pip install -r requirements-telegram.txt
+
+python-telegram-bot==20.7
+python-dotenv==1.0.0
