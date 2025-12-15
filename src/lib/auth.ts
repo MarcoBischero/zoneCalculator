@@ -113,5 +113,6 @@ export const authOptions: NextAuthOptions = {
             return session;
         }
     },
-    secret: process.env.NEXTAUTH_SECRET || "changeme_dev_secret"
+    secret: process.env.NEXTAUTH_SECRET || "changeme_dev_secret",
+    ...(process.env.NODE_ENV === "production" && { trustHost: true } as any)
 };
