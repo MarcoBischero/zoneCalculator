@@ -81,5 +81,6 @@ jobs:
             DATABASE_URL=mysql://zonecalc_user:ZoneCalcUserPass123!@localhost/zonecalculator?socket=/cloudsql/gen-lang-client-0322370238:europe-west1:zone-calc-db
             NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
             NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}
+            AUTH_TRUST_HOST=true
             GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
           flags: '--add-cloudsql-instances=gen-lang-client-0322370238:europe-west1:zone-calc-db --allow-unauthenticated --memory=1024Mi'
