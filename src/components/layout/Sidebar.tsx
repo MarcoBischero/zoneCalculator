@@ -230,8 +230,22 @@ export function Sidebar() {
                         </div>
                     </div>
 
-                    {/* Footer / Theme Toggle */}
-                    <div className="p-4 border-t border-border/10">
+                    {/* Footer / User / Theme Toggle */}
+                    <div className="p-4 border-t border-border/10 space-y-4">
+                        {/* User Mini Profile */}
+                        <div className="glass-card p-3 rounded-xl flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                <Users className="w-4 h-4 text-primary" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-xs font-medium truncate">User</p>
+                                <p className="text-[10px] text-muted-foreground">Logged In</p>
+                            </div>
+                            <Link href="/api/auth/signout" className="p-1.5 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-destructive">
+                                <X className="w-4 h-4" />
+                            </Link>
+                        </div>
+
                         <div className="glass-card p-4 rounded-xl flex items-center justify-between">
                             <span className="text-xs font-medium text-muted-foreground">Theme</span>
                             <ThemeToggle />

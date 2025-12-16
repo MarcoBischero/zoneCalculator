@@ -18,77 +18,104 @@ export async function GET() {
             if (stderr) console.error("DB Push Error:", stderr);
         } catch (e: any) {
             console.error("Failed to run db push:", e);
-            // Continue? If schema is missing, next steps fail, but might work if table exists.
-            return NextResponse.json({ error: "Failed to sync schema", details: e.message }, { status: 500 });
         }
 
         const messages = [];
 
-        // 2. Ensure Super Admin Users
-        const admins = [
-            { username: 'MarcoBischero', email: 'marco@example.com', pass: 'password' }, // Or ZoneCalcUserPass123!
-            { username: 'superadmin', email: 'admin@zonecalculator.pro', pass: 'SuperAdmin123!' }
+        // 2. Ensure Users
+        const usersToSeed = [
+            { username: 'superadmin', email: 'admin@zonecalculator.pro', pass: 'SuperAdmin123!', role: 1, mode: '1' },
+            { username: 'MarcoBischero', email: 'marco.biscardi@gmail.com', pass: 'ZoneCalcUserPass123!', role: 1, mode: '1' },
+            { username: 'NoemiBischero', email: 'noemi@zonecalculator.pro', pass: 'UserPass123!', role: 0, mode: '0' },
+            { username: 'MarcoBiscardi', email: 'marco@zonecalculator.pro', pass: 'UserPass123!', role: 0, mode: '0' }
         ];
 
-        for (const admin of admins) {
-            const existing = await prisma.user.findFirst({ where: { username: admin.username } });
-            const hash = await bcrypt.hash(admin.pass, 10);
+        for (const u of usersToSeed) {
+            const existing = await prisma.user.findFirst({ where: { username: u.username } });
+            const hash = await bcrypt.hash(u.pass, 10);
 
             if (existing) {
                 await prisma.user.update({
                     where: { id: existing.id },
-                    data: { idRuolo: 1, password: hash, mode: '1' }
+                    data: {
+                        idRuolo: u.role,
+                        email: u.email, // Ensure email is correct
+                        password: hash, // Reset password to known value
+                        mode: u.mode
+                    }
                 });
-                messages.push(`Updated ${admin.username} to Super Admin (Role 1). Pass: ${admin.pass}`);
+                messages.push(`Updated ${u.username} (Role ${u.role}).`);
             } else {
                 await prisma.user.create({
                     data: {
-                        username: admin.username,
+                        username: u.username,
                         password: hash,
-                        email: admin.email,
-                        idRuolo: 1,
-                        randKey: 'admin',
+                        email: u.email,
+                        idRuolo: u.role,
+                        mode: u.mode,
+                        randKey: 'seed',
                         ip: '0.0.0.0',
                         ipupdate: '0.0.0.0',
-                        mode: '1',
                         language: 'it',
                         sesso: 'uomo'
                     }
                 });
-                messages.push(`Created ${admin.username} as Super Admin (Role 1). Pass: ${admin.pass}`);
+                messages.push(`Created ${u.username} (Role ${u.role}).`);
             }
         }
 
-        // 3. Seed Foods (Original Logic)
-        const count = await prisma.alimento.count();
-        if (count > 0) {
-            messages.push(`Database already contains ${count} foods. Skipping food seed.`);
-        } else {
-            const foods = [
-                // PROTEINS (codTipo: 1)
-                { nome: 'Chicken Breast (Petto di pollo)', proteine: 23, carboidrati: 0, grassi: 1, codTipo: 1, codFonte: 1 },
-                { nome: 'Egg White (Albume)', proteine: 11, carboidrati: 0, grassi: 0, codTipo: 1, codFonte: 2 },
-                { nome: 'Salmon (Salmone)', proteine: 20, carboidrati: 0, grassi: 13, codTipo: 1, codFonte: 3 },
-                { nome: 'Greek Yogurt 0% (Yogurt Greco)', proteine: 10, carboidrati: 4, grassi: 0, codTipo: 1, codFonte: 1 },
-                { nome: 'Tuna canned (Tonno al naturale)', proteine: 25, carboidrati: 0, grassi: 1, codTipo: 1, codFonte: 1 },
+        // 3. Ensure System Packages
+        // Package 1: Base Foods
+        const pkgFoods = await prisma.package.upsert({
+            where: { id: 1 },
+            update: { name: 'Base Foods', isSystemPackage: true, type: 'FOOD' },
+            create: { id: 1, name: 'Base Foods', description: 'Standard System Foods', type: 'FOOD', isSystemPackage: true, ownerId: 1 }
+        });
+        messages.push(`Package 'Base Foods' verified.`);
 
-                // CARBOHYDRATES (codTipo: 2)
-                { nome: 'Oatmeal (Avena)', proteine: 13, carboidrati: 68, grassi: 7, codTipo: 2, codFonte: 4 },
-                { nome: 'Apple (Mela)', proteine: 0, carboidrati: 14, grassi: 0, codTipo: 2, codFonte: 5 },
-                { nome: 'Spinach (Spinaci)', proteine: 3, carboidrati: 3.6, grassi: 0, codTipo: 2, codFonte: 6 },
-                { nome: 'Broccoli', proteine: 3, carboidrati: 7, grassi: 0, codTipo: 2, codFonte: 6 },
+        // Package 2: Base Meals
+        const pkgMeals = await prisma.package.upsert({
+            where: { id: 2 },
+            update: { name: 'Base Meals', isSystemPackage: true, type: 'MEAL' },
+            create: { id: 2, name: 'Base Meals', description: 'Standard System Meals', type: 'MEAL', isSystemPackage: true, ownerId: 1 }
+        });
+        messages.push(`Package 'Base Meals' verified.`);
 
-                // FATS (codTipo: 3)
-                { nome: 'Almonds (Mandorle)', proteine: 21, carboidrati: 22, grassi: 50, codTipo: 3, codFonte: 7 },
-                { nome: 'Olive Oil (Olio Extravergine)', proteine: 0, carboidrati: 0, grassi: 100, codTipo: 3, codFonte: 8 },
-                { nome: 'Avocado', proteine: 2, carboidrati: 9, grassi: 15, codTipo: 3, codFonte: 9 },
-                { nome: 'Walnuts (Noci)', proteine: 15, carboidrati: 14, grassi: 65, codTipo: 3, codFonte: 7 }
-            ];
-
-            for (const food of foods) {
-                await prisma.alimento.create({ data: food });
+        // 4. Populate Base Foods Package (if empty)
+        const foodCount = await prisma.packageItem.count({ where: { packageId: 1 } });
+        if (foodCount === 0) {
+            const allFoods = await prisma.alimento.findMany({ select: { codiceAlimento: true } });
+            if (allFoods.length > 0) {
+                await prisma.packageItem.createMany({
+                    data: allFoods.map(f => ({ packageId: 1, foodId: f.codiceAlimento }))
+                });
+                messages.push(`Added ${allFoods.length} foods to Base Package.`);
             }
-            messages.push(`Seeded ${foods.length} base foods.`);
+        }
+
+        // 5. Assign Packages to Users
+        for (const u of usersToSeed) {
+            const user = await prisma.user.findFirst({ where: { username: u.username } });
+            if (user) {
+                // Assign Package 1
+                try {
+                    await prisma.userPackage.upsert({
+                        where: { userId_packageId: { userId: user.id, packageId: 1 } },
+                        update: {},
+                        create: { userId: user.id, packageId: 1, assignedBy: 1 }
+                    });
+                } catch (e) { }
+
+                // Assign Package 2
+                try {
+                    await prisma.userPackage.upsert({
+                        where: { userId_packageId: { userId: user.id, packageId: 2 } },
+                        update: {},
+                        create: { userId: user.id, packageId: 2, assignedBy: 1 }
+                    });
+                } catch (e) { }
+                messages.push(`Assigned packages to ${u.username}.`);
+            }
         }
 
         return NextResponse.json({ success: true, log: messages });

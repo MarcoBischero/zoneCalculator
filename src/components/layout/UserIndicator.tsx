@@ -9,7 +9,7 @@ export default function UserIndicator() {
     if (!session?.user) return null;
 
     return (
-        <div className="fixed bottom-4 left-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg px-4 py-3 flex items-center gap-3 z-50 border border-gray-200 dark:border-gray-700">
+        <div className="fixed bottom-4 left-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg px-4 py-3 flex items-center gap-3 z-30 border border-gray-200 dark:border-gray-700 lg:hidden">
             <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                     <User className="w-4 h-4 text-primary" />
