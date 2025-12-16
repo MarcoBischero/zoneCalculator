@@ -5,8 +5,8 @@ import { headers, cookies } from "next/headers";
 
 export async function GET(request: Request) {
     const session = await getServerSession(authOptions);
-    const headersList = headers();
-    const cookiesList = cookies();
+    const headersList = await headers();
+    const cookiesList = await cookies();
 
     const allCookies = cookiesList.getAll().map(c => ({ name: c.name, value: c.value.substring(0, 10) + '...' }));
 
