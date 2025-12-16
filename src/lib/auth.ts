@@ -118,7 +118,7 @@ export const authOptions: NextAuthOptions = {
         trustHost: true,
         cookies: {
             sessionToken: {
-                name: `__Secure-next-auth.session-token`,
+                name: `__session`,
                 options: {
                     httpOnly: true,
                     sameSite: 'lax',

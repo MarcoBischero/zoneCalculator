@@ -20,9 +20,12 @@ export async function middleware(req: NextRequest) {
     // Cloud Run terminates SSL, so internal traffic is HTTP.
     // By default, getToken expects non-secure cookies on HTTP.
     // We FORCE it to look for the Secure cookie because the Browser sent one.
+    // UPDATE: Firebase Hosting STRIPS all cookies except '__session'.
+    // So we must use '__session' as the cookie name.
     const token = await getToken({
         req,
-        secureCookie: process.env.NODE_ENV === "production"
+        secureCookie: process.env.NODE_ENV === "production",
+        cookieName: process.env.NODE_ENV === "production" ? '__session' : undefined
     });
 
     const isAuth = !!token;
