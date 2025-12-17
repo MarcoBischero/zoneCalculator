@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { SUPERMARKETS } from '@/lib/supermarket-layouts';
+import { DailyMotivation } from '@/components/shopping/DailyMotivation';
 
 interface IngredientItem {
     id: string;
@@ -272,62 +273,54 @@ export default function ShoppingListPage() {
                 </Card>
 
                 {/* AI Supermarket Optimizer - Hide on print */}
+                {/* AI Supermarket Optimizer - Hide on print */}
                 {items.length > 0 && (
-                    <Card className="print:hidden bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950 dark:to-purple-950 border-indigo-200 dark:border-indigo-800">
-                        <CardHeader className="pb-3">
-                            <CardTitle className="text-sm font-semibold flex items-center gap-2 text-indigo-900 dark:text-indigo-100">
-                                <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                                Ottimizzazione AI Percorso
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div>
-                                <label className="text-sm font-medium mb-2 flex items-center gap-2 text-indigo-900 dark:text-indigo-200">
-                                    <Store className="w-4 h-4" />
-                                    Seleziona il tuo supermercato
-                                </label>
-                                <select
-                                    value={selectedSupermarket}
-                                    onChange={(e) => {
-                                        setSelectedSupermarket(e.target.value);
-                                        setIsOptimized(false);
-                                    }}
-                                    className="w-full mt-1 p-2 border rounded-md bg-white dark:bg-gray-900 text-foreground border-indigo-200 dark:border-indigo-800 focus:ring-2 focus:ring-indigo-500"
-                                >
-                                    {SUPERMARKETS.map(s => (
-                                        <option key={s.id} value={s.id}>{s.name}</option>
-                                    ))}
-                                </select>
+                    <div className="bg-card border-l-4 border-primary shadow-sm rounded-r-lg p-6 mb-8 mt-8 animate-in slide-in-from-left duration-500 print:hidden">
+                        <div className="flex flex-col md:flex-row gap-6 items-end">
+                            <div className="flex-1 space-y-4">
+                                <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-wider text-xs">
+                                    <Sparkles className="w-4 h-4" />
+                                    Ottimizzazione AI Percorso
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                                        <Store className="w-4 h-4 text-muted-foreground" />
+                                        Seleziona il tuo supermercato
+                                    </label>
+                                    <select
+                                        className="w-full bg-background border border-border rounded-lg p-3 text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                                        value={selectedSupermarket}
+                                        onChange={(e) => {
+                                            setSelectedSupermarket(e.target.value);
+                                            setIsOptimized(false);
+                                        }}
+                                    >
+                                        {SUPERMARKETS.map(s => (
+                                            <option key={s.id} value={s.id}>{s.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
+
                             <Button
                                 onClick={handleOptimizeRoute}
                                 disabled={optimizing || items.length === 0}
-                                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white dark:bg-indigo-600 dark:hover:bg-indigo-700"
-                                size="lg"
+                                className="w-full md:w-auto h-12 px-8 bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95"
                             >
                                 {optimizing ? (
-                                    <>
-                                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                                        Ottimizzazione in corso...
-                                    </>
+                                    <><RefreshCw className="w-5 h-5 mr-2 animate-spin" /> Ottimizzazione...</>
                                 ) : (
-                                    <>
-                                        <Sparkles className="w-4 h-4 mr-2" />
-                                        {isOptimized ? 'Ri-ottimizza Percorso' : 'Ottimizza Percorso'}
-                                    </>
+                                    <><Sparkles className="w-5 h-5 mr-2" /> Ottimizza Percorso</>
                                 )}
                             </Button>
-                            {isOptimized && (
-                                <div className="text-xs text-center text-indigo-700 dark:text-indigo-200 bg-indigo-100 dark:bg-indigo-900/50 p-2 rounded border border-indigo-200 dark:border-indigo-800">
-                                    ✨ Lista ordinata per un percorso ottimale in {currentSupermarket?.name}
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
+                        </div>
+                    </div>
                 )}
 
-                {/* Print-only header */}
+
                 <div className="hidden print:block mb-6">
+
                     <h1 className="text-2xl font-bold mb-2">Lista della Spesa</h1>
                     <p className="text-sm text-gray-600">
                         Giorni: {selectedDayIndices.map(i => DAYS[i]).join(', ')}
@@ -337,111 +330,56 @@ export default function ShoppingListPage() {
                 </div>
 
                 {/* Shopping List Content */}
-                {loading ? (
-                    <div className="text-center py-20 text-muted-foreground">Caricamento...</div>
-                ) : selectedDayIndices.length === 0 ? (
-                    <Card className="border-dashed border-2 print:hidden">
-                        <CardContent className="flex flex-col items-center justify-center p-12 text-muted-foreground">
-                            <Calendar className="w-12 h-12 mb-4 opacity-50" />
-                            <p>Seleziona almeno un giorno per generare la lista</p>
-                        </CardContent>
-                    </Card>
-                ) : items.length === 0 ? (
-                    <Card className="border-dashed border-2 print:hidden">
-                        <CardContent className="flex flex-col items-center justify-center p-12 text-muted-foreground">
-                            <ShoppingCart className="w-12 h-12 mb-4 opacity-50" />
-                            <p>Nessun pasto nel calendario per i giorni selezionati</p>
-                            <Button variant="link" onClick={() => window.location.href = '/calendar'}>
-                                Vai al Calendario
-                            </Button>
-                        </CardContent>
-                    </Card>
-                ) : isOptimized ? (
-                    // Optimized view by supermarket sections
-                    <div className="space-y-6">
-                        {organizedSections.map((section, idx) => (
-                            <Card key={`${section.name}-${idx}`} className="shadow-sm print:shadow-none print:border-2">
-                                <CardHeader className="pb-3 bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-700 dark:to-purple-700 border-b">
-                                    <div className="flex justify-between items-center">
-                                        <CardTitle className="text-base font-bold flex items-center gap-2 text-white">
-                                            <span className="text-2xl">{section.icon}</span>
-                                            <span>{section.name}</span>
-                                            <span className="text-xs font-normal text-white/80">
-                                                ({section.items.length} {section.items.length === 1 ? 'articolo' : 'articoli'})
-                                            </span>
-                                        </CardTitle>
-                                        <span className="text-xs font-semibold text-white/90">
-                                            Totale: {Math.round(section.items.reduce((sum, item) => sum + item.grams, 0))}g
-                                        </span>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="p-0">
-                                    <ul className="divide-y divide-border">
-                                        {section.items.map((item, itemIdx) => (
-                                            <li
-                                                key={`${item.name}-${itemIdx}`}
-                                                className={cn(
-                                                    "flex items-center justify-between p-4 transition-all print:py-2",
-                                                    "cursor-pointer hover:bg-muted/50 print:cursor-default print:hover:bg-transparent",
-                                                    item.checked && "bg-muted/30"
-                                                )}
-                                                onClick={() => toggleCheck(item.name)}
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    {item.checked
-                                                        ? <CheckCircle className="w-5 h-5 text-green-500 print:hidden" />
-                                                        : <Circle className="w-5 h-5 text-muted-foreground/30 print:hidden" />
-                                                    }
-                                                    <span className="hidden print:inline-block w-4 h-4 border-2 border-gray-400 mr-2"></span>
-                                                    <span className={cn(
-                                                        "font-medium text-foreground",
-                                                        item.checked && "line-through text-muted-foreground print:no-underline print:text-foreground"
-                                                    )}>
-                                                        {item.name}
-                                                    </span>
-                                                </div>
-                                                <span className={cn(
-                                                    "font-bold text-foreground",
-                                                    item.checked && "text-muted-foreground print:text-foreground"
-                                                )}>
-                                                    {Math.round(item.grams)}g
-                                                </span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                ) : (
-                    // Default view by macronutrient category
-                    <div className="space-y-6">
-                        {Object.entries(groupedItems).map(([category, catItems]) => (
-                            catItems.length > 0 && (
-                                <Card key={category} className="shadow-sm print:shadow-none print:border-2">
-                                    <CardHeader className="pb-3 bg-muted/50 border-b print:bg-gray-50">
+                {
+                    loading ? (
+                        <div className="text-center py-20 text-muted-foreground">Caricamento...</div>
+                    ) : selectedDayIndices.length === 0 ? (
+                        <Card className="border-dashed border-2 print:hidden">
+                            <CardContent className="flex flex-col items-center justify-center p-12 text-muted-foreground">
+                                <Calendar className="w-12 h-12 mb-4 opacity-50" />
+                                <p>Seleziona almeno un giorno per generare la lista</p>
+                            </CardContent>
+                        </Card>
+                    ) : items.length === 0 ? (
+                        <Card className="border-dashed border-2 print:hidden">
+                            <CardContent className="flex flex-col items-center justify-center p-12 text-muted-foreground">
+                                <ShoppingCart className="w-12 h-12 mb-4 opacity-50" />
+                                <p>Nessun pasto nel calendario per i giorni selezionati</p>
+                                <Button variant="link" onClick={() => window.location.href = '/calendar'}>
+                                    Vai al Calendario
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    ) : isOptimized ? (
+                        // Optimized view by supermarket sections
+                        <div className="space-y-6">
+                            {organizedSections.map((section, idx) => (
+                                <Card key={`${section.name}-${idx}`} className="shadow-sm print:shadow-none print:border-2">
+                                    <CardHeader className="pb-3 bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-700 dark:to-purple-700 border-b">
                                         <div className="flex justify-between items-center">
-                                            <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
-                                                {category === 'Protein' ? 'Proteine' :
-                                                    category === 'Carb' ? 'Carboidrati' :
-                                                        category === 'Fat' ? 'Grassi' : 'Altro'}
+                                            <CardTitle className="text-base font-bold flex items-center gap-2 text-white">
+                                                <span className="text-2xl">{section.icon}</span>
+                                                <span>{section.name}</span>
+                                                <span className="text-xs font-normal text-white/80">
+                                                    ({section.items.length} {section.items.length === 1 ? 'articolo' : 'articoli'})
+                                                </span>
                                             </CardTitle>
-                                            <span className="text-xs font-semibold text-muted-foreground">
-                                                Totale: {Math.round(getTotalGrams(category as any))}g
+                                            <span className="text-xs font-semibold text-white/90">
+                                                Totale: {Math.round(section.items.reduce((sum, item) => sum + item.grams, 0))}g
                                             </span>
                                         </div>
                                     </CardHeader>
                                     <CardContent className="p-0">
                                         <ul className="divide-y divide-border">
-                                            {catItems.map((item) => (
+                                            {section.items.map((item, itemIdx) => (
                                                 <li
-                                                    key={item.id}
+                                                    key={`${item.name}-${itemIdx}`}
                                                     className={cn(
                                                         "flex items-center justify-between p-4 transition-all print:py-2",
                                                         "cursor-pointer hover:bg-muted/50 print:cursor-default print:hover:bg-transparent",
                                                         item.checked && "bg-muted/30"
                                                     )}
-                                                    onClick={() => toggleCheck(item.id)}
+                                                    onClick={() => toggleCheck(item.name)}
                                                 >
                                                     <div className="flex items-center gap-3">
                                                         {item.checked
@@ -467,14 +405,71 @@ export default function ShoppingListPage() {
                                         </ul>
                                     </CardContent>
                                 </Card>
-                            )
-                        ))}
-                    </div>
-                )}
-            </div>
+                            ))}
+                        </div>
+                    ) : (
+                        // Default view by macronutrient category
+                        <div className="space-y-6">
+                            {Object.entries(groupedItems).map(([category, catItems]) => (
+                                catItems.length > 0 && (
+                                    <Card key={category} className="shadow-sm print:shadow-none print:border-2">
+                                        <CardHeader className="pb-3 bg-muted/50 border-b print:bg-gray-50">
+                                            <div className="flex justify-between items-center">
+                                                <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                                                    {category === 'Protein' ? 'Proteine' :
+                                                        category === 'Carb' ? 'Carboidrati' :
+                                                            category === 'Fat' ? 'Grassi' : 'Altro'}
+                                                </CardTitle>
+                                                <span className="text-xs font-semibold text-muted-foreground">
+                                                    Totale: {Math.round(getTotalGrams(category as any))}g
+                                                </span>
+                                            </div>
+                                        </CardHeader>
+                                        <CardContent className="p-0">
+                                            <ul className="divide-y divide-border">
+                                                {catItems.map((item) => (
+                                                    <li
+                                                        key={item.id}
+                                                        className={cn(
+                                                            "flex items-center justify-between p-4 transition-all print:py-2",
+                                                            "cursor-pointer hover:bg-muted/50 print:cursor-default print:hover:bg-transparent",
+                                                            item.checked && "bg-muted/30"
+                                                        )}
+                                                        onClick={() => toggleCheck(item.id)}
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            {item.checked
+                                                                ? <CheckCircle className="w-5 h-5 text-green-500 print:hidden" />
+                                                                : <Circle className="w-5 h-5 text-muted-foreground/30 print:hidden" />
+                                                            }
+                                                            <span className="hidden print:inline-block w-4 h-4 border-2 border-gray-400 mr-2"></span>
+                                                            <span className={cn(
+                                                                "font-medium text-foreground",
+                                                                item.checked && "line-through text-muted-foreground print:no-underline print:text-foreground"
+                                                            )}>
+                                                                {item.name}
+                                                            </span>
+                                                        </div>
+                                                        <span className={cn(
+                                                            "font-bold text-foreground",
+                                                            item.checked && "text-muted-foreground print:text-foreground"
+                                                        )}>
+                                                            {Math.round(item.grams)}g
+                                                        </span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </CardContent>
+                                    </Card>
+                                )
+                            ))}
+                        </div>
+                    )
+                }
+            </div >
 
             {/* Print styles */}
-            <style jsx global>{`
+            < style jsx global > {`
                 @media print {
                     body {
                         background: white;
@@ -517,7 +512,7 @@ export default function ShoppingListPage() {
                         margin: 1cm;
                     }
                 }
-            `}</style>
-        </div>
+            `}</style >
+        </div >
     );
 }

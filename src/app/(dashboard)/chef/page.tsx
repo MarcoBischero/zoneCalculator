@@ -130,15 +130,15 @@ export default function ChefPage() {
     const totals = getRecipeTotals();
 
     return (
-        <div className="p-8 space-y-8 bg-slate-50/50 min-h-screen">
+        <div className="p-8 space-y-8 bg-background min-h-screen">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
+                    <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
                         <Sparkles className="w-8 h-8 text-zone-orange-500" />
                         {t('chef.title')}
                     </h1>
-                    <p className="text-slate-500">{t('chef.subtitle')}</p>
+                    <p className="text-muted-foreground">{t('chef.subtitle')}</p>
                 </div>
             </div>
 
@@ -148,16 +148,16 @@ export default function ChefPage() {
                     onClick={() => setMode('fridge')}
                     className={cn(
                         "cursor-pointer rounded-2xl p-6 border-2 transition-all hover:scale-[1.02]",
-                        mode === 'fridge' ? "border-zone-blue-500 bg-white shadow-xl ring-4 ring-zone-blue-500/10" : "border-slate-200 bg-white hover:border-slate-300 shadow-sm"
+                        mode === 'fridge' ? "border-zone-blue-500 bg-card shadow-xl ring-4 ring-zone-blue-500/10" : "border-border bg-card hover:border-primary/30 shadow-sm"
                     )}
                 >
                     <div className="flex items-center gap-4 mb-4">
-                        <div className={cn("p-3 rounded-xl", mode === 'fridge' ? "bg-zone-blue-100 text-zone-blue-600" : "bg-slate-100 text-slate-500")}>
+                        <div className={cn("p-3 rounded-xl", mode === 'fridge' ? "bg-zone-blue-100 text-zone-blue-600" : "bg-muted text-muted-foreground")}>
                             <Refrigerator className="w-8 h-8" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-lg text-slate-900">{t('chef.fridge_mode')}</h3>
-                            <p className="text-slate-500 text-sm">{t('chef.fridge_desc')}</p>
+                            <h3 className="font-bold text-lg text-foreground">{t('chef.fridge_mode')}</h3>
+                            <p className="text-muted-foreground text-sm">{t('chef.fridge_desc')}</p>
                         </div>
                     </div>
                 </div>
@@ -166,26 +166,26 @@ export default function ChefPage() {
                     onClick={() => setMode('zone')}
                     className={cn(
                         "cursor-pointer rounded-2xl p-6 border-2 transition-all hover:scale-[1.02]",
-                        mode === 'zone' ? "border-zone-orange-500 bg-white shadow-xl ring-4 ring-zone-orange-500/10" : "border-slate-200 bg-white hover:border-slate-300 shadow-sm"
+                        mode === 'zone' ? "border-zone-orange-500 bg-card shadow-xl ring-4 ring-zone-orange-500/10" : "border-border bg-card hover:border-primary/30 shadow-sm"
                     )}
                 >
                     <div className="flex items-center gap-4 mb-4">
-                        <div className={cn("p-3 rounded-xl", mode === 'zone' ? "bg-zone-orange-100 text-zone-orange-600" : "bg-slate-100 text-slate-500")}>
+                        <div className={cn("p-3 rounded-xl", mode === 'zone' ? "bg-zone-orange-100 text-zone-orange-600" : "bg-muted text-muted-foreground")}>
                             <ChefHat className="w-8 h-8" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-lg text-slate-900">{t('chef.zone_mode')}</h3>
-                            <p className="text-slate-500 text-sm">{t('chef.zone_desc')}</p>
+                            <h3 className="font-bold text-lg text-foreground">{t('chef.zone_mode')}</h3>
+                            <p className="text-muted-foreground text-sm">{t('chef.zone_desc')}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Input Area */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="bg-card rounded-2xl shadow-sm border border-border p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {mode === 'fridge' ? (
                     <div className="space-y-6">
-                        <h2 className="text-xl font-bold text-slate-800">Select Available Ingredients</h2>
+                        <h2 className="text-xl font-bold text-foreground">Select Available Ingredients</h2>
                         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
                             {SAMPLE_INGREDIENTS.map(ing => (
                                 <button
@@ -195,7 +195,7 @@ export default function ChefPage() {
                                         "p-3 rounded-lg border text-sm font-medium transition-all text-left flex flex-col justify-between h-20",
                                         selectedIngredients.includes(ing.id)
                                             ? "border-blue-500 bg-blue-50 text-blue-700 shadow-inner"
-                                            : "border-slate-200 hover:border-slate-300 text-slate-600 hover:bg-slate-50"
+                                            : "border-border hover:border-primary/50 text-muted-foreground hover:bg-muted/50"
                                     )}
                                 >
                                     <span>{ing.name}</span>
@@ -205,8 +205,8 @@ export default function ChefPage() {
                         </div>
 
                         {/* Manual Input Section */}
-                        <div className="mt-6 border-t pt-4 border-slate-100">
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Add Other Ingredients (What else is in the fridge?)</label>
+                        <div className="mt-6 border-t pt-4 border-border">
+                            <label className="block text-sm font-medium text-foreground mb-2">Add Other Ingredients (What else is in the fridge?)</label>
                             <div className="flex gap-2">
                                 <input
                                     type="text"
@@ -214,7 +214,7 @@ export default function ChefPage() {
                                     onChange={(e) => setManualInput(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && addManualIngredient()}
                                     placeholder="e.g., Leftover Pasta, Half a Lemon..."
-                                    className="flex-1 p-3 rounded-lg border border-slate-200 text-sm"
+                                    className="flex-1 p-3 rounded-lg border border-border text-sm bg-background text-foreground"
                                 />
                                 <Button onClick={addManualIngredient} variant="outline" className="h-auto">
                                     <Plus className="w-4 h-4 mr-2" /> Add
@@ -247,33 +247,33 @@ export default function ChefPage() {
                     </div>
                 ) : (
                     <div className="space-y-6">
-                        <h2 className="text-xl font-bold text-slate-800">{t('chef.configure_title')}</h2>
+                        <h2 className="text-xl font-bold text-foreground">{t('chef.configure_title')}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">{t('chef.hunger_label')}</label>
+                                <label className="block text-sm font-medium text-foreground mb-2">{t('chef.hunger_label')}</label>
                                 <div className="flex items-center gap-4">
                                     <input
                                         type="range"
                                         min="1" max="6" step="1"
                                         value={zoneBlocks}
                                         onChange={(e) => setZoneBlocks(parseInt(e.target.value))}
-                                        className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-zone-orange-500"
+                                        className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-zone-orange-500"
                                     />
                                     <span className="text-3xl font-black text-zone-orange-500 w-12 text-center">{zoneBlocks}</span>
                                 </div>
-                                <p className="text-xs text-slate-500 mt-2">1 Block = Snack, 3-4 Blocks = Main Meal</p>
+                                <p className="text-xs text-muted-foreground mt-2">1 Block = Snack, 3-4 Blocks = Main Meal</p>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">{t('chef.meal_time_label')}</label>
+                                <label className="block text-sm font-medium text-foreground mb-2">{t('chef.meal_time_label')}</label>
                                 <div className="flex gap-2">
                                     {['breakfast', 'lunch', 'snack', 'dinner'].map(time => (
                                         <button
                                             key={time}
                                             onClick={() => setMealTime(time)}
                                             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${mealTime === time
-                                                ? 'bg-slate-800 text-white'
-                                                : 'bg-white border text-slate-600 hover:bg-slate-50'
+                                                ? 'bg-primary text-primary-foreground'
+                                                : 'bg-card border border-border text-muted-foreground hover:bg-muted'
                                                 }`}
                                         >
                                             {t(`chef.meal_times.${time}`)}
@@ -283,7 +283,7 @@ export default function ChefPage() {
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">{t('chef.dietary_label')}</label>
+                            <label className="block text-sm font-medium text-foreground mb-2">{t('chef.dietary_label')}</label>
                             <div className="flex gap-2 flex-wrap">
                                 {['any', 'meat', 'fish', 'vegetarian', 'vegan'].map(pref => (
                                     <button
@@ -296,8 +296,8 @@ export default function ChefPage() {
                                             return newPrefs.length === 0 ? ['any'] : newPrefs;
                                         })}
                                         className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${preference.includes(pref)
-                                            ? 'bg-slate-800 text-white'
-                                            : 'bg-white border text-slate-600 hover:bg-slate-50'
+                                            ? 'bg-primary text-primary-foreground'
+                                            : 'bg-card border border-border text-muted-foreground hover:bg-muted'
                                             }`}
                                     >
                                         {t(`chef.dietary.${pref}`)}
@@ -322,12 +322,12 @@ export default function ChefPage() {
 
             {/* Results Area */}
             {generatedRecipe && (
-                <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
-                    <div className="bg-slate-900 p-6 border-b border-slate-800">
+                <div className="bg-card rounded-2xl shadow-xl border border-border overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
+                    <div className="bg-muted/50 p-6 border-b border-border">
                         <div className="flex justify-between items-start">
                             <div>
-                                <h2 className="text-2xl font-bold mb-1 text-white">{generatedRecipe.title}</h2>
-                                <p className="text-slate-300">{generatedRecipe.description}</p>
+                                <h2 className="text-2xl font-bold mb-1 text-foreground">{generatedRecipe.title}</h2>
+                                <p className="text-muted-foreground">{generatedRecipe.description}</p>
                             </div>
                             <div className="bg-orange-500 text-white px-4 py-2 rounded-xl font-black text-xl shadow-lg border border-orange-400">
                                 {generatedRecipe.blocks} BLK
@@ -337,27 +337,27 @@ export default function ChefPage() {
 
                     <div className="p-6">
                         <table className="w-full text-sm">
-                            <thead className="text-xs text-slate-500 uppercase bg-slate-50">
+                            <thead className="text-xs text-muted-foreground uppercase bg-muted/30">
                                 <tr>
                                     <th className="px-4 py-3 text-left font-bold">{t('chef.ingredients_col')}</th>
                                     <th className="px-4 py-3 text-right font-bold">{t('chef.amount_col')}</th>
                                     <th className="px-4 py-3 text-right font-bold hidden md:table-cell">{t('chef.details_col')}</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-border">
                                 {generatedRecipe.ingredients.map((ing: any, i: number) => (
-                                    <tr key={i} className="hover:bg-slate-50/50">
-                                        <td className="px-4 py-3 font-medium text-slate-800">{ing.name}</td>
+                                    <tr key={i} className="hover:bg-muted/30">
+                                        <td className="px-4 py-3 font-medium text-foreground">{ing.name}</td>
                                         <td className="px-4 py-3 text-right font-bold text-blue-600">{Math.round(ing.grams)}g</td>
-                                        <td className="px-4 py-3 text-right text-slate-400 text-xs hidden md:table-cell">
+                                        <td className="px-4 py-3 text-right text-muted-foreground text-xs hidden md:table-cell">
                                             High quality source
                                         </td>
                                     </tr>
                                 ))}
                                 {/* Totals Footer */}
-                                <tr className="bg-slate-50 font-bold border-t-2 border-slate-200">
-                                    <td className="px-4 py-3 text-slate-700">{t('chef.total_nutrients')}</td>
-                                    <td className="px-4 py-3 text-right text-slate-900" colSpan={2}>
+                                <tr className="bg-muted/20 font-bold border-t-2 border-border">
+                                    <td className="px-4 py-3 text-muted-foreground">{t('chef.total_nutrients')}</td>
+                                    <td className="px-4 py-3 text-right text-foreground" colSpan={2}>
                                         <span className="text-red-500 mr-3">P: {Math.round(parseFloat(String(totals.p)) * 7)}g</span>
                                         <span className="text-green-500 mr-3">C: {Math.round(parseFloat(String(totals.c)) * 9)}g</span>
                                         <span className="text-yellow-500">F: {Math.round(parseFloat(String(totals.f)) * 1.5)}g</span>

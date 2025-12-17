@@ -23,13 +23,13 @@ export function RecentMeals() {
 
     if (loading) return (
         <div className="flex justify-center p-4">
-            <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+            <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
         </div>
     );
 
     if (meals.length === 0) return (
         <div className="text-center py-10 flex flex-col items-center justify-center space-y-3 opacity-60 hover:opacity-100 transition-opacity">
-            <div className="p-3 bg-white/5 rounded-full ring-1 ring-white/10">
+            <div className="p-3 bg-muted/10 rounded-full ring-1 ring-muted/20">
                 <UtensilsCrossed className="w-6 h-6 text-muted-foreground" />
             </div>
             <div>
@@ -47,21 +47,21 @@ export function RecentMeals() {
     return (
         <div className="space-y-3 flex-1">
             {meals.map((meal) => (
-                <div key={meal.codicePasto} className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors border border-dashed border-slate-100 hover:border-slate-200 cursor-pointer group">
+                <div key={meal.codicePasto} className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/50 transition-colors border border-dashed border-border hover:border-border/80 cursor-pointer group">
                     <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-lg bg-orange-50 flex items-center justify-center text-xl shadow-sm group-hover:shadow-md transition-all">
+                        <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-xl shadow-sm group-hover:shadow-md transition-all">
                             {meal.imgUrl ? '📸' : '🍽️'}
                         </div>
                         <div>
-                            <div className="font-semibold text-slate-800 text-sm">{meal.nome}</div>
-                            <div className="text-xs text-slate-500">
+                            <div className="font-semibold text-foreground text-sm">{meal.nome}</div>
+                            <div className="text-xs text-muted-foreground">
                                 {meal.mealType === '0' ? 'Colazione' :
                                     meal.mealType === '1' ? 'Pranzo' :
                                         meal.mealType === '2' ? 'Cena' : 'Spuntino'}
                             </div>
                         </div>
                     </div>
-                    <div className="h-8 w-8 rounded-full border border-slate-100 flex items-center justify-center text-xs font-bold text-slate-600 bg-white group-hover:bg-zone-blue-50 group-hover:text-zone-blue-600 transition-colors">
+                    <div className="h-8 w-8 rounded-full border border-border flex items-center justify-center text-xs font-bold text-muted-foreground bg-card group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                         {meal.blocks}
                     </div>
                 </div>

@@ -80,35 +80,35 @@ export default function AdminSettingsPage() {
     if (status === 'loading' || loading) return <div className="p-8 flex justify-center"><Loader2 className="animate-spin" /></div>;
 
     return (
-        <div className="p-8 space-y-6 max-w-4xl mx-auto">
-            <div className="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <div className="p-8 space-y-6 max-w-4xl mx-auto bg-background min-h-screen">
+            <div className="flex justify-between items-center bg-card p-6 rounded-xl shadow-sm border border-border">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 flex items-center">
-                        <Settings className="mr-3 h-8 w-8 text-indigo-600" /> {t('system.title')}
+                    <h1 className="text-3xl font-bold text-foreground flex items-center">
+                        <Settings className="mr-3 h-8 w-8 text-primary" /> {t('system.title')}
                     </h1>
-                    <p className="text-slate-500">{t('system.subtitle')}</p>
+                    <p className="text-muted-foreground">{t('system.subtitle')}</p>
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden p-6 space-y-8">
+            <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden p-6 space-y-8">
 
                 {/* AI Configuration Section */}
                 <section className="space-y-4">
-                    <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
-                        <Bot className="w-5 h-5 text-indigo-500" />
-                        <h2 className="text-lg font-semibold text-slate-800">{t('system.ai_section')}</h2>
+                    <div className="flex items-center gap-2 border-b border-border pb-2">
+                        <Bot className="w-5 h-5 text-primary" />
+                        <h2 className="text-lg font-semibold text-foreground">{t('system.ai_section')}</h2>
                     </div>
 
                     <div className="grid gap-2">
-                        <label className="text-sm font-medium text-slate-700">{t('system.active_model')}</label>
-                        <p className="text-xs text-slate-500 mb-2">{t('system.active_model_desc')}</p>
+                        <label className="text-sm font-medium text-foreground">{t('system.active_model')}</label>
+                        <p className="text-xs text-muted-foreground mb-2">{t('system.active_model_desc')}</p>
                         <select
-                            className="w-full max-w-md p-2 border border-slate-300 rounded-md bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="w-full max-w-md p-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                             value={aiModel}
                             onChange={(e) => setAiModel(e.target.value)}
                         >
                             {AVAILABLE_MODELS.map(model => (
-                                <option key={model.value} value={model.value}>
+                                <option key={model.value} value={model.value} className="bg-background text-foreground">
                                     {model.label}
                                 </option>
                             ))}

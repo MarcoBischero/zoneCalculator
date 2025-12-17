@@ -64,10 +64,10 @@ export function MealBlock({ foodName, protein, carbs, fat, grams, onChangeGrams,
                             type="number"
                             value={grams || ''}
                             onChange={(e) => onChangeGrams(parseFloat(e.target.value) || 0)}
-                            className="w-full bg-secondary/10 border border-border/50 rounded-lg py-2 px-3 font-mono font-bold text-lg text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all"
+                            className="w-full bg-secondary/10 border border-border/50 rounded-lg py-3 px-4 font-mono font-bold text-xl text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all"
                             placeholder="0"
                         />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-medium pointer-events-none">g</span>
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium pointer-events-none">g</span>
                     </div>
                 </div>
 

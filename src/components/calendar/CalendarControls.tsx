@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Copy, Loader2, RefreshCw, Trash2 } from 'lucide-react';
+import { Copy, Loader2, RefreshCw, Trash2, Printer } from 'lucide-react';
 import React from 'react';
 
 interface CalendarControlsProps {
@@ -20,17 +20,17 @@ export function CalendarControls({
     hasItems
 }: CalendarControlsProps) {
     return (
-        <div className="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-slate-200 gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-center bg-card p-6 rounded-xl shadow-sm border border-border gap-4">
             <div>
-                <h1 className="text-3xl font-bold text-slate-900">Planner Settimanale</h1>
-                <p className="text-slate-500">Pianifica i tuoi blocchi Zona per la settimana.</p>
+                <h1 className="text-3xl font-bold text-foreground">Planner Settimanale</h1>
+                <p className="text-muted-foreground">Pianifica i tuoi blocchi Zona per la settimana.</p>
             </div>
             <div className="flex gap-2">
                 <Button
                     variant="ghost"
                     onClick={onClearWeek}
                     disabled={isClearing || !hasItems}
-                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
                 >
                     {isClearing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
                     Svuota
@@ -43,9 +43,16 @@ export function CalendarControls({
                     Copia Scorsa Settimana
                 </Button>
                 <Button
+                    variant="outline"
+                    onClick={() => window.print()}
+                >
+                    <Printer className="mr-2 h-4 w-4" />
+                    Stampa
+                </Button>
+                <Button
                     onClick={onGenerate}
                     disabled={isGenerating}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
                 >
                     <RefreshCw className={`mr-2 h-4 w-4 ${isGenerating ? 'animate-spin' : ''}`} />
                     {isGenerating ? 'Generando...' : 'AI Auto-Fill'}

@@ -115,19 +115,19 @@ export default function RecipePage() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 relative print:bg-white print:p-0 pb-20">
+        <div className="min-h-screen bg-background relative print:bg-white print:p-0 pb-20">
             {/* Header / Infographic Banner - Hidden on print if we want a cleaner print card, but usually we want the title */}
 
             {/* Navigation - Hidden in Print */}
-            <div className="print:hidden bg-slate-900 text-white p-4 sticky top-0 z-50">
+            <div className="print:hidden bg-card/80 backdrop-blur-md border-b border-border text-foreground p-4 sticky top-0 z-50">
                 <div className="max-w-4xl mx-auto flex justify-between items-center">
                     <Link href="/meals">
-                        <Button variant="ghost" className="text-slate-300 hover:text-white pl-0">
+                        <Button variant="ghost" className="text-muted-foreground hover:text-foreground pl-0">
                             <ArrowLeft className="w-4 h-4 mr-2" /> Torna ai Pasti
                         </Button>
                     </Link>
                     <div className="flex gap-2">
-                        <Button onClick={() => window.print()} className="bg-zone-blue-600 hover:bg-zone-blue-700 text-white">
+                        <Button onClick={() => window.print()} className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-lg shadow-primary/20">
                             <Printer className="w-4 h-4 mr-2" /> <span className="hidden sm:inline">Stampa</span>Card
                         </Button>
                     </div>
@@ -135,35 +135,35 @@ export default function RecipePage() {
             </div>
 
             {/* MAIN RECIPE CARD - The Printable Area */}
-            <div className="w-full max-w-[210mm] mx-auto bg-white shadow-xl my-4 md:my-8 print:shadow-none print:my-0 print:w-full min-h-[297mm] relative overflow-hidden rounded-xl md:rounded-NONE transition-all">
+            <div className="w-full max-w-[210mm] mx-auto bg-card shadow-xl my-4 md:my-8 print:shadow-none print:my-0 print:w-full min-h-[297mm] relative overflow-hidden rounded-xl md:rounded-NONE transition-all border border-border/50">
                 {/* Decorative border/holes for binder - HIDDEN ON MOBILE */}
-                <div className="hidden md:flex absolute left-0 top-0 bottom-0 w-8 bg-slate-100 border-r border-slate-200 flex-col justify-center gap-24 items-center print:bg-transparent print:border-none print:flex">
-                    <div className="w-4 h-4 rounded-full bg-slate-300 print:border print:border-slate-300 print:bg-transparent"></div>
-                    <div className="w-4 h-4 rounded-full bg-slate-300 print:border print:border-slate-300 print:bg-transparent"></div>
-                    <div className="w-4 h-4 rounded-full bg-slate-300 print:border print:border-slate-300 print:bg-transparent"></div>
+                <div className="hidden md:flex absolute left-0 top-0 bottom-0 w-8 bg-muted/30 border-r border-border flex-col justify-center gap-24 items-center print:bg-transparent print:border-none print:flex">
+                    <div className="w-4 h-4 rounded-full bg-muted-foreground/20 print:border print:border-slate-300 print:bg-transparent"></div>
+                    <div className="w-4 h-4 rounded-full bg-muted-foreground/20 print:border print:border-slate-300 print:bg-transparent"></div>
+                    <div className="w-4 h-4 rounded-full bg-muted-foreground/20 print:border print:border-slate-300 print:bg-transparent"></div>
                 </div>
 
                 <div className="p-6 md:pl-16 md:pr-12 md:py-12 h-full flex flex-col">
                     {/* Header */}
-                    <div className="flex justify-between items-start border-b-4 border-zone-blue-600 pb-6 mb-8">
+                    <div className="flex justify-between items-start border-b-4 border-primary pb-6 mb-8">
                         <div>
-                            <div className="inline-flex items-center space-x-2 text-zone-blue-600 font-bold uppercase tracking-wider text-[10px] md:text-xs mb-2">
+                            <div className="inline-flex items-center space-x-2 text-primary font-bold uppercase tracking-wider text-[10px] md:text-xs mb-2">
                                 <span className="text-sm">✦</span>
                                 <span>Ricetta Ufficiale Zona</span>
                             </div>
-                            <h1 className="text-3xl md:text-4xl font-serif font-black text-slate-900 leading-tight mb-2">
+                            <h1 className="text-3xl md:text-4xl font-serif font-black text-foreground leading-tight mb-2">
                                 {meal.nome}
                             </h1>
-                            <div className="flex gap-4 md:gap-6 text-slate-500 text-xs md:text-sm font-medium">
+                            <div className="flex gap-4 md:gap-6 text-muted-foreground text-xs md:text-sm font-medium">
                                 <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> 15 min</span>
                                 <span className="flex items-center gap-1"><ChefHat className="w-4 h-4" /> Facile</span>
                                 <span className="flex items-center gap-1"><Scale className="w-4 h-4" /> Bilanciato</span>
                             </div>
                         </div>
                         <div className="text-right">
-                            <div className="w-20 h-20 md:w-24 md:h-24 bg-zone-orange-500 rounded-full flex flex-col items-center justify-center text-white shadow-lg print:shadow-none print:text-black print:border-2 print:border-black print:bg-transparent">
+                            <div className="w-20 h-20 md:w-24 md:h-24 bg-primary rounded-full flex flex-col items-center justify-center text-primary-foreground shadow-lg shadow-primary/20 print:shadow-none print:text-black print:border-2 print:border-black print:bg-transparent">
                                 <span className="text-2xl md:text-3xl font-black leading-none">{meal.blocks}</span>
-                                <span className="text-[10px] md:text-xs font-bold uppercase">Blocchi</span>
+                                <span className="text-[10px] md:text-xs font-bold uppercase opacity-90">Blocchi</span>
                             </div>
                         </div>
                     </div>
@@ -172,35 +172,35 @@ export default function RecipePage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 flex-1">
                         {/* Left Column: Ingredients */}
                         <div className="order-2 md:order-1">
-                            <h3 className="font-bold text-xl text-slate-900 mb-6 uppercase tracking-wider border-b border-slate-200 pb-2">
+                            <h3 className="font-bold text-xl text-foreground mb-6 uppercase tracking-wider border-b border-border pb-2 print:text-black print:border-slate-300">
                                 Ingredienti
                             </h3>
                             <ul className="space-y-4">
                                 {ingredients.map((item: any, i: number) => (
                                     <li key={i} className="flex justify-between items-baseline group text-sm md:text-base">
-                                        <span className="font-medium text-slate-700 group-hover:text-zone-blue-600 transition-colors">{item.alimento.nome}</span>
-                                        <div className="flex-1 mx-4 border-b border-dotted border-slate-300 relative top-[-4px]"></div>
-                                        <span className="font-bold text-slate-900">{item.grAlimento}g</span>
+                                        <span className="font-medium text-muted-foreground group-hover:text-primary transition-colors print:text-slate-700">{item.alimento.nome}</span>
+                                        <div className="flex-1 mx-4 border-b border-dotted border-muted-foreground/30 relative top-[-4px] print:border-slate-300"></div>
+                                        <span className="font-bold text-foreground print:text-black">{item.grAlimento}g</span>
                                     </li>
                                 ))}
                             </ul>
 
-                            <div className="mt-8 md:mt-12 bg-slate-50 p-6 rounded-xl border border-slate-100 print:bg-transparent print:border-2 print:border-slate-800">
-                                <h4 className="font-bold text-slate-900 mb-2 flex items-center gap-2">
-                                    <CalendarCheck className="w-4 h-4 text-zone-blue-500" /> Valori Nutrizionali
+                            <div className="mt-8 md:mt-12 bg-muted/30 p-6 rounded-xl border border-border print:bg-transparent print:border-2 print:border-slate-800">
+                                <h4 className="font-bold text-foreground mb-2 flex items-center gap-2 print:text-black">
+                                    <CalendarCheck className="w-4 h-4 text-primary print:text-black" /> Valori Nutrizionali
                                 </h4>
                                 <div className="grid grid-cols-3 gap-4 text-center">
                                     <div>
-                                        <div className="text-xs text-slate-500 uppercase">Proteine</div>
-                                        <div className="font-bold text-slate-900 text-lg">{Math.round(meal.blocks * 7)}g</div>
+                                        <div className="text-xs text-muted-foreground uppercase print:text-slate-600">Proteine</div>
+                                        <div className="font-bold text-foreground text-lg print:text-black">{Math.round(meal.blocks * 7)}g</div>
                                     </div>
                                     <div>
-                                        <div className="text-xs text-slate-500 uppercase">Carboidrati</div>
-                                        <div className="font-bold text-slate-900 text-lg">{Math.round(meal.blocks * 9)}g</div>
+                                        <div className="text-xs text-muted-foreground uppercase print:text-slate-600">Carboidrati</div>
+                                        <div className="font-bold text-foreground text-lg print:text-black">{Math.round(meal.blocks * 9)}g</div>
                                     </div>
                                     <div>
-                                        <div className="text-xs text-slate-500 uppercase">Grassi</div>
-                                        <div className="font-bold text-slate-900 text-lg">{Math.round(meal.blocks * 1.5)}g</div>
+                                        <div className="text-xs text-muted-foreground uppercase">Grassi</div>
+                                        <div className="font-bold text-foreground text-lg">{Math.round(meal.blocks * 1.5)}g</div>
                                     </div>
                                 </div>
                             </div>
@@ -210,7 +210,7 @@ export default function RecipePage() {
                         <div className="flex flex-col h-full order-1 md:order-2">
                             {/* Photo Placeholder or Real Image */}
                             {meal.imgUrl ? (
-                                <div className="w-full aspect-video md:aspect-square relative rounded-lg overflow-hidden shadow-md mb-8 border border-slate-200 print:border-slate-800">
+                                <div className="w-full aspect-video md:aspect-square relative rounded-lg overflow-hidden shadow-md mb-8 border border-border print:border-slate-800">
                                     <Image
                                         src={meal.imgUrl}
                                         alt={meal.nome}
@@ -219,23 +219,23 @@ export default function RecipePage() {
                                     />
                                 </div>
                             ) : (
-                                <div className="w-full aspect-video md:aspect-square bg-slate-50 rounded-lg border-2 border-slate-200 border-dashed flex flex-col items-center justify-center text-slate-400 mb-8 print:hidden">
+                                <div className="w-full aspect-video md:aspect-square bg-muted/20 rounded-lg border-2 border-dashed border-muted flex flex-col items-center justify-center text-muted-foreground mb-8 print:hidden">
                                     <Camera className="w-12 h-12 mb-2 opacity-50" />
                                     <span className="text-sm font-medium mb-4">Nessuna foto disponibile</span>
                                     <Button
                                         onClick={handleGenerateAI}
                                         disabled={generating}
-                                        className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2 shadow-lg shadow-indigo-200"
+                                        className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2 shadow-lg shadow-primary/20"
                                     >
                                         {generating ? <Wand2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
                                         {generating ? "Generazione in corso..." : "Genera con AI ✨"}
                                     </Button>
-                                    <p className="text-[10px] text-slate-400 mt-2 max-w-[200px] text-center">Genera foto e procedimento automatici con Gemini.</p>
+                                    <p className="text-[10px] text-muted-foreground/70 mt-2 max-w-[200px] text-center">Genera foto e procedimento automatici con Gemini.</p>
                                 </div>
                             )}
 
-                            <div className="flex items-center justify-between mb-6 border-b border-slate-200 pb-2">
-                                <h3 className="font-bold text-xl text-slate-900 uppercase tracking-wider">
+                            <div className="flex items-center justify-between mb-6 border-b border-border pb-2 print:border-slate-300">
+                                <h3 className="font-bold text-xl text-foreground uppercase tracking-wider print:text-black">
                                     Procedimento
                                 </h3>
                                 {/* Mobile Generate Button if needed and not already generated */}
@@ -245,7 +245,7 @@ export default function RecipePage() {
                                         variant="ghost"
                                         size="sm"
                                         disabled={generating}
-                                        className="text-indigo-600 md:hidden"
+                                        className="text-primary md:hidden"
                                     >
                                         <Wand2 className="w-4 h-4 mr-1" />
                                         {generating ? "..." : "Genera"}
@@ -258,19 +258,19 @@ export default function RecipePage() {
                                     procedureSteps.length > 0 ? (
                                         procedureSteps.map((step: string, i: number) => (
                                             <div key={i} className="flex gap-4">
-                                                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-slate-900 text-white text-xs font-bold flex items-center justify-center print:bg-transparent print:border print:border-black print:text-black">
+                                                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-secondary text-secondary-foreground text-xs font-bold flex items-center justify-center print:bg-transparent print:border print:border-black print:text-black">
                                                     {i + 1}
                                                 </span>
-                                                <p className="text-slate-700 leading-relaxed text-sm">
+                                                <p className="text-secondary-foreground/90 leading-relaxed text-sm print:text-slate-900">
                                                     {step}
                                                 </p>
                                             </div>
                                         ))
                                     ) : (
-                                        <p className="text-slate-700 leading-relaxed text-sm whitespace-pre-wrap">{procedureText}</p>
+                                        <p className="text-secondary-foreground/90 leading-relaxed text-sm whitespace-pre-wrap print:text-slate-900">{procedureText}</p>
                                     )
                                 ) : (
-                                    <div className="text-center py-12 bg-slate-50 rounded-lg border border-slate-100 italic text-slate-400">
+                                    <div className="text-center py-12 bg-muted/30 rounded-lg border border-border italic text-muted-foreground print:text-slate-500 print:border-slate-300">
                                         Nessun procedimento salvato. <br />
                                         Clicca &quot;Genera con AI&quot; per crearlo!
                                     </div>
@@ -280,7 +280,7 @@ export default function RecipePage() {
                     </div>
 
                     {/* Footer */}
-                    <div className="mt-8 md:mt-auto pt-8 border-t border-slate-200 text-center text-slate-400 text-xs flex flex-col md:flex-row justify-between items-center gap-2 print:text-slate-600 print:flex-row">
+                    <div className="mt-8 md:mt-auto pt-8 border-t border-border text-center text-muted-foreground text-xs flex flex-col md:flex-row justify-between items-center gap-2 print:text-slate-600 print:flex-row">
                         <span>Generato da ZoneCalculator v2</span>
                         <span>www.zonecalculator.app</span>
                     </div>

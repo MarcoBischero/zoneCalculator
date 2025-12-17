@@ -21,8 +21,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: var(--base-hue) var(--base-sat) 10%;
 
-    /* Brand Colors (Linear-style Blue) */
-    --primary: 220 90% 56%;
+    /* Brand Colors */
+    --primary: 220 90% 56%; /* Existing Blue */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 220 20% 90%;
@@ -34,6 +34,10 @@
     --accent: 220 90% 56%;
     --accent-foreground: 0 0% 100%;
 
+    /* ZONE RED - The new energetic accent */
+    --zone-red: 350 85% 60%;
+    --zone-red-foreground: 0 0% 100%;
+
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
@@ -43,22 +47,12 @@
     --ring: 220 90% 56%;
 
     /* Radius & Spacing */
-    --radius: 0.75rem;
-    /* 12px for modern feel */
-
-    /* ZoneOS Specifics */
-    --sidebar-bg: var(--base-hue) var(--base-sat) 98%;
-    --sidebar-fg: var(--base-hue) var(--base-sat) 40%;
-    --sidebar-fg-active: var(--base-hue) var(--base-sat) 10%;
-    --sidebar-accent: 220 90% 56%;
+    --radius: 0.75rem; /* 12px */
 
     /* Nutrient Macros */
     --macro-protein: 0 80% 60%;
-    /* Vibrant Red */
     --macro-carb: 150 60% 45%;
-    /* Emerald Green */
     --macro-fat: 45 90% 55%;
-    /* Golden Yellow */
   }
 
   .dark {
@@ -67,7 +61,6 @@
     --base-sat: 14%;
 
     --background: var(--base-hue) var(--base-sat) 4%;
-    /* Almost Black */
     --foreground: var(--base-hue) 10% 90%;
 
     --card: var(--base-hue) var(--base-sat) 8%;
@@ -88,65 +81,46 @@
     --accent: 220 20% 16%;
     --accent-foreground: 220 10% 90%;
 
+    /* ZONE RED - Adjusted for Dark Mode */
+    --zone-red: 350 85% 65%;
+    --zone-red-foreground: 0 0% 100%;
+
     --destructive: 0 62% 30%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 220 20% 12%;
     --input: 220 20% 12%;
     --ring: 220 90% 60%;
-
-    --sidebar-bg: var(--base-hue) var(--base-sat) 4%;
-    --sidebar-fg: var(--base-hue) 10% 60%;
-    --sidebar-fg-active: var(--base-hue) 10% 95%;
-    --sidebar-accent: 220 90% 60%;
   }
 
+  /* ... Keep existing themes but add --zone-red to them strictly if needed, 
+     otherwise they fall back to :root if not overridden. 
+     For safety, let's ensure they have good contrast if they override it. 
+     Currently they don't seem to override custom properties unless specified.
+  */
+  
   html.professional-light {
-    /* Ocean Serenity (Default Light) */
+     /* Inherits :root mostly, just specific overrides */
     --background: 220 14% 98%;
     --foreground: 220 14% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 220 14% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 14% 10%;
-    --primary: 220 90% 56%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 20% 90%;
-    --secondary-foreground: 220 40% 10%;
-    --muted: 220 20% 94%;
-    --muted-foreground: 220 20% 45%;
-    --accent: 220 90% 56%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 220 20% 90%;
-    --input: 220 20% 90%;
-    --ring: 220 90% 56%;
-    --sidebar-bg: 220 14% 98%;
-    --sidebar-fg: 220 14% 40%;
-    --sidebar-fg-active: 220 14% 10%;
-    --sidebar-accent: 220 90% 56%;
+    /* ... existing ... */
+    --zone-red: 350 85% 60%;
   }
 
   html.midnight-pro {
-    /* Deep Sea (High Contrast Dark Blue) */
+    /* Deep Sea */
     --background: 222 47% 6%;
-    /* Darker background */
     --foreground: 210 40% 98%;
     --card: 222 45% 10%;
-    /* Darker card */
     --card-foreground: 210 40% 98%;
     --popover: 222 45% 10%;
     --popover-foreground: 210 40% 98%;
     --primary: 199 89% 55%;
-    /* Cyan */
     --primary-foreground: 222 47% 10%;
-    /* Dark text on Cyan */
     --secondary: 217 30% 15%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217 30% 15%;
     --muted-foreground: 215 20% 80%;
-    /* Brighter muted text */
     --accent: 199 89% 55%;
     --accent-foreground: 222 47% 10%;
     --destructive: 0 84% 60%;
@@ -154,75 +128,56 @@
     --border: 217 30% 20%;
     --input: 217 30% 20%;
     --ring: 199 89% 55%;
-    --sidebar-bg: 222 47% 4%;
-    --sidebar-fg: 215 20% 70%;
-    --sidebar-fg-active: 199 89% 55%;
+    --zone-red: 350 90% 65%; /* Popping red against deep blue */
   }
 
   html.tokyo-nights {
-    /* Cyberpunk (Neon/Violet - High Contrast) */
+    /* Cyberpunk */
     --background: 265 40% 4%;
-    /* Pitch black violet */
     --foreground: 280 10% 98%;
     --card: 265 40% 6%;
     --card-foreground: 280 10% 98%;
     --popover: 265 40% 6%;
     --popover-foreground: 280 10% 98%;
     --primary: 290 85% 65%;
-    /* Neon Purple */
     --primary-foreground: 265 40% 5%;
-    /* Dark text on Neon Purple (FIXED) */
     --secondary: 265 30% 12%;
     --secondary-foreground: 280 10% 98%;
     --muted: 265 30% 12%;
     --muted-foreground: 265 20% 80%;
     --accent: 180 90% 65%;
-    /* Cyan accent */
     --accent-foreground: 265 40% 5%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     --border: 265 30% 20%;
     --input: 265 30% 20%;
     --ring: 290 85% 65%;
-    --sidebar-bg: 265 40% 3%;
-    --sidebar-fg: 265 20% 70%;
-    --sidebar-fg-active: 290 85% 65%;
+    --zone-red: 340 90% 65%; /* Pinkish Red for Cyberpunk */
   }
 
   html.zen-garden {
-    /* Zen Garden (Natural/Wellness) */
+    /* Zen Garden */
     --background: 47 52% 93%;
-    /* Cream #F8F4E3 */
     --foreground: 153 15% 15%;
-    /* Dark Green Text */
     --card: 0 0% 100%;
     --card-foreground: 153 15% 15%;
     --popover: 0 0% 100%;
     --popover-foreground: 153 15% 15%;
     --primary: 153 25% 49%;
-    /* Sage Green #6B9080 (adjusted sat for pop) */
     --primary-foreground: 0 0% 100%;
     --secondary: 13 68% 63%;
-    /* Terracotta #E07A5F */
     --secondary-foreground: 0 0% 100%;
     --muted: 47 30% 88%;
     --muted-foreground: 153 10% 40%;
     --accent: 182 43% 76%;
-    /* Lavender/Blue #A8DADC */
     --accent-foreground: 153 15% 15%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     --border: 47 20% 85%;
     --input: 47 20% 85%;
     --ring: 153 25% 49%;
-    --sidebar-bg: 47 52% 91%;
-    --sidebar-fg: 153 15% 40%;
-    --sidebar-fg-active: 13 68% 63%;
-    /* Active item is Terracotta */
-    --sidebar-accent: 153 25% 49%;
+    --zone-red: 10 70% 60%; /* Earthy Red/Terracotta */
   }
-
-
 }
 
 @layer base {
@@ -235,13 +190,13 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  /* Typography Scale */
+  /* Premium Typography Scale */
   h1 {
-    @apply text-3xl font-bold tracking-tight text-foreground md:text-4xl;
+    @apply text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl;
   }
 
   h2 {
-    @apply text-2xl font-semibold tracking-tight text-foreground;
+    @apply text-2xl font-semibold tracking-tight text-foreground md:text-3xl;
   }
 
   h3 {
@@ -249,56 +204,45 @@
   }
 
   p {
-    @apply text-sm leading-7 text-muted-foreground;
+    @apply text-sm leading-relaxed text-muted-foreground;
   }
 }
 
 @layer utilities {
 
-  /* Glassmorphism v2 - Refined */
+  /* Premium Glassmorphism */
   .glass-panel {
-    @apply bg-white/70 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-sm;
+    @apply bg-white/60 dark:bg-black/40 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/20;
   }
 
-  /* Force Dark Glass for Custom Dark Themes (Fixes Transparency Issues) */
+  /* Harder glass for specific themes if needed, handled by tokens mostly now */
   html.midnight-pro .glass-panel,
   html.tokyo-nights .glass-panel {
-    background-color: rgba(0, 0, 0, 0.4);
-    border-color: rgba(255, 255, 255, 0.1);
+    @apply bg-black/60 border-white/10;
   }
 
   .glass-card {
-    @apply bg-white/50 dark:bg-white/5 backdrop-blur-lg border border-white/20 dark:border-white/10 shadow-sm transition-all duration-300;
+    @apply bg-white/40 dark:bg-white/5 backdrop-blur-lg border border-white/30 dark:border-white/10 shadow-sm transition-all duration-300 hover:shadow-md hover:bg-white/50 dark:hover:bg-white/10;
   }
 
-  /* Force Dark Card for Custom Dark Themes */
-  html.midnight-pro .glass-card,
-  html.tokyo-nights .glass-card {
-    background-color: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-
-  html.midnight-pro .glass-card:hover,
-  html.tokyo-nights .glass-card:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-
-  /* Utility Animations */
+  /* Animations */
   .animate-in-up {
-    animation: fadeUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  
+  .animate-in-scale {
+    animation: scaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   .animate-pulse-subtle {
     animation: pulseSubtle 3s infinite ease-in-out;
   }
 
-  /* Sparkle Effect */
-  .shimmer {
-    @apply relative overflow-hidden;
+  .shimmer-bg {
+     @apply relative overflow-hidden;
   }
-
-  .shimmer::after {
-    @apply absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent;
+  .shimmer-bg::after {
+    @apply absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent;
     content: '';
     animation: shimmer 2s infinite;
   }
@@ -307,29 +251,30 @@
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(15px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
+@keyframes scaleUp {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
 @keyframes pulseSubtle {
-
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.7;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
 }
 
 @keyframes shimmer {
-  100% {
-    transform: translateX(100%);
-  }
+  100% { transform: translateX(100%); }
 }

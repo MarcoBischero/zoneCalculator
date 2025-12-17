@@ -29,6 +29,8 @@ export default function ProteinPage() {
     const [isSaving, setIsSaving] = useState(false);
     const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
+    const [activeTab, setActiveTab] = useState("calculator");
+
     // Load user gender from session/profile
     useEffect(() => {
         fetch('/api/auth/session')
@@ -136,248 +138,264 @@ export default function ProteinPage() {
         <div className="p-8 space-y-6 bg-slate-50/50 min-h-screen">
             <div className="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900">Calcolatore Proteine</h1>
-                    <p className="text-slate-500">Determina il tuo fabbisogno giornaliero di blocchi Zone.</p>
+                    <h1 className="text-3xl font-bold text-slate-900">Profilo Corporeo</h1>
+                    <p className="text-slate-500">Gestisci le tue misure e calcola il fabbisogno.</p>
+                </div>
+                <div className="flex gap-2">
+                    <Button
+                        variant={activeTab === 'calculator' ? 'default' : 'outline'}
+                        onClick={() => setActiveTab('calculator')}
+                    >
+                        Calcolatore
+                    </Button>
+                    <Button
+                        variant={activeTab === 'history' ? 'default' : 'outline'}
+                        onClick={() => setActiveTab('history')}
+                    >
+                        Diario Progressi
+                    </Button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Input Form */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h3 className="font-bold text-slate-800 mb-6 flex items-center">
-                        <Ruler className="w-5 h-5 mr-2 text-blue-600" /> Misurazioni
-                    </h3>
+            <div className="flex gap-4">
+                <button
+                    onClick={() => setGender('uomo')}
+                    className={`flex-1 p-3 rounded-lg border-2 font-medium transition-all ${gender === 'uomo'
+                        ? 'border-blue-600 bg-blue-50 text-blue-700'
+                        : 'border-slate-300 bg-white text-slate-600 hover:border-slate-400'
+                        }`}
+                >
+                    👨 Uomo
+                </button>
+                <button
+                    onClick={() => setGender('donna')}
+                    className={`flex-1 p-3 rounded-lg border-2 font-medium transition-all ${gender === 'donna'
+                        ? 'border-pink-600 bg-pink-50 text-pink-700'
+                        : 'border-slate-300 bg-white text-slate-600 hover:border-slate-400'
+                        }`}
+                >
+                    👩 Donna
+                </button>
+            </div>
 
-                    <div className="space-y-4">
-                        {/* Gender Selector */}
+
+            {/* Weight and Height */}
+            <div className="grid grid-cols-2 gap-4">
+                <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Peso (Kg)</label>
+                    <input
+                        type="text"
+                        inputMode="decimal"
+                        value={stats.weight}
+                        onChange={e => setStats({ ...stats, weight: e.target.value })}
+                        className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Altezza (Cm)</label>
+                    <input
+                        type="text"
+                        inputMode="decimal"
+                        value={stats.height}
+                        onChange={e => setStats({ ...stats, height: e.target.value })}
+                        className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    />
+                </div>
+            </div>
+
+            {/* Male Measurements */}
+            {
+                gender === 'uomo' && (
+                    <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">
-                                <User className="w-4 h-4 inline mr-1" /> Sesso
+                            <label className="block text-sm font-medium text-slate-700 mb-1">
+                                Collo (Cm) <span className="text-blue-600">ℹ️</span>
                             </label>
-                            <div className="flex gap-4">
-                                <button
-                                    onClick={() => setGender('uomo')}
-                                    className={`flex-1 p-3 rounded-lg border-2 font-medium transition-all ${gender === 'uomo'
-                                            ? 'border-blue-600 bg-blue-50 text-blue-700'
-                                            : 'border-slate-300 bg-white text-slate-600 hover:border-slate-400'
-                                        }`}
-                                >
-                                    👨 Uomo
-                                </button>
-                                <button
-                                    onClick={() => setGender('donna')}
-                                    className={`flex-1 p-3 rounded-lg border-2 font-medium transition-all ${gender === 'donna'
-                                            ? 'border-pink-600 bg-pink-50 text-pink-700'
-                                            : 'border-slate-300 bg-white text-slate-600 hover:border-slate-400'
-                                        }`}
-                                >
-                                    👩 Donna
-                                </button>
-                            </div>
+                            <input
+                                type="text"
+                                inputMode="decimal"
+                                value={stats.neck}
+                                onChange={e => setStats({ ...stats, neck: e.target.value })}
+                                className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            />
                         </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">
+                                Addome (Cm) <span className="text-blue-600">ℹ️</span>
+                            </label>
+                            <input
+                                type="text"
+                                inputMode="decimal"
+                                value={stats.abdomen}
+                                onChange={e => setStats({ ...stats, abdomen: e.target.value })}
+                                className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            />
+                        </div>
+                    </div>
+                )
+            }
 
-                        {/* Weight and Height */}
+            {/* Female Measurements */}
+            {
+                gender === 'donna' && (
+                    <>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Peso (Kg)</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                    Collo (Cm) <span className="text-pink-600">ℹ️</span>
+                                </label>
                                 <input
                                     type="text"
                                     inputMode="decimal"
-                                    value={stats.weight}
-                                    onChange={e => setStats({ ...stats, weight: e.target.value })}
-                                    className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                    value={stats.neck}
+                                    onChange={e => setStats({ ...stats, neck: e.target.value })}
+                                    className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Altezza (Cm)</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                    Vita (Cm) <span className="text-pink-600">ℹ️</span>
+                                </label>
                                 <input
                                     type="text"
                                     inputMode="decimal"
-                                    value={stats.height}
-                                    onChange={e => setStats({ ...stats, height: e.target.value })}
-                                    className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                    value={stats.waist}
+                                    onChange={e => setStats({ ...stats, waist: e.target.value })}
+                                    className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
                                 />
                             </div>
                         </div>
-
-                        {/* Male Measurements */}
-                        {gender === 'uomo' && (
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">
-                                        Collo (Cm) <span className="text-blue-600">ℹ️</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        inputMode="decimal"
-                                        value={stats.neck}
-                                        onChange={e => setStats({ ...stats, neck: e.target.value })}
-                                        className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">
-                                        Addome (Cm) <span className="text-blue-600">ℹ️</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        inputMode="decimal"
-                                        value={stats.abdomen}
-                                        onChange={e => setStats({ ...stats, abdomen: e.target.value })}
-                                        className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                                    />
-                                </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                    Anche (Cm) <span className="text-pink-600">ℹ️</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    inputMode="decimal"
+                                    value={stats.hips}
+                                    onChange={e => setStats({ ...stats, hips: e.target.value })}
+                                    className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
+                                />
                             </div>
-                        )}
-
-                        {/* Female Measurements */}
-                        {gender === 'donna' && (
-                            <>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">
-                                            Collo (Cm) <span className="text-pink-600">ℹ️</span>
-                                        </label>
-                                        <input
-                                            type="text"
-                                            inputMode="decimal"
-                                            value={stats.neck}
-                                            onChange={e => setStats({ ...stats, neck: e.target.value })}
-                                            className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">
-                                            Vita (Cm) <span className="text-pink-600">ℹ️</span>
-                                        </label>
-                                        <input
-                                            type="text"
-                                            inputMode="decimal"
-                                            value={stats.waist}
-                                            onChange={e => setStats({ ...stats, waist: e.target.value })}
-                                            className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">
-                                            Anche (Cm) <span className="text-pink-600">ℹ️</span>
-                                        </label>
-                                        <input
-                                            type="text"
-                                            inputMode="decimal"
-                                            value={stats.hips}
-                                            onChange={e => setStats({ ...stats, hips: e.target.value })}
-                                            className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">
-                                            Polso (Cm) <span className="text-pink-600">ℹ️</span>
-                                        </label>
-                                        <input
-                                            type="text"
-                                            inputMode="decimal"
-                                            value={stats.wrist}
-                                            onChange={e => setStats({ ...stats, wrist: e.target.value })}
-                                            className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">
-                                        Avambraccio (Cm) <span className="text-pink-600">ℹ️</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        inputMode="decimal"
-                                        value={stats.forearm}
-                                        onChange={e => setStats({ ...stats, forearm: e.target.value })}
-                                        className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
-                                    />
-                                </div>
-                            </>
-                        )}
-
-                        {/* Activity Level */}
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Tipo Attività</label>
-                            <select
-                                value={stats.activity}
-                                onChange={e => setStats({ ...stats, activity: e.target.value })}
-                                className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-                            >
-                                <option value="1.1">Sedentario (1.1)</option>
-                                <option value="1.3">Leggermente Attivo (1.3)</option>
-                                <option value="1.5">Moderatamente Attivo (1.5)</option>
-                                <option value="1.7">Molto Attivo (1.7)</option>
-                                <option value="1.9">Estremamente Attivo (1.9)</option>
-                            </select>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                    Polso (Cm) <span className="text-pink-600">ℹ️</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    inputMode="decimal"
+                                    value={stats.wrist}
+                                    onChange={e => setStats({ ...stats, wrist: e.target.value })}
+                                    className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
+                                />
+                            </div>
                         </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">
+                                Avambraccio (Cm) <span className="text-pink-600">ℹ️</span>
+                            </label>
+                            <input
+                                type="text"
+                                inputMode="decimal"
+                                value={stats.forearm}
+                                onChange={e => setStats({ ...stats, forearm: e.target.value })}
+                                className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
+                            />
+                        </div>
+                    </>
+                )
+            }
 
-                        <Button className="w-full mt-4 bg-blue-600 hover:bg-blue-700" onClick={calculate}>
-                            Calcola
-                        </Button>
+            {/* Activity Level */}
+            <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Tipo Attività</label>
+                <select
+                    value={stats.activity}
+                    onChange={e => setStats({ ...stats, activity: e.target.value })}
+                    className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                >
+                    <option value="1.1">Sedentario (1.1)</option>
+                    <option value="1.3">Leggermente Attivo (1.3)</option>
+                    <option value="1.5">Moderatamente Attivo (1.5)</option>
+                    <option value="1.7">Molto Attivo (1.7)</option>
+                    <option value="1.9">Estremamente Attivo (1.9)</option>
+                </select>
+            </div>
+
+            <Button className="w-full mt-4 bg-blue-600 hover:bg-blue-700" onClick={calculate}>
+                Calcola
+            </Button>
+        </div >
+                        </div >
+
+        {/* Results Card */ }
+        < div className = "bg-slate-900 text-white p-6 rounded-xl shadow-lg relative overflow-hidden" >
+                            <div className="absolute top-0 right-0 p-32 bg-blue-500 rounded-full blur-3xl opacity-10 translate-x-10 -translate-y-10"></div>
+
+                            <h3 className="font-bold text-xl mb-6 flex items-center relative z-10">
+                                <Activity className="w-5 h-5 mr-2 text-green-400" /> I Tuoi Risultati
+                            </h3>
+
+    {
+        results ? (
+            <div className="space-y-6 relative z-10">
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-slate-800/50 p-4 rounded-lg">
+                        <div className="text-slate-400 text-xs uppercase tracking-wider">% Massa Grassa</div>
+                        <div className="text-2xl font-bold text-white">{results.bodyFat}%</div>
+                    </div>
+                    <div className="bg-slate-800/50 p-4 rounded-lg">
+                        <div className="text-slate-400 text-xs uppercase tracking-wider">Massa Magra (Kg)</div>
+                        <div className="text-2xl font-bold text-white">{results.leanMass}</div>
                     </div>
                 </div>
 
-                {/* Results Card */}
-                <div className="bg-slate-900 text-white p-6 rounded-xl shadow-lg relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-32 bg-blue-500 rounded-full blur-3xl opacity-10 translate-x-10 -translate-y-10"></div>
-
-                    <h3 className="font-bold text-xl mb-6 flex items-center relative z-10">
-                        <Activity className="w-5 h-5 mr-2 text-green-400" /> I Tuoi Risultati
-                    </h3>
-
-                    {results ? (
-                        <div className="space-y-6 relative z-10">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-slate-800/50 p-4 rounded-lg">
-                                    <div className="text-slate-400 text-xs uppercase tracking-wider">% Massa Grassa</div>
-                                    <div className="text-2xl font-bold text-white">{results.bodyFat}%</div>
-                                </div>
-                                <div className="bg-slate-800/50 p-4 rounded-lg">
-                                    <div className="text-slate-400 text-xs uppercase tracking-wider">Massa Magra (Kg)</div>
-                                    <div className="text-2xl font-bold text-white">{results.leanMass}</div>
-                                </div>
-                            </div>
-
-                            <div className="pt-4 border-t border-slate-700">
-                                <div className="flex justify-between items-end mb-2">
-                                    <div className="text-slate-400 font-medium">Fabbisogno proteico giornaliero (gr)</div>
-                                    <div className="text-3xl font-bold text-blue-400">{results.dailyProtein}g</div>
-                                </div>
-                                <div className="flex justify-between items-end">
-                                    <div className="text-slate-400 font-medium">Totale blocchi zona</div>
-                                    <div className="text-4xl font-extrabold text-orange-500">{results.blocks}</div>
-                                </div>
-                            </div>
-
-                            <Button
-                                onClick={handleSaveProfile}
-                                disabled={isSaving}
-                                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold"
-                            >
-                                {isSaving ? 'Salvataggio...' : <><Save className="w-4 h-4 mr-2" /> Salva nel Profilo</>}
-                            </Button>
-                        </div>
-                    ) : (
-                        <div className="h-64 flex flex-col items-center justify-center text-slate-500 relative z-10">
-                            <Activity className="w-12 h-12 mb-3 opacity-20" />
-                            <p>Inserisci le tue misure per vedere i risultati</p>
-                        </div>
-                    )}
+                <div className="pt-4 border-t border-slate-700">
+                    <div className="flex justify-between items-end mb-2">
+                        <div className="text-slate-400 font-medium">Fabbisogno proteico giornaliero (gr)</div>
+                        <div className="text-3xl font-bold text-blue-400">{results.dailyProtein}g</div>
+                    </div>
+                    <div className="flex justify-between items-end">
+                        <div className="text-slate-400 font-medium">Totale blocchi zona</div>
+                        <div className="text-4xl font-extrabold text-orange-500">{results.blocks}</div>
+                    </div>
                 </div>
+
+                <Button
+                    onClick={handleSaveProfile}
+                    disabled={isSaving}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold"
+                >
+                    {isSaving ? 'Salvataggio...' : <><Save className="w-4 h-4 mr-2" /> Salva nel Profilo</>}
+                </Button>
             </div>
-
-            {/* Feedback Toast */}
-            {saveMessage && (
-                <div className="fixed bottom-4 right-4 bg-slate-900 border border-slate-800 text-white px-4 py-3 rounded-lg shadow-xl shadow-black/20 flex items-center animate-in slide-in-from-bottom-2 fade-in">
-                    <div className="h-2 w-2 rounded-full bg-green-500 mr-3" />
-                    {saveMessage}
-                </div>
-            )}
+        ) : (
+            <div className="h-64 flex flex-col items-center justify-center text-slate-500 relative z-10">
+                <Activity className="w-12 h-12 mb-3 opacity-20" />
+                <p>Inserisci le tue misure per vedere i risultati</p>
+            </div>
+        )
+    }
+                        </div >
+                    </div >
+                ) : (
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 animate-in fade-in slide-in-from-right-4">
+            <p className="text-center text-slate-500 py-10">Diario in costruzione... (Usa "Calcolatore" e "Salva" per ora)</p>
+            {/* TODO: Implement log list here using basic fetch similar to reports */}
         </div>
+    )
+}
+
+{/* Feedback Toast */ }
+{
+    saveMessage && (
+        <div className="fixed bottom-4 right-4 bg-slate-900 border border-slate-800 text-white px-4 py-3 rounded-lg shadow-xl shadow-black/20 flex items-center animate-in slide-in-from-bottom-2 fade-in">
+            <div className="h-2 w-2 rounded-full bg-green-500 mr-3" />
+            {saveMessage}
+        </div>
+    )
+}
+            </div >
     );
 }

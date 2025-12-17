@@ -87,7 +87,7 @@ export default function AdminPage() {
         <div className="p-8 space-y-8 bg-slate-50 min-h-screen">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-2">
+                    <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
                         {isSuperAdmin ? <Crown className="text-yellow-500" /> : <Shield className="text-indigo-500" />}
                         {isSuperAdmin ? 'Super Admin Console' : 'Dietician Portal'}
                     </h1>

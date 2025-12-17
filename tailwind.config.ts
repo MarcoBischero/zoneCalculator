@@ -42,43 +42,36 @@ const config: Config = {
 				DEFAULT: 'hsl(var(--card) / <alpha-value>)',
 				foreground: 'hsl(var(--card-foreground) / <alpha-value>)'
 			},
+			// NEW ZONE RED
+			zone: {
+				red: {
+					DEFAULT: 'hsl(var(--zone-red) / <alpha-value>)',
+					foreground: 'hsl(var(--zone-red-foreground) / <alpha-value>)'
+				},
+				DEFAULT: 'hsl(var(--zone-red) / <alpha-value>)', // Alias for zone-red
+			},
 			protein: 'hsl(var(--macro-protein) / <alpha-value>)',
 			carb: 'hsl(var(--macro-carb) / <alpha-value>)',
 			fat: 'hsl(var(--macro-fat) / <alpha-value>)',
-			zone: {
-				blue: {
-					'50': '#f0f9ff',
-					'100': '#e0f2fe',
-					'400': '#38bdf8',
-					'500': '#0ea5e9',
-					'600': '#0284c7',
-					'700': '#0369a1',
-					'900': '#0c4a6e'
-				},
-				orange: {
-					'500': '#f97316',
-					'600': '#ea580c'
-				}
-			},
 			gradientColorStops: {
 				'primary-start': 'hsl(var(--primary))',
 				'primary-end': 'hsl(var(--secondary))',
-				'tokyo-cyan': '#00F0FF',
-				'tokyo-pink': '#FF006E',
-				'tokyo-purple': '#B026FF',
-				'tokyo-gold': '#FFD700'
 			},
 			boxShadow: {
 				glass: '0 8px 32px 0 rgba(0, 0, 0, 0.1)',
 				'glow-sm': '0 0 10px hsl(var(--primary) / 0.3)',
 				'glow-md': '0 0 20px hsl(var(--primary) / 0.5)',
 				'glow-lg': '0 0 30px hsl(var(--primary) / 0.7)',
-				neon: '0 0 10px currentColor, 0 0 20px currentColor'
+				'premium-sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+				'premium-md': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+				'premium-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025)',
 			},
 			animation: {
 				gradient: 'gradient 3s ease infinite',
 				'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
-				shimmer: 'shimmer 2s linear infinite'
+				shimmer: 'shimmer 2s linear infinite',
+				'fade-up': 'fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+				'scale-in': 'scaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
 			},
 			keyframes: {
 				gradient: {
@@ -104,6 +97,14 @@ const config: Config = {
 					'100%': {
 						transform: 'translateX(100%)'
 					}
+				},
+				fadeUp: {
+					'0%': { opacity: '0', transform: 'translateY(15px)' },
+					'100%': { opacity: '1', transform: 'translateY(0)' }
+				},
+				scaleUp: {
+					'0%': { opacity: '0', transform: 'scale(0.95)' },
+					'100%': { opacity: '1', transform: 'scale(1)' }
 				}
 			},
 			borderRadius: {
@@ -145,12 +146,8 @@ const config: Config = {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
-				chart: {
-					'1': 'hsl(var(--chart-1))',
-					'2': 'hsl(var(--chart-2))',
-					'3': 'hsl(var(--chart-3))',
-					'4': 'hsl(var(--chart-4))',
-					'5': 'hsl(var(--chart-5))'
+				brand: { // Alias for easy semantic access
+					red: 'hsl(var(--zone-red))'
 				}
 			}
 		},

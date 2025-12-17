@@ -13,58 +13,70 @@ export async function GET(req: Request) {
     const userId = Number((session.user as any).id);
 
     try {
-        // 1. Weight History (from ProtNeed)
-        const weightHistory = await prisma.protNeed.findMany({
+        // 1. Fetch Data Sources
+        // Fetch Weight Logs (New System)
+        const measurementLogs = await prisma.measurementLog.findMany({
+            where: { userId },
+            orderBy: { date: 'asc' },
+            select: { date: true, weight: true },
+            take: 20
+        });
+
+        // Fetch Protocol Needs (Old System + Current Target Source)
+        const protNeeds = await prisma.protNeed.findMany({
             where: { codUser: userId },
             orderBy: { lastCheck: 'asc' },
             select: {
                 lastCheck: true,
                 peso: true,
-                blocchi: true // Target blocks at that time
+                blocchi: true
             },
-            take: 20 // Last 20 checks
+            take: 20
         });
 
-        // Format for Chart
-        const weightData = weightHistory.map(entry => ({
-            date: new Date(entry.lastCheck).toLocaleDateString('it-IT', { day: '2-digit', month: 'short' }),
-            weight: entry.peso,
-            targetBlocks: entry.blocchi
-        }));
+        // 2. Determine Weight History Data
+        let weightData: any[] = [];
 
-        // 2. Block Adherence (Last 7 Days)
-        const today = new Date();
-        const startOfWeek = new Date(today);
-        startOfWeek.setDate(today.getDate() - 6); // Last 7 days
+        if (measurementLogs.length > 0) {
+            // Use new logs if available
+            weightData = measurementLogs.map(entry => ({
+                date: new Date(entry.date).toLocaleDateString('it-IT', { day: '2-digit', month: 'short' }),
+                weight: Number(entry.weight),
+            }));
+        } else {
+            weightData = protNeeds.map((entry: any) => ({
+                date: new Date(entry.lastCheck).toLocaleDateString('it-IT', { day: '2-digit', month: 'short' }),
+                weight: entry.peso,
+            }));
+        }
 
-        // Get Meals logged in Calendar
-        // CalendarItem uses 'column' (0=Mon, 6=Sun) or similar.
-        // Actually, CalendarItem is a "Plan", not necessarily a "Log".
-        // BUT, the dashboard "Recent Meals" uses Logged Meals.
-        // For Adherence, we should ideally check "What did I eat today?".
-        // If we don't have a "Log Log", we might have to use Calendar as "Planned vs Target".
-        // Let's assume CalendarItems are the "Planned/Eaten" meals for now if no specific Log table exists.
+        // 3. Determine Current Stats (Blocks, Weight)
+        // Current blocks always come from the latest ProtNeed calculation (most reliable for "Target")
+        // If no ProtNeed exists, default to 11
+        const latestProtNeed = protNeeds.length > 0 ? protNeeds[protNeeds.length - 1] : null;
+        let currentBlocks = latestProtNeed ? Number(latestProtNeed.blocchi) : 11;
 
-        // Wait, 'Pasto' has 'codUser'. But Pasto is a recipe.
-        // 'CalendarItem' links User + Pasto to a 'col' (Day) and 'order'.
-        // Let's use CalendarItems to estimate "Planned Week".
+        // Current Weight
+        const currentWeight = weightData.length > 0 ? weightData[weightData.length - 1].weight : 0;
+        const prevWeight = weightData.length > 1 ? weightData[weightData.length - 2].weight : currentWeight;
+        const weightTrend = currentWeight - prevWeight;
 
+        // 4. Block Adherence (Last 7 Days)
+        // Using CalendarItems as "Planned/Eaten" proxy
         const calendarItems = await prisma.calendarItem.findMany({
             where: { idUser: userId },
             include: { pasto: { select: { blocks: true } } }
         });
 
-        // Group by Day (0-6)
-        // Note: Calendar 'column' 0 usually is Monday in this app based on previous views.
         const dayNames = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
-        const currentBlocks = weightHistory.length > 0 ? weightHistory[weightHistory.length - 1].blocchi : 11; // Default 11
-
         const adherenceMap = new Array(7).fill(0);
 
         calendarItems.forEach(item => {
-            // item.column is 0..6
             if (item.column >= 0 && item.column < 7) {
-                adherenceMap[item.column] += item.pasto.blocks;
+                // FIXED: Only count consumed blocks for adherence
+                if (item.isConsumed) {
+                    adherenceMap[item.column] += item.pasto.blocks;
+                }
             }
         });
 
@@ -74,17 +86,12 @@ export async function GET(req: Request) {
             target: currentBlocks
         }));
 
-        // 3. Macro Split (Mock for now, as we assume Perfect Zone 40/30/30 for Zone Meals)
+        // 5. Macro Split (Mock for Perfect Zone)
         const macroData = [
             { name: 'Proteine', value: 30, color: '#f97316' },
             { name: 'Carboidrati', value: 40, color: '#3b82f6' },
             { name: 'Grassi', value: 30, color: '#10b981' },
         ];
-
-        // 4. Current Stats
-        const currentWeight = weightData.length > 0 ? weightData[weightData.length - 1].weight : 0;
-        const prevWeight = weightData.length > 1 ? weightData[weightData.length - 2].weight : currentWeight;
-        const weightTrend = currentWeight - prevWeight;
 
         return NextResponse.json({
             weightData,

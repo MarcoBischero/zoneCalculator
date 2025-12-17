@@ -54,35 +54,41 @@ export default function CalendarPage() {
             const toDayIndex = DAYS.indexOf(toDay);
             const toTypeIndex = MEAL_TYPES.indexOf(toType);
 
-            await fetch('/api/calendar', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'remove',
-                    day: fromDayIndex,
-                    type: fromTypeIndex
-                })
-            });
+            try {
+                const res = await fetch('/api/calendar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'move',
+                        day: fromDayIndex,
+                        type: fromTypeIndex,
+                        targetDay: toDayIndex,
+                        targetType: toTypeIndex
+                    })
+                });
 
-            await fetch('/api/calendar', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'add',
-                    day: toDayIndex,
-                    type: toTypeIndex,
-                    mealId: fromMeal.codicePasto
-                })
-            });
+                if (!res.ok) {
+                    console.error("Failed to sync move");
+                    // Optionally revert state here if critical
+                }
+            } catch (e) {
+                console.error("Error moving meal:", e);
+            }
         }
 
         setActiveDrag(null);
     };
 
     useEffect(() => {
-        fetch('/api/meals').then(res => res.json()).then(data => {
-            if (Array.isArray(data)) setMeals(data);
-        });
+        fetch('/api/meals?limit=100').then(res => res.json()).then(data => {
+            // API returns { meals: [], pagination: {} }
+            if (data.meals && Array.isArray(data.meals)) {
+                setMeals(data.meals);
+            } else if (Array.isArray(data)) {
+                // Fallback for legacy
+                setMeals(data);
+            }
+        }).catch(err => console.error("Failed to load meals", err));
     }, []);
 
     useEffect(() => {
@@ -101,7 +107,11 @@ export default function CalendarPage() {
                 const day = DAYS[item.column];
                 const type = MEAL_TYPES[item.order];
                 if (day && type) {
-                    newPlan[`${day}-${type}`] = item.pasto;
+                    newPlan[`${day}-${type}`] = {
+                        ...item.pasto,
+                        isConsumed: item.isConsumed,
+                        calendarItemId: item.id
+                    };
                 }
             });
             setPlan(newPlan);
@@ -230,26 +240,15 @@ export default function CalendarPage() {
         try {
             const currentTypeIdx = MEAL_TYPES.indexOf(type);
 
-            // Remove from current
             await fetch('/api/calendar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    action: 'remove',
+                    action: 'move',
                     day: currentIdx,
-                    type: currentTypeIdx
-                })
-            });
-
-            // Add to next
-            await fetch('/api/calendar', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'add',
-                    day: currentIdx + 1,
                     type: currentTypeIdx,
-                    mealId: meal.codicePasto
+                    targetDay: currentIdx + 1,
+                    targetType: currentTypeIdx
                 })
             });
         } catch (e) {
@@ -268,24 +267,26 @@ export default function CalendarPage() {
                 </div>
             </div>
 
-            <div className="glass-panel p-6 rounded-2xl">
-                <CalendarControls
-                    onClearWeek={clearWeek}
-                    onCopyPrevious={handleCopyPrevious}
-                    onGenerate={generateWeek}
-                    isClearing={clearing}
-                    isGenerating={generating}
-                    hasItems={Object.keys(plan).length > 0}
-                />
+            <div className="glass-panel p-6 rounded-2xl print:border-none print:shadow-none print:p-0">
+                <div className="print:hidden">
+                    <CalendarControls
+                        onClearWeek={clearWeek}
+                        onCopyPrevious={handleCopyPrevious}
+                        onGenerate={generateWeek}
+                        isClearing={clearing}
+                        isGenerating={generating}
+                        hasItems={Object.keys(plan).length > 0}
+                    />
+                </div>
 
                 {error && (
-                    <div className="mt-4 bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 rounded-xl">
+                    <div className="mt-4 bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 rounded-xl print:hidden">
                         {error}
                     </div>
                 )}
 
                 {loading ? (
-                    <div className="flex items-center justify-center py-20">
+                    <div className="flex items-center justify-center py-20 print:hidden">
                         <RefreshCw className="w-8 h-8 animate-spin text-primary" />
                         <span className="ml-3 text-muted-foreground">Loading calendar...</span>
                     </div>
@@ -296,7 +297,7 @@ export default function CalendarPage() {
                         onDragStart={(event) => setActiveDrag(event.active.id as string)}
                         onDragEnd={handleDragEnd}
                     >
-                        <div className="mt-6 grid grid-cols-7 gap-4 min-w-[1000px] overflow-x-auto pb-4">
+                        <div className="mt-6 grid grid-cols-7 gap-4 min-w-[1000px] overflow-x-auto pb-4 print:min-w-0 print:overflow-visible print:gap-1">
                             {DAYS.map((day) => {
                                 const dayTotal = MEAL_TYPES.reduce((acc, type) => {
                                     const meal = plan[`${day}-${type}`];
@@ -306,7 +307,7 @@ export default function CalendarPage() {
                                 const isTargetReached = dayTotal >= 11; // Example target, could be dynamic later
 
                                 return (
-                                    <div key={day} className="flex flex-col gap-3">
+                                    <div key={day} className="flex flex-col gap-3 print:gap-1">
                                         <div className={`
                                             flex items-center justify-between px-3 py-2 rounded-xl border transition-colors
                                             ${isTargetReached
@@ -330,6 +331,18 @@ export default function CalendarPage() {
                                                 setSelectingFor={setSelectingFor}
                                                 clearSlot={clearSlot}
                                                 moveForward={moveForward}
+                                                onTrack={async (d, t, status) => {
+                                                    // Immediately update local state for snappiness if needed, 
+                                                    // but for correctness we reload the calendar data to sync strict state
+                                                    // In a real optimized app we would shallow merge 'plan' state here.
+                                                    // Let's do shallow merge for instant feedback + background refresh
+                                                    const key = `${d}-${t}`;
+                                                    if (plan[key]) {
+                                                        const updatedPlan = { ...plan, [key]: { ...plan[key], isConsumed: status } };
+                                                        setPlan(updatedPlan);
+                                                    }
+                                                    // No await loadCalendar() to avoid flicker, just trust local + api
+                                                }}
                                             />
                                         ))}
                                     </div>

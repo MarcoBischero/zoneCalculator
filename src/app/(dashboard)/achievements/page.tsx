@@ -71,7 +71,7 @@ export default function AchievementsPage() {
     return (
         <div className="container mx-auto p-4 md:p-8 space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col gap-2">
-                <h1 className="text-3xl font-bold tracking-tight">{t('achievements.title')}</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-foreground">{t('achievements.title')}</h1>
                 <p className="text-muted-foreground">{t('achievements.subtitle')}</p>
             </div>
 
@@ -80,34 +80,27 @@ export default function AchievementsPage() {
                     <div
                         key={achievement.id}
                         className={`p-6 rounded-2xl border transition-all hover:scale-[1.02] relative overflow-hidden ${achievement.unlocked
-                            ? 'glass-card border-primary/20 bg-white/60 dark:bg-white/5 shadow-lg shadow-primary/5'
-                            : 'bg-slate-900 border-slate-800 opacity-90'
+                            ? 'glass-card border-border/50 bg-card/50 shadow-lg shadow-primary/5'
+                            : 'bg-muted/20 border-border/50 grayscale opacity-80'
                             }`}
                     >
-                        {/* Lock Overlay for Locked Items */}
-                        {!achievement.unlocked && (
-                            <div className="absolute top-2 right-2 flex items-center justify-center">
-                                {/* Optional: Lock icon visual if desired, or keep clean */}
-                            </div>
-                        )}
-
                         <div className="flex items-start justify-between mb-4">
-                            <div className={`p-3 rounded-xl ${achievement.unlocked ? achievement.bg : 'bg-slate-800'}`}>
-                                <achievement.icon className={`w-6 h-6 ${achievement.unlocked ? achievement.color : 'text-slate-500'}`} />
+                            <div className={`p-3 rounded-xl ${achievement.unlocked ? achievement.bg : 'bg-muted'}`}>
+                                <achievement.icon className={`w-6 h-6 ${achievement.unlocked ? achievement.color : 'text-muted-foreground'}`} />
                             </div>
                             {achievement.unlocked ? (
-                                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-900">
+                                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
                                     {t('achievements.unlocked')}
                                 </span>
                             ) : (
-                                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-muted text-muted-foreground border border-border">
                                     {t('achievements.locked')}
                                 </span>
                             )}
                         </div>
 
-                        <h3 className={`font-semibold text-lg mb-1 ${achievement.unlocked ? '' : 'text-slate-200'}`}>{achievement.title}</h3>
-                        <p className={`text-sm leading-relaxed mb-4 ${achievement.unlocked ? 'text-muted-foreground' : 'text-slate-400'}`}>
+                        <h3 className={`font-semibold text-lg mb-1 ${achievement.unlocked ? 'text-foreground' : 'text-muted-foreground'}`}>{achievement.title}</h3>
+                        <p className="text-sm leading-relaxed mb-4 text-muted-foreground">
                             {achievement.description}
                         </p>
 
@@ -117,9 +110,9 @@ export default function AchievementsPage() {
                                     <span>{t('achievements.progress')}</span>
                                     <span>{achievement.progress}/50</span>
                                 </div>
-                                <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                                     <div
-                                        className="h-full bg-primary transition-all duration-500"
+                                        className="h-full bg-primary/50 transition-all duration-500"
                                         style={{ width: `${(achievement.progress / 50) * 100}%` }}
                                     />
                                 </div>

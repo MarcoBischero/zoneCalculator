@@ -96,8 +96,8 @@ export default function AdminUsersPage() {
     if (error) return <div className="p-8 text-red-500">Error: {error}</div>;
 
     return (
-        <div className="p-8 space-y-6">
-            <div className="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <div className="p-8 space-y-6 bg-background min-h-screen">
+            <div className="flex justify-between items-center bg-card p-6 rounded-xl shadow-sm border border-border">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-900 flex items-center">
                         <Shield className="mr-3 h-8 w-8 text-indigo-600" /> Admin Dashboard
@@ -126,18 +126,18 @@ export default function AdminUsersPage() {
             />
 
             {/* User List */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="p-4 border-b border-slate-100 flex items-center gap-4">
-                    <Search className="text-slate-400 w-5 h-5" />
+            <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+                <div className="p-4 border-b border-border flex items-center gap-4">
+                    <Search className="text-muted-foreground w-5 h-5" />
                     <input
-                        className="flex-1 outline-none text-sm"
+                        className="flex-1 outline-none text-sm bg-transparent text-foreground placeholder:text-muted-foreground"
                         placeholder="Cerca utenti..."
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
                     />
                 </div>
                 <table className="w-full text-left text-sm">
-                    <thead className="bg-slate-50 text-slate-500">
+                    <thead className="bg-muted text-muted-foreground">
                         <tr>
                             <th className="p-4 font-medium">Username</th>
                             <th className="p-4 font-medium">Email</th>
@@ -146,11 +146,11 @@ export default function AdminUsersPage() {
                             <th className="p-4 font-medium text-right">Azioni</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-border">
                         {filteredUsers.map(user => (
-                            <tr key={user.id} className="hover:bg-slate-50 transition-colors">
-                                <td className="p-4 font-medium text-slate-900">{user.username}</td>
-                                <td className="p-4 text-slate-500">{user.email || '-'}</td>
+                            <tr key={user.id} className="hover:bg-muted/50 transition-colors">
+                                <td className="p-4 font-medium text-foreground">{user.username}</td>
+                                <td className="p-4 text-muted-foreground">{user.email || '-'}</td>
                                 <td className="p-4">
                                     {getRoleBadge(user.roleId)}
                                 </td>
@@ -164,6 +164,32 @@ export default function AdminUsersPage() {
                                         </Button>
                                         <Button variant="ghost" size="sm" onClick={() => openEditUser(user)}>
                                             Modifica
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="text-red-500 hover:bg-red-50 hover:text-red-700"
+                                            onClick={async () => {
+                                                if (confirm(`Sei sicuro di voler eliminare l'utente ${user.username}? Questa azione è irreversibile.`)) {
+                                                    try {
+                                                        const res = await fetch('/api/user/delete', {
+                                                            method: 'DELETE',
+                                                            headers: { 'Content-Type': 'application/json' },
+                                                            body: JSON.stringify({ targetId: user.id })
+                                                        });
+                                                        if (res.ok) {
+                                                            fetchUsers();
+                                                        } else {
+                                                            const err = await res.json();
+                                                            alert('Errore: ' + (err.error || 'Impossibile eliminare'));
+                                                        }
+                                                    } catch (e) {
+                                                        alert('Errore di connessione');
+                                                    }
+                                                }
+                                            }}
+                                        >
+                                            <Trash2 className="w-4 h-4" />
                                         </Button>
                                     </div>
                                 </td>

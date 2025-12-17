@@ -61,3 +61,15 @@ variable "enable_sql_backups" {
   type        = bool
   default     = false
 }
+
+variable "nextauth_secret" {
+  description = "Secret for NextAuth.js encryption"
+  type        = string
+  sensitive   = true
+}
+
+variable "gemini_api_key" {
+  description = "API Key for Google Gemini AI"
+  type        = string
+  sensitive   = true
+}

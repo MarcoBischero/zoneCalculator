@@ -48,14 +48,14 @@ export default function LeaderboardPage() {
     }, []);
 
     const Row = ({ rank, username, points, level, streak }: any) => (
-        <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-slate-100 mb-2 shadow-sm">
+        <div className="flex items-center justify-between p-4 bg-card rounded-lg border border-border mb-2 shadow-sm">
             <div className="flex items-center gap-4">
-                <div className={`w-8 h-8 flex items-center justify-center font-bold rounded-full ${rank === 1 ? 'bg-yellow-100 text-yellow-600' : rank === 2 ? 'bg-slate-100 text-slate-600' : rank === 3 ? 'bg-orange-100 text-orange-600' : 'text-slate-400'}`}>
+                <div className={`w-8 h-8 flex items-center justify-center font-bold rounded-full ${rank === 1 ? 'bg-yellow-100 text-yellow-600' : rank === 2 ? 'bg-muted text-muted-foreground' : rank === 3 ? 'bg-orange-100 text-orange-600' : 'text-muted-foreground'}`}>
                     {rank <= 3 ? <Trophy className="w-4 h-4" /> : rank}
                 </div>
                 <div>
-                    <div className="font-bold text-slate-800">{username}</div>
-                    <div className="text-xs text-slate-400">Streak: {streak} days</div>
+                    <div className="font-bold text-foreground">{username}</div>
+                    <div className="text-xs text-muted-foreground">Streak: {streak} days</div>
                 </div>
             </div>
             <div className="text-right">
@@ -66,16 +66,16 @@ export default function LeaderboardPage() {
     );
 
     return (
-        <div className="p-4 md:p-8 min-h-screen bg-slate-50">
+        <div className="p-4 md:p-8 min-h-screen bg-background text-foreground">
             <div className="flex items-center gap-2 mb-8">
                 <Crown className="w-8 h-8 text-yellow-500" />
-                <h1 className="text-3xl font-black text-slate-900">{text.title}</h1>
+                <h1 className="text-3xl font-black text-foreground">{text.title}</h1>
             </div>
 
             <Tabs defaultValue="local" className="space-y-6">
-                <TabsList className="bg-white border p-1 rounded-xl shadow-sm">
-                    <TabsTrigger value="local" className="data-[state=active]:bg-zone-blue-50 data-[state=active]:text-zone-blue-700">{text.local}</TabsTrigger>
-                    <TabsTrigger value="global" className="data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700">{text.global}</TabsTrigger>
+                <TabsList className="bg-muted border border-border p-1 rounded-xl shadow-sm">
+                    <TabsTrigger value="local" className="data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">{text.local}</TabsTrigger>
+                    <TabsTrigger value="global" className="data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">{text.global}</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="local">

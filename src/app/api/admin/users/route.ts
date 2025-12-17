@@ -10,6 +10,8 @@ const ROLE_SUPER_ADMIN = 1;
 const ROLE_DIETICIAN = 2;
 const ROLE_PATIENT = 3;
 
+import { UserSchema, UserUpdateSchema } from "@/lib/schemas";
+
 // GET: List Users
 export async function GET(req: Request) {
     const session = await getServerSession(authOptions);
@@ -69,10 +71,15 @@ export async function PUT(req: Request) {
     const roleId = Number(role);
 
     const body = await req.json();
-    const { id, username, email, role: targetRole, password } = body;
+
+    const validation = UserUpdateSchema.safeParse(body);
+    if (!validation.success) {
+        return NextResponse.json({ error: "Validation Error", details: validation.error.flatten() }, { status: 400 });
+    }
+
+    const { id, username, email, role: targetRole, password } = validation.data;
 
     console.log(`[ADMIN PUT] Update User: ${id} by Requester Role: ${roleId}`);
-    console.log(`[ADMIN PUT] Payload targetRole: ${targetRole} (Type: ${typeof targetRole})`);
 
     try {
         const targetUser = await prisma.user.findUnique({ where: { id: Number(id) } });
@@ -83,15 +90,11 @@ export async function PUT(req: Request) {
             if (targetUser.dieticianId !== userId) {
                 return NextResponse.json({ error: "Forbidden: Not your patient" }, { status: 403 });
             }
-            // Dietician cannot change roles (Target must remain Patient)
-            // Implicitly enforced by not updating role if Dietician, or better:
-            // Let's just ignore 'targetRole' from body if Dietician
         }
 
-        const updateData: any = {
-            username,
-            email,
-        };
+        const updateData: any = {};
+        if (username) updateData.username = username;
+        if (email !== undefined) updateData.email = email;
 
         // Only update role if provided AND User is SuperAdmin
         if (targetRole !== undefined && roleId === ROLE_SUPER_ADMIN) {
@@ -130,7 +133,13 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { username, password, email, targetRole } = body;
+
+    const validation = UserSchema.safeParse(body);
+    if (!validation.success) {
+        return NextResponse.json({ error: "Validation Error", details: validation.error.flatten() }, { status: 400 });
+    }
+
+    const { username, password, email, targetRole, assignBasePackages } = validation.data;
 
     // Dieticians can ONLY create Patients (Role 3) and must link to themselves
     // Admins can create anything
@@ -173,7 +182,7 @@ export async function POST(req: Request) {
         }
 
         // AUTO-ASSIGN BASE PACKAGES (unless explicitly disabled via body.assignBasePackages === false)
-        const shouldAssignPackages = body.assignBasePackages !== false; // Default: true
+        const shouldAssignPackages = assignBasePackages !== false; // Default: true
 
         if (shouldAssignPackages) {
             // Fetch Base Packages (isSystemPackage = 1)

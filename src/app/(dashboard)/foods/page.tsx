@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Search, Filter, Plus, ChevronLeft, ChevronRight, Utensils } from 'lucide-react';
+import { Search, Filter, Plus, ChevronLeft, ChevronRight, Utensils, Trash2 } from 'lucide-react';
 
 interface Food {
     codiceAlimento: number;
@@ -118,7 +118,7 @@ export default function FoodsPage() {
                                     <td className="px-6 py-4 text-right text-muted-foreground">{food.proteine}</td>
                                     <td className="px-6 py-4 text-right text-muted-foreground">{food.carboidrati}</td>
                                     <td className="px-6 py-4 text-right text-muted-foreground">{food.grassi}</td>
-                                    <td className="px-6 py-4 text-center">
+                                    <td className="px-6 py-4 text-center flex justify-center gap-2">
                                         <Button
                                             variant="ghost"
                                             size="sm"
@@ -126,6 +126,27 @@ export default function FoodsPage() {
                                             onClick={() => handleEdit(food)}
                                         >
                                             Edit
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="opacity-0 group-hover:opacity-100 text-destructive hover:bg-destructive/10 rounded-full px-2"
+                                            onClick={async () => {
+                                                if (confirm(`Eliminare ${food.nome}?`)) {
+                                                    try {
+                                                        const res = await fetch(`/api/foods/${food.codiceAlimento}`, {
+                                                            method: 'DELETE'
+                                                        });
+                                                        if (res.ok) {
+                                                            fetchFoods();
+                                                        } else {
+                                                            alert('Impossibile eliminare. Potrebbe essere in uso in qualche ricetta.');
+                                                        }
+                                                    } catch (e) { console.error(e); }
+                                                }
+                                            }}
+                                        >
+                                            <Trash2 className="w-4 h-4" />
                                         </Button>
                                     </td>
                                 </tr>

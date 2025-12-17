@@ -59,7 +59,12 @@ export function AddUserDialog({ isOpen, onClose, onSuccess, userToEdit }: AddUse
         try {
             const url = '/api/admin/users';
             const method = userToEdit ? 'PUT' : 'POST';
-            const body = userToEdit ? { ...formData, id: userToEdit.id } : formData;
+
+            // Clean payload
+            const payload = { ...formData };
+            if (!payload.password) delete (payload as any).password;
+
+            const body = userToEdit ? { ...payload, id: userToEdit.id } : payload;
 
             const res = await fetch(url, {
                 method,

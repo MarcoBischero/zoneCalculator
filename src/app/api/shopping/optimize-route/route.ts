@@ -40,8 +40,8 @@ export async function POST(request: Request) {
             .map(s => `${s.order}. ${s.icon} ${s.name} - keywords: ${s.keywords.slice(0, 5).join(', ')}`)
             .join('\n');
 
-        const prompt = `You are a smart shopping assistant. 
-Given this list of food ingredients and a supermarket layout, organize the ingredients by section in the optimal walking order through the store.
+        const prompt = `You are an expert personal shopper and nutritionist. 
+Given this list of food ingredients and a supermarket layout, organize the ingredients by section in the optimal walking order.
 
 SUPERMARKET: ${supermarket.name}
 SECTIONS (in walking order):
@@ -51,11 +51,11 @@ INGREDIENTS TO ORGANIZE:
 ${itemsList}
 
 RULES:
-1. Match each ingredient to the most appropriate section based on the keywords
-2. If an ingredient could fit multiple sections, choose the most logical one
-3. If no keywords match, use the "Altro" or last section
-4. Preserve the original ingredient names exactly as given
-5. Return ONLY a valid JSON response, no explanation
+1. AGGRESSIVELY categorize every item. Do NOT use "Altro" or "Other" unless absolutely impossible.
+2. Infer the category for vague items (e.g., "Protein Powder" -> Supplements/Pharmacy or Breakfast; "Water" -> Drinks).
+3. If an item matches multiple sections, choose the one typically visited FIRST in a standard flow, or the most logical one (e.g. "Tomatoes" -> Vegetables, not Canned unless specified).
+4. Group similar items together within the section.
+5. Return ONLY a valid JSON response.
 
 REQUIRED JSON FORMAT:
 {

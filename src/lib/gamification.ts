@@ -23,20 +23,20 @@ export async function awardPoints(userId: number, actionKey: keyof typeof GAMIFI
             where: { userId },
             create: {
                 userId,
-                points: action.points,
+                lifetimeXp: action.points,
                 level: 1,
-                lastAction: new Date()
+                lastActionDate: new Date()
             },
             update: {
-                points: { increment: action.points },
-                lastAction: new Date()
+                lifetimeXp: { increment: action.points },
+                lastActionDate: new Date()
             }
         });
 
         // Level Sync (Post-Atomic Update)
         // If points incremented, we check if level needs update.
         // This is safe because points are already secured.
-        const expectedLevel = Math.floor(profile.points / 100) + 1;
+        const expectedLevel = Math.floor(profile.lifetimeXp / 100) + 1;
         if (profile.level !== expectedLevel) {
             await prisma.gamificationProfile.update({
                 where: { userId },
@@ -46,7 +46,7 @@ export async function awardPoints(userId: number, actionKey: keyof typeof GAMIFI
             profile.level = expectedLevel;
         }
 
-        console.log(`[GAMIFICATION] User ${userId} awarded ${action.points} pts for ${action.label}. Total: ${profile.points} (Lvl ${profile.level})`); // Log from DB profile
+        console.log(`[GAMIFICATION] User ${userId} awarded ${action.points} pts for ${action.label}. Total: ${profile.lifetimeXp} (Lvl ${profile.level})`); // Log from DB profile
 
 
 

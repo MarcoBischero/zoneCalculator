@@ -64,3 +64,26 @@ Integrazione HealthKit/Google Fit (richiede Mobile App o PWA avanzata).
 
 ### Phase 4: Marketplace 🏪
 Sviluppo infrastruttura e-commerce e gestione pagamenti (Stripe Connect).
+
+## 🏗️ Future Architecture (The "NutritionOS" Vision)
+*Deferred for Future Evolution (Post-Zone Module Completion)*
+
+### Core vs Plugin Philosophy
+To support multiple diets (Keto, Paleo, etc.), we will move to a **Platform First** architecture.
+- **Universal Core**: Identity, Logistics, Physics (Calories/Macros).
+- **Diet Plugins**: Logic (Blocks, Ratios, Scoring).
+
+### Planned Schema Refactoring (Option A: Clean Break)
+
+#### 1. Universal Data Layer
+- **Ingredient**: Pure nutritional data (Protein/Carbs/Fat/Fiber per 100g). No "Blocks".
+- **Meal**: Aggregated macros. No diet-specific scoring.
+- **User**: Biometrics only (Weight, Height, Body Fat).
+
+#### 2. Zone Module Extension
+- **ZoneIngredientExtension**: Links to Ingredient. Adds `blockFactor`, `zoneType` (Favorevole/Sfavorevole).
+- **ZoneMealExtension**: Links to Meal. Adds `totalBlocks`, `complianceScore`.
+- **ZoneUserProfile**: Links to User. Adds `dailyBlockTarget`, `leanMass`.
+
+### Migration Strategy
+When ready, we will strictly separate these layers to allow the "AI Nutritionist" to context-switch between protocols.

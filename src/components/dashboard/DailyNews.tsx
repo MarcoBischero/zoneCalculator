@@ -36,10 +36,10 @@ export function DailyNews() {
     }, []);
 
     if (loading) return (
-        <Card className="bg-white border-slate-100 shadow-sm">
+        <Card className="bg-card border-border shadow-sm">
             <CardContent className="p-4 flex items-center justify-center h-24">
-                <Loader2 className="w-4 h-4 animate-spin text-indigo-400 mr-2" />
-                <span className="text-slate-400 text-xs">Finding latest research...</span>
+                <Loader2 className="w-4 h-4 animate-spin text-primary mr-2" />
+                <span className="text-muted-foreground text-xs">Finding latest research...</span>
             </CardContent>
         </Card>
     );
@@ -48,7 +48,7 @@ export function DailyNews() {
 
     return (
         <Link href="/news/daily" className="block group">
-            <Card className="bg-indigo-600 text-white border-none shadow-md overflow-hidden relative transition-all hover:shadow-xl hover:scale-[1.01]">
+            <Card className="bg-primary text-primary-foreground border-none shadow-md overflow-hidden relative transition-all hover:shadow-xl hover:scale-[1.01]">
                 <div className="absolute top-0 right-0 p-6 opacity-20 transform translate-x-4 -translate-y-4">
                     <Newspaper className="w-24 h-24 rotate-12" />
                 </div>
@@ -62,7 +62,7 @@ export function DailyNews() {
                         <h3 className="text-lg font-bold leading-tight pr-4 group-hover:underline decoration-white/30 underline-offset-4 decoration-2">
                             {news.title}
                         </h3>
-                        <p className="text-xs text-indigo-200 mt-1 line-clamp-1">{news.summary}</p>
+                        <p className="text-xs text-primary-foreground/80 mt-1 line-clamp-1">{news.summary}</p>
                     </div>
                 </CardContent>
             </Card>

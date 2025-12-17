@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -45,7 +46,7 @@ export default function LoginPage() {
                     console.warn('Failed to track login:', trackError);
                 }
 
-                router.push('/');
+                router.push('/dashboard');
                 router.refresh();
             }
         } catch (err) {
@@ -113,6 +114,11 @@ export default function LoginPage() {
                     )}
                 </Button>
             </form>
+            <div className="text-center text-sm">
+                <Link href="/register" className="text-muted-foreground hover:text-primary transition-colors">
+                    Non hai un account? <span className="font-bold underline">Registrati</span>
+                </Link>
+            </div>
         </div>
     );
 }

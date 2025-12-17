@@ -33,6 +33,7 @@ model CalendarItem {
   lastUpdateDate DateTime @default(now()) @updatedAt @map("last_update_date") @db.Timestamp(0)
   idUser         Int      @map("id_user")
   codPasto       Int      @map("cod_pasto")
+  isConsumed     Boolean  @default(false) @map("is_consumed") // New tracking field
   user           User     @relation(fields: [idUser], references: [id])
   pasto          Pasto    @relation(fields: [codPasto], references: [codicePasto])
 
@@ -151,6 +152,7 @@ model User {
   lastaccessupdate Int            @default(0)
   ip               String         @db.Text
   ipupdate         String         @db.Text
+  createdAt        DateTime       @default(now()) @map("created_at")
 
   // Hierarchy: Dietician -> Patients
   dieticianId      Int?           @map("dietician_id")
@@ -171,6 +173,7 @@ model User {
   preferences      UserPreferences?
   goals            NutritionGoal[]
   coachSuggestions CoachSuggestion[]
+  measurements     MeasurementLog[]
 
   @@index([id], map: "id")
   @@index([idRuolo], map: "id_ruolo")
@@ -179,16 +182,66 @@ model User {
 }
 
 model GamificationProfile {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @unique @map("user_id")
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  points    Int      @default(0)
-  level     Int      @default(1)
-  streak    Int      @default(0)
-  lastAction DateTime @default(now()) @map("last_action")
+  id              Int      @id @default(autoincrement())
+  userId          Int      @unique @map("user_id")
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Progression
+  lifetimeXp      Int      @default(0) @map("lifetime_xp")
+  level           Int      @default(1)
+  
+  // Streak System
+  currentStreak   Int      @default(0) @map("current_streak")
+  longestStreak   Int      @default(0) @map("longest_streak")
+  lastActionDate  DateTime @default(now()) @map("last_action_date")
+  
+  // Meta
+  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at")
 
-  @@index([points]) // efficient leaderboard
+  badges          UserBadge[]
+  
+  @@index([lifetimeXp])
   @@map("gamification_profiles")
+}
+
+model MeasurementLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  date      DateTime @default(now()) @db.Date
+  weight    Decimal? @db.Decimal(5, 2) // kg
+  waist     Int?     // cm
+  hips      Int?     // cm
+  chest     Int?     // cm
+  bodyFat   Decimal? @db.Decimal(5, 2) // %
+  lbm       Decimal? @db.Decimal(5, 2) // Lean Body Mass
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+  @@map("measurement_logs")
+}
+
+model Badge {
+  code        String      @id
+  name        String      @db.VarChar(100)
+  description String      @db.Text
+  icon        String      @db.VarChar(50) // emoji or icon name
+  category    String      @default("GENERAL") // STREAK, SOCIAL, NUTRITION
+  
+  users       UserBadge[]
+  @@map("badges")
+}
+
+model UserBadge {
+  userId    Int      @map("user_id")
+  badgeCode String   @map("badge_code")
+  earnedAt  DateTime @default(now()) @map("earned_at")
+
+  user      GamificationProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  badge     Badge               @relation(fields: [badgeCode], references: [code])
+
+  @@id([userId, badgeCode])
+  @@map("user_badges")
 }
 
 model Role {

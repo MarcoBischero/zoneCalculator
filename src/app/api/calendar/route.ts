@@ -178,6 +178,47 @@ export async function POST(request: Request) {
             return NextResponse.json(item);
         }
 
+        if (action === 'move') {
+            const { day, type, targetDay, targetType } = body;
+
+            // 1. Find the item to move
+            const existingItem = await prisma.calendarItem.findFirst({
+                where: {
+                    idUser: userId,
+                    column: day,
+                    order: parseInt(type)
+                }
+            });
+
+            if (!existingItem) {
+                return NextResponse.json({ error: 'Item to move not found' }, { status: 404 });
+            }
+
+            // 2. Check if target slot is occupied (swap or overwrite?)
+            // For simplicity, let's overwrite for now, or we could swap. 
+            // The UI logic seemed to imply overwrite/swap handled by delete+add previously.
+            // Let's safe-delete target slot first.
+            await prisma.calendarItem.deleteMany({
+                where: {
+                    idUser: userId,
+                    column: targetDay,
+                    order: parseInt(targetType)
+                }
+            });
+
+            // 3. Move the item (update coordinates)
+            // We use update to preserve 'isConsumed' and other potential future metadata
+            const movedItem = await prisma.calendarItem.update({
+                where: { id: existingItem.id },
+                data: {
+                    column: targetDay,
+                    order: parseInt(targetType)
+                }
+            });
+
+            return NextResponse.json({ success: true, item: movedItem });
+        }
+
         if (action === 'remove') {
             await prisma.calendarItem.deleteMany({
                 where: {

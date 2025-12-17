@@ -55,17 +55,17 @@ export default function ReportsPage() {
     const { weightData, adherenceData, macroData, currentWeight, weightTrend, currentBlocks } = data;
 
     return (
-        <div className="p-4 md:p-8 space-y-8 min-h-screen bg-slate-50/50">
+        <div className="p-4 md:p-8 space-y-8 min-h-screen bg-background">
             <div>
-                <h1 className="text-3xl font-black text-slate-900 tracking-tight">I Tuoi Progressi</h1>
-                <p className="text-slate-500 mt-2">Monitora il tuo percorso in Zona, metriche corporee e aderenza.</p>
+                <h1 className="text-3xl font-black text-foreground tracking-tight">I Tuoi Progressi</h1>
+                <p className="text-muted-foreground mt-2">Monitora il tuo percorso in Zona, metriche corporee e aderenza.</p>
             </div>
 
             {/* Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Peso Attuale</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Peso Attuale</CardTitle>
                         <Activity className="h-4 w-4 text-orange-500" />
                     </CardHeader>
                     <CardContent>
@@ -77,17 +77,17 @@ export default function ReportsPage() {
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Target Blocchi</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Target Blocchi</CardTitle>
                         <PieChartIcon className="h-4 w-4 text-blue-500" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{currentBlocks.toFixed(1)}</div>
-                        <p className="text-xs text-slate-400 mt-1">Giornalieri</p>
+                        <p className="text-xs text-muted-foreground mt-1">Giornalieri</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-slate-500">Piano Settimanale</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">Piano Settimanale</CardTitle>
                         <Calendar className="h-4 w-4 text-green-500" />
                     </CardHeader>
                     <CardContent>

@@ -12,6 +12,9 @@ import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/lib/language-context';
 
+// ... imports
+import { motion, Variants } from 'framer-motion';
+
 export const dynamic = 'force-dynamic';
 
 interface MealRow {
@@ -46,7 +49,7 @@ function CalculatorContent() {
 
     const importParam = searchParams.get('import');
 
-    // Initial Load Logic (Edit/Copy/Import)
+    // ... (Keep existing useEffect logic for loading/importing data unchanged)
     useEffect(() => {
         const idToLoad = editId || copyId;
 
@@ -60,7 +63,6 @@ function CalculatorContent() {
                 }
 
                 const parsed = JSON.parse(decoded);
-                console.log("Importing meal data:", parsed);
                 if (parsed.name) setMealName(parsed.name);
                 if (Array.isArray(parsed.ingredients)) {
                     const newRows = parsed.ingredients.map((ing: any) => ({
@@ -70,7 +72,7 @@ function CalculatorContent() {
                         fat: Number(ing.macros.f) || 0,
                         grams: Number(ing.grams) || 100,
                         uniqueId: Math.random().toString(36).substr(2, 9),
-                        codiceAlimento: 0 // Treat as new/generic items
+                        codiceAlimento: 0
                     }));
                     setRows(newRows);
                 }
@@ -78,51 +80,30 @@ function CalculatorContent() {
                 console.error("Failed to parse import data", e);
             }
         } else if (idToLoad) {
-            console.log("Loading meal to edit:", idToLoad);
             fetch(`/api/meals?id=${idToLoad}`)
-                .then(res => {
-                    if (!res.ok) throw new Error("Failed to fetch meal data");
-                    return res.json();
-                })
+                .then(res => res.ok ? res.json() : null)
                 .then(data => {
-                    console.log("Meal API Response:", data);
-                    // API returns { meals: [...] } or just array in some fallback cases
+                    if (!data) return;
                     const list = data.meals || (Array.isArray(data) ? data : []);
                     const found = list.find((m: any) => m.codicePasto === parseInt(idToLoad));
-
                     if (found) {
-                        console.log("Found meal:", found);
                         setMealName(found.nome + (copyId ? ' (Copy)' : ''));
                         setMealType(found.mealType || '1');
-
-                        // Robust mapping
                         if (Array.isArray(found.alimenti)) {
                             const newRows = found.alimenti.map((a: any) => {
-                                // Safeguard against broken relations
-                                if (!a.alimento) {
-                                    console.warn("Missing alimento relation for item:", a);
-                                    return null;
-                                }
+                                if (!a.alimento) return null;
                                 return {
-                                    foodName: a.alimento.nome || "Unknown Food",
+                                    foodName: a.alimento.nome,
                                     protein: Number(a.alimento.proteine) || 0,
                                     carbs: Number(a.alimento.carboidrati) || 0,
                                     fat: Number(a.alimento.grassi) || 0,
-                                    grams: Number(a.grAlimento) || 100, // Explicit Number conversion
+                                    grams: Number(a.grAlimento) || 100,
                                     uniqueId: Math.random().toString(36).substr(2, 9),
                                     codiceAlimento: a.codiceAlimento
                                 };
                             }).filter((row: any) => row !== null) as MealRow[];
-
-                            console.log("Mapped rows:", newRows);
                             setRows(newRows);
-                        } else {
-                            console.warn("found.alimenti is not an array:", found.alimenti);
                         }
-                    } else {
-                        console.error("Meal not found in response list");
-                        // Optional fallback: maybe fetch directly by ID if not searching list?
-                        // But current API pattern seems to support list search.
                     }
                 })
                 .catch(err => console.error("Error loading meal:", err));
@@ -161,7 +142,7 @@ function CalculatorContent() {
             protein: food.proteine,
             carbs: food.carboidrati,
             fat: food.grassi,
-            grams: 100, // Default to 100g
+            grams: 100,
             uniqueId: Math.random().toString(36).substr(2, 9),
             codiceAlimento: food.codiceAlimento
         }]);
@@ -180,8 +161,6 @@ function CalculatorContent() {
     const handleSave = async () => {
         if (!session) return;
         setIsSaving(true);
-        console.log("Saving meal...", { editId, mealType, mealName, totals, rows });
-
         try {
             const payload = {
                 id: (editId && !copyId) ? parseInt(editId) : undefined,
@@ -199,76 +178,84 @@ function CalculatorContent() {
                 }))
             };
 
-            console.log("Payload to send:", payload);
-
             const res = await fetch('/api/meals', {
-                method: 'POST', // Simplified: always POST for now, handle edit later
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
 
-            console.log("Save response status:", res.status);
-
             if (res.ok) {
-                const data = await res.json();
-                console.log("Save success:", data);
                 router.push('/meals');
             } else {
                 const err = await res.json();
-                console.error("Save failed:", err);
                 alert(`Error saving meal: ${err.error || 'Unknown error'}`);
             }
         } catch (e) {
-            console.error("Exception during save:", e);
-            alert("Exception during save. Check console.");
+            console.error(e);
+            alert("Exception during save.");
         } finally {
             setIsSaving(false);
         }
     };
 
+    const containerVariants: Variants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0.1 }
+        }
+    };
+
+    const itemVariants: Variants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+    };
 
     return (
-        <div className="p-6 lg:p-10 max-w-5xl mx-auto space-y-8 animate-in-up pb-32">
+        <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={containerVariants}
+            className="p-6 lg:p-10 max-w-7xl mx-auto space-y-8 pb-32 lg:pb-10"
+        >
 
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+            <motion.div variants={itemVariants} className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                 <div>
-                    <h1 className="text-4xl font-bold tracking-tight text-foreground">{t('calculator.title')}</h1>
-                    <p className="text-muted-foreground mt-2">{t('calculator.subtitle')}</p>
+                    <h1 className="text-4xl font-extrabold tracking-tight text-foreground">{t('calculator.title')}</h1>
+                    <p className="text-muted-foreground mt-2 text-lg">{t('calculator.subtitle')}</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline" onClick={() => setIsPhotoModalOpen(true)}>
+                    <Button variant="outline" className="h-10 px-4 rounded-xl border-primary/20 hover:bg-primary/5 hover:text-primary transition-colors" onClick={() => setIsPhotoModalOpen(true)}>
                         <Camera className="w-4 h-4 mr-2" /> {t('calculator.ai_chef')}
                     </Button>
-                    <Button variant="outline" onClick={() => setRows([])}>
+                    <Button variant="ghost" className="h-10 px-4 rounded-xl hover:bg-destructive/10 hover:text-destructive transition-colors" onClick={() => setRows([])}>
                         <RefreshCw className="w-4 h-4 mr-2" /> {t('calculator.clear')}
                     </Button>
                 </div>
-            </div>
+            </motion.div>
 
             {/* Main Workspace */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
 
                 {/* Left: Builder Canvas */}
-                <div className="lg:col-span-2 space-y-6">
+                <motion.div variants={containerVariants} className="lg:col-span-2 space-y-6">
 
                     {/* Search Bar (Floating) */}
-                    <div className="sticky top-6 z-40">
+                    <motion.div variants={itemVariants} className="sticky top-6 z-40 bg-background/80 backdrop-blur-md p-1 rounded-2xl shadow-lg shadow-black/5 border border-white/5">
                         <ZoneSearch onSelect={handleAddFood} />
-                    </div>
+                    </motion.div>
 
                     {/* Food Stack */}
                     <div className="space-y-3 min-h-[300px]">
                         {rows.length === 0 ? (
-                            <div className="border-2 border-dashed border-border/50 rounded-2xl p-12 text-center flex flex-col items-center justify-center h-[300px] text-muted-foreground">
-                                <div className="p-4 bg-muted/50 rounded-full mb-4">
-                                    <Button size="icon" variant="ghost" className="h-12 w-12 pointer-events-none">
-                                        <Plus className="w-8 h-8 text-muted-foreground/50" />
-                                    </Button>
+                            <motion.div variants={itemVariants} className="border-2 border-dashed border-border/50 rounded-3xl p-12 text-center flex flex-col items-center justify-center h-[400px] text-muted-foreground bg-secondary/5">
+                                <div className="p-6 bg-background rounded-full mb-6 shadow-sm">
+                                    <Plus className="w-10 h-10 text-muted-foreground/30" />
                                 </div>
-                                <p className="font-medium">{t('calculator.empty_plate')}</p>
-                                <p className="text-sm mt-1">{t('calculator.search_prompt')}</p>
-                            </div>
+                                <p className="font-medium text-lg text-foreground">{t('calculator.empty_plate')}</p>
+                                <p className="text-sm mt-2 max-w-xs mx-auto">{t('calculator.search_prompt')}</p>
+                            </motion.div>
                         ) : (
                             rows.map((row, i) => (
                                 <MealBlock
@@ -284,10 +271,10 @@ function CalculatorContent() {
                             ))
                         )}
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Right: Real-time Stats Panel */}
-                <div className="lg:col-span-1">
+                <motion.div variants={itemVariants} className="lg:col-span-1">
                     <MealTotalsPanel
                         totals={totals}
                         mealType={mealType}
@@ -298,7 +285,7 @@ function CalculatorContent() {
                         isSaving={isSaving}
                         hasItems={rows.length > 0}
                     />
-                </div>
+                </motion.div>
 
             </div>
 
@@ -306,16 +293,12 @@ function CalculatorContent() {
                 isOpen={isPhotoModalOpen}
                 onClose={() => setIsPhotoModalOpen(false)}
                 onMealGenerated={(newRows) => {
-                    // Map generic rows to our specific structure if needed, or just set them
-                    // Ensure they have unique IDs
                     const processedRows = newRows.map(r => ({
                         ...r,
                         uniqueId: Math.random().toString(36).substr(2, 9)
                     }));
                     setRows(processedRows);
 
-                    // Generate smart name: "Chicken & Rice" or "Top Ingredient 1, Top Ingredient 2"
-                    // Sort by grams descending to find "main" ingredients
                     const sorted = [...processedRows].sort((a, b) => b.grams - a.grams);
                     const topNames = sorted.slice(0, 2).map(r => r.foodName);
                     const dateStr = new Date().toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' });
@@ -327,20 +310,7 @@ function CalculatorContent() {
                     setMealName(`${smartName} (${dateStr})`);
                 }}
             />
-            {/* Debug Panel - Only for Super Admin (Role 1) */}
-            {Number(session?.user?.role) === 1 && (
-                <div className="bg-slate-100 p-4 rounded text-xs font-mono text-slate-600 overflow-auto max-h-40">
-                    <p><strong>DEBUG INFO (Admin Only):</strong></p>
-                    <p>Edit ID: {editId || 'None'}</p>
-                    <p>Rows Loaded: {rows.length}</p>
-                    <p>Meal Name: {mealName}</p>
-                    <details>
-                        <summary>Raw Rows Data</summary>
-                        <pre>{JSON.stringify(rows, null, 2)}</pre>
-                    </details>
-                </div>
-            )}
-        </div>
+        </motion.div>
     );
 }
 

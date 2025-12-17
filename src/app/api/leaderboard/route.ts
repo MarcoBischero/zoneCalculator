@@ -23,7 +23,7 @@ export async function GET(req: Request) {
         // 1. Global Leaderboard (Top 50)
         const globalRaw = await prisma.gamificationProfile.findMany({
             take: 50,
-            orderBy: { points: 'desc' },
+            orderBy: { lifetimeXp: 'desc' },
             include: { user: { select: { username: true } } }
         });
 
@@ -33,7 +33,7 @@ export async function GET(req: Request) {
             localRaw = await prisma.gamificationProfile.findMany({
                 where: { user: { dieticianId: me.dieticianId } },
                 take: 50,
-                orderBy: { points: 'desc' },
+                orderBy: { lifetimeXp: 'desc' },
                 include: { user: { select: { username: true } } }
             });
         } else {
@@ -43,7 +43,7 @@ export async function GET(req: Request) {
             localRaw = await prisma.gamificationProfile.findMany({
                 where: { user: { dieticianId: userId } },
                 take: 50,
-                orderBy: { points: 'desc' },
+                orderBy: { lifetimeXp: 'desc' },
                 include: { user: { select: { username: true } } }
             });
         }
@@ -51,9 +51,9 @@ export async function GET(req: Request) {
         const mapProfile = (p: any, i: number) => ({
             rank: i + 1,
             username: p.user.username,
-            points: p.points,
+            points: p.lifetimeXp,
             level: p.level,
-            streak: p.streak
+            streak: p.currentStreak
         });
 
         return NextResponse.json({

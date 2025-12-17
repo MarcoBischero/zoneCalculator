@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { generateRecipeContent } from '@/lib/recipe-generator';
 import { rateLimit } from '@/lib/rate-limit';
+import { MealSchema } from '@/lib/schemas';
 
 export async function GET(request: Request) {
     const session = await getServerSession(authOptions);
@@ -150,46 +151,42 @@ export async function POST(request: Request) {
     try {
         const body = await request.json();
 
-        const { id, name, mealType, blocks } = body;
-        // Use 'foods' from payload, but alias to 'rows' to match existing logic if needed,
-        // or just use a new variable. Existing logic uses 'rows'.
-        // Use 'foods' from payload, but alias to 'rows' to match existing logic if needed,
-        // or just use a new variable. Existing logic uses 'rows'.
-        const rawRows = body.foods || body.rows || []; // Support both for backward compatibility
+        // Normalize input for Zod
+        // Support legacy 'rows' field or 'foods'
+        const rawFoods = body.foods || body.rows || [];
 
-        // Normalize rows to ensure foodName is present
-        const rows = Array.isArray(rawRows) ? rawRows.map((r: any) => ({
-            ...r,
-            foodName: r.foodName || r.nome // Fix for frontend sending 'nome'
+        // Normalize food maps if needed (frontend sends 'nome' sometimes instead of 'foodName')
+        const normalizedFoods = Array.isArray(rawFoods) ? rawFoods.map((f: any) => ({
+            ...f,
+            foodName: f.foodName || f.nome,
         })) : [];
 
-        if (!Array.isArray(rows)) {
-            return NextResponse.json({ error: 'Validation Error: Invalid foods data' }, { status: 400 });
+        const payloadToValidate = {
+            ...body,
+            id: body.id ? Number(body.id) : undefined,
+            foods: normalizedFoods
+        };
+
+        const validation = MealSchema.safeParse(payloadToValidate);
+
+        if (!validation.success) {
+            return NextResponse.json({
+                error: 'Validation Error',
+                details: validation.error.flatten()
+            }, { status: 400 });
         }
 
+        const { id: validatedId, name, mealType, blocks, isShared, foods: rows } = validation.data;
+        // userId and limitCheck Logic remains unchanged below, but we need to ensure we don't redeclare variables if they are used later.
+
         const userId = parseInt(session.user.id);
+        const userRole = Number((session.user as any).role);
 
         // Security: Rate Limit (10 requests per minute)
         const limitCheck = rateLimit(`meal-create-${userId}`, 10, 60000);
         if (!limitCheck.success) return limitCheck.error;
 
-        // Security: Input Validation
-        if (!name || name.length > 100) {
-            return NextResponse.json({ error: 'Validation Error: Name is too long or empty' }, { status: 400 });
-        }
-        if (parseFloat(blocks) < 0) {
-            return NextResponse.json({ error: 'Validation Error: Blocks cannot be negative' }, { status: 400 });
-        }
-
-        // Validate mealType: only 0/1/2/3 allowed for meals
-        const validMealTypes = [0, 1, 2, 3];
-        if (mealType !== undefined && mealType !== null && !validMealTypes.includes(Number(mealType))) {
-            return NextResponse.json({
-                error: 'Validation Error: Invalid meal type. Must be 0 (COLAZIONE), 1 (PRANZO), 2 (CENA), or 3 (SPUNTINO)'
-            }, { status: 400 });
-        }
-
-        // Fetch user
+        // Fetch user (needed for role check on isShared)
         const user = await prisma.user.findFirst({
             where: { email: session.user.email },
             select: { id: true, idRuolo: true }
@@ -197,7 +194,7 @@ export async function POST(request: Request) {
 
         if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-        let mealId = id ? parseInt(id) : undefined;
+        const mealId = validatedId;
 
         // To properly aggregate, we need the IDs first.
         const distinctNames = Array.from(new Set(rows.map((r: any) => r.foodName).filter((n: any) => n && typeof n === 'string' && n.trim().length > 0)));
@@ -223,9 +220,9 @@ export async function POST(request: Request) {
                         const newFood = await prisma.alimento.create({
                             data: {
                                 nome: missingName as string,
-                                proteine: parseFloat(sourceRow.protein) || 0,
-                                carboidrati: parseFloat(sourceRow.carbs) || 0,
-                                grassi: parseFloat(sourceRow.fat) || 0,
+                                proteine: Number(sourceRow.protein || 0),
+                                carboidrati: Number(sourceRow.carbs || 0),
+                                grassi: Number(sourceRow.fat || 0),
                                 codTipo: 1, // Default to "Proteine" or generic
                                 codFonte: 1
                             }
@@ -254,7 +251,7 @@ export async function POST(request: Request) {
             if (!row.foodName) continue;
 
             // Security: Validate grams
-            const grams = parseFloat(row.grams);
+            const grams = row.grams;
             if (isNaN(grams) || grams < 0) {
                 return NextResponse.json({ error: 'Validation Error: Ingredient grams cannot be negative' }, { status: 400 });
             }
@@ -282,10 +279,10 @@ export async function POST(request: Request) {
                     where: { codicePasto: mealId },
                     data: {
                         nome: name,
-                        mealType: body.mealType || 0,
-                        blocks: parseFloat(blocks),
+                        mealType: mealType || 0,
+                        blocks: Number(blocks),
                         // SECURITY: Only Dieticians (Role 2) can share meals
-                        isShared: (user.idRuolo === 2) ? (body.isShared || false) : false
+                        isShared: (user.idRuolo === 2) ? (isShared || false) : false
                     }
                 });
 
@@ -298,10 +295,10 @@ export async function POST(request: Request) {
                     data: {
                         codUser: user.id,
                         nome: name,
-                        mealType: body.mealType || 0,
-                        blocks: parseFloat(blocks),
+                        mealType: mealType || 0,
+                        blocks: Number(blocks),
                         // SECURITY: Only Dieticians (Role 2) can share meals
-                        isShared: (user.idRuolo === 2) ? (body.isShared || false) : false
+                        isShared: (user.idRuolo === 2) ? (isShared || false) : false
                     }
                 });
                 finalMealId = newMeal.codicePasto;

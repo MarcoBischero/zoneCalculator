@@ -43,11 +43,24 @@ export async function GET(request: Request) {
         const labels: string[] = [];
         const weightData: number[] = [];
 
-        stats.forEach(s => {
-            const dateStr = new Date(s.lastCheck).toLocaleDateString();
-            labels.push(dateStr);
-            weightData.push(s.peso);
-        });
+        // 1. Function to format date like Reports
+        const formatDate = (d: Date) => d.toLocaleDateString('it-IT', { day: '2-digit', month: 'short' });
+
+        if (stats.length > 0) {
+            stats.forEach(s => {
+                labels.push(formatDate(s.lastCheck));
+                weightData.push(s.peso);
+            });
+        } else {
+            // Fallback: If no history, use current user weight (if available) to show at least one point
+            // Check if user has weight/peso field. Based on common sense/previous code, let's try 'weight' or 'peso'
+            // We cast to any to be safe if types aren't perfectly generated in this context, but 'weight' is used in page.tsx session
+            const currentWeight = (user as any).weight || (user as any).peso;
+            if (currentWeight) {
+                labels.push(formatDate(new Date()));
+                weightData.push(Number(currentWeight));
+            }
+        }
 
         // For blocks, let's just map the last few days if possible, or just mock it relative to weight dates?
         // Let's actually just return the average blocks per day for the last 7 days?

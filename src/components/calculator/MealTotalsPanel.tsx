@@ -91,9 +91,9 @@ export function MealTotalsPanel({
                                         key={type}
                                         onClick={() => setMealType(type)}
                                         className={cn(
-                                            "text-xs font-medium py-2 rounded-lg border transition-all",
+                                            "text-xs font-semibold py-3 rounded-xl border transition-all active:scale-95 touch-manipulation",
                                             mealType === type
-                                                ? "border-primary bg-primary/10 text-primary"
+                                                ? "border-primary bg-primary/10 text-primary shadow-sm"
                                                 : "border-border hover:border-primary/50 text-muted-foreground"
                                         )}
                                     >

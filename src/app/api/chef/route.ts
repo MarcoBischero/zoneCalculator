@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { rateLimit } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
 import { getAIModel } from "@/lib/ai-config";
+import { ChefSchema } from "@/lib/schemas";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
@@ -20,7 +21,16 @@ export async function POST(req: Request) {
 
     try {
         const body = await req.json();
-        const { mode, ingredients, blocks, mealTime, preference, manualIngredients } = body;
+
+        const validation = ChefSchema.safeParse(body);
+        if (!validation.success) {
+            return NextResponse.json({
+                error: 'Validation Error',
+                details: validation.error.flatten()
+            }, { status: 400 });
+        }
+
+        const { mode, ingredients, blocks, mealTime, preference, manualIngredients } = validation.data;
 
         if (!process.env.GEMINI_API_KEY) {
             return NextResponse.json({ error: "GEMINI_API_KEY not configured" }, { status: 500 });

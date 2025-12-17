@@ -1,61 +1,33 @@
-import { getToken } from "next-auth/jwt";
+import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 
-export async function middleware(req: NextRequest) {
-    const { pathname } = req.nextUrl;
-
-    // 1. Define Public Paths (allow access without token)
-    if (
-        pathname.startsWith('/login') ||
-        pathname.startsWith('/api/auth') ||
-        pathname.startsWith('/api/seed') ||
-        pathname.startsWith('/api/debug-auth') || // Allow Debug Endpoint!
-        pathname === '/favicon.ico'
-    ) {
+export default withAuth(
+    function middleware(req) {
+        // Custom middleware logic if needed
         return NextResponse.next();
+    },
+    {
+        callbacks: {
+            authorized: ({ token }) => !!token,
+        },
+        pages: {
+            signIn: "/login",
+        },
     }
+);
 
-    // 2. Read Token (The Critical Fix)
-    // Cloud Run terminates SSL, so internal traffic is HTTP.
-    // By default, getToken expects non-secure cookies on HTTP.
-    // We FORCE it to look for the Secure cookie because the Browser sent one.
-    // UPDATE: Firebase Hosting STRIPS all cookies except '__session'.
-    // So we must use '__session' as the cookie name.
-    const token = await getToken({
-        req,
-        secureCookie: process.env.NODE_ENV === "production",
-        cookieName: process.env.NODE_ENV === "production" ? '__session' : undefined
-    });
-
-    const isAuth = !!token;
-
-    // 3. Protect Routes
-    if (!isAuth) {
-        // Redirect unauthenticated users to Login
-        const url = new URL('/login', req.url);
-        url.searchParams.set('callbackUrl', pathname);
-        return NextResponse.redirect(url);
-    }
-
-    // 4. Onboarding Logic (Legacy from proxy.ts)
-    const role = Number(token?.role || 0);
-    const mode = token?.mode || '0';
-    const needsOnboarding = role === 0 && mode === '0';
-    const isOnboardingPage = pathname.startsWith('/onboarding');
-
-    if (needsOnboarding && !isOnboardingPage) {
-        return NextResponse.redirect(new URL('/onboarding', req.url));
-    }
-
-    if (!needsOnboarding && isOnboardingPage) {
-        return NextResponse.redirect(new URL('/', req.url));
-    }
-
-    return NextResponse.next();
-}
-
+// Apply middleware ONLY to protected routes
 export const config = {
-    // Apply to all routes except static assets
-    matcher: ["/((?!_next/static|_next/image).*)"],
+    matcher: [
+        "/dashboard/:path*",
+        "/calculator/:path*",
+        "/meals/:path*",
+        "/settings/:path*",
+        "/admin/:path*",
+        "/coach/:path*",
+        "/foods/:path*",
+        "/recipe/:path*",
+        "/shopping-list/:path*",
+        // Add other protected routes here
+    ]
 };

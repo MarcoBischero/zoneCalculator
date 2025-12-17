@@ -133,7 +133,7 @@ resource "google_cloud_run_service" "default" {
         
         env {
           name  = "DATABASE_URL"
-          value = "mysql://zoneuser:${var.db_password}@${google_sql_database_instance.master.public_ip_address}/zonecalculator"
+          value = "mysql://zoneuser:${var.db_password}@localhost/zonecalculator?socket=/cloudsql/${google_sql_database_instance.master.connection_name}"
         }
         
         env {
@@ -143,7 +143,12 @@ resource "google_cloud_run_service" "default" {
          
         env {
           name = "NEXTAUTH_SECRET"
-          value = "production_secret_here_change_me"
+          value = var.nextauth_secret
+        }
+        
+        env {
+          name = "GEMINI_API_KEY"
+          value = var.gemini_api_key
         }
       }
     }
