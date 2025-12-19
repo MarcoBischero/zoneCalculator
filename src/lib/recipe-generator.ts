@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { prisma } from "@/lib/prisma";
+import { getAIModel } from "@/lib/ai-config";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
@@ -11,7 +12,8 @@ export async function generateRecipeContent(mealId: number, mealName: string, in
         }
 
         // 1. Generate Procedure via Gemini
-        const model = genAI.getGenerativeModel({ model: "gemini-3-pro-preview" });
+        const modelName = await getAIModel();
+        const model = genAI.getGenerativeModel({ model: modelName });
         const prompt = `Act as a professional chef. Create a detailed step-by-step cooking procedure for a meal named "${mealName}" containing strictly these ingredients: ${ingredientsList}.
         The procedure must be in ${language === 'it' ? 'Italian' : 'English'}.
         Formatting: Just the numbered steps. No intro/outro.

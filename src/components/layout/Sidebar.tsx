@@ -22,6 +22,7 @@ import {
     Scale,
     HelpCircle
 } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useState, useEffect } from 'react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { useLanguage } from '@/lib/language-context';
@@ -154,42 +155,47 @@ export function Sidebar({ isDrawerMode = false }: SidebarProps) {
                 </div>
             </div>
 
-            {/* Navigation */}
-            <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-1">
-                {mainNav.map((item) => <NavItem key={item.href} item={item} />)}
-            </nav>
+            {/* Scrollable Content */}
+            <ScrollArea className="flex-1">
+                <div className="px-4 py-6 space-y-6">
+                    {/* Main Navigation */}
+                    <nav className="space-y-1">
+                        {mainNav.map((item) => <NavItem key={item.href} item={item} />)}
+                    </nav>
 
-            {/* Gamification Stats */}
-            <div className="px-6 py-2">
-                <GamificationStats />
-            </div>
-
-            {/* Bottom Sections (Gamification, User, Admin) */}
-            <div className="px-4 pb-2 mt-auto space-y-6">
-                {/* Gamification Section */}
-                <div>
-                    <div className="mb-2 px-4 text-xs font-bold text-muted-foreground/40 uppercase tracking-widest">
-                        Gamification
+                    {/* Gamification Stats */}
+                    <div className="px-2">
+                        <GamificationStats />
                     </div>
-                    {gameNav.map((item) => <NavItem key={item.href} item={item} />)}
-                </div>
 
-                {/* User Section */}
-                <div>
-                    <div className="mb-2 px-4 text-xs font-bold text-muted-foreground/40 uppercase tracking-widest">
-                        User
-                    </div>
-                    {systemNav.map((item) => <NavItem key={item.href} item={item} />)}
-                </div>
+                    {/* Bottom Sections (Gamification, User, Admin) */}
+                    <div className="space-y-6">
+                        {/* Gamification Section */}
+                        <div>
+                            <div className="mb-2 px-4 text-xs font-bold text-muted-foreground/40 uppercase tracking-widest">
+                                Gamification
+                            </div>
+                            {gameNav.map((item) => <NavItem key={item.href} item={item} />)}
+                        </div>
 
-                {/* Admin Section */}
-                <div>
-                    <div className="mb-2 px-4 text-xs font-bold text-muted-foreground/40 uppercase tracking-widest">
-                        Admin
+                        {/* User Section */}
+                        <div>
+                            <div className="mb-2 px-4 text-xs font-bold text-muted-foreground/40 uppercase tracking-widest">
+                                User
+                            </div>
+                            {systemNav.map((item) => <NavItem key={item.href} item={item} />)}
+                        </div>
+
+                        {/* Admin Section */}
+                        <div>
+                            <div className="mb-2 px-4 text-xs font-bold text-muted-foreground/40 uppercase tracking-widest">
+                                Admin
+                            </div>
+                            {adminNav.map((item) => <NavItem key={item.href} item={item} />)}
+                        </div>
                     </div>
-                    {adminNav.map((item) => <NavItem key={item.href} item={item} />)}
                 </div>
-            </div>
+            </ScrollArea>
 
             {/* Footer / User / Theme Toggle */}
             <div className="p-4 border-t border-border/10 space-y-4">
